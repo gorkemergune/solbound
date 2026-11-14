@@ -1,6 +1,7 @@
 import type { CoverMode, Crop, DestinationId, Environment, GreenhouseMode, H2Mode, ItemId, ResourceKey, SiteId, SkillKey, SystemKey, TraitId } from './types';
 import { EVENTS_2 } from './events2';
 import { EVENTS_3 } from './events3';
+import { EVENTS_4 } from './events4';
 
 // ---------- Declarative event DSL ----------
 
@@ -42,6 +43,12 @@ export type Effect =
   | { kind: 'rest'; target: CrewTarget }
   | { kind: 'use'; item: ItemId; qty?: number }
   | { kind: 'addItem'; item: ItemId; qty: number }
+  /** add `by` to a numeric flag (e.g. count live calls with Earth) */
+  | { kind: 'inc'; key: string; by: number }
+  /** schedule a big event `days` from now (reinforcement crew, extra cargo lander) */
+  | { kind: 'scheduleBig'; big: 'crew' | 'resupply'; days: number; notBeforeDay?: number }
+  /** the two reinforcement astronauts join the crew */
+  | { kind: 'arrive'; count: number }
   | { kind: 'evacuate'; target: 'subject' }
   | { kind: 'harvestNow'; fraction: number }
   | { kind: 'wait'; hours: number }
@@ -161,7 +168,7 @@ const MOON_01: EventDef = {
     {
       id: 'calibrate',
       crew: { count: 1, skill: 'technical', traits: ['eva', 'mechanic'], outside: true },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 12 }],
       check: { base: 0.5, skill: 'technical', traits: ['eva', 'mechanic'], items: [{ item: 'cleaner', bonus: 0.15 }], earth: true },
       success: [{ kind: 'sysSet', key: 'solar', value: 100 }],
@@ -183,7 +190,7 @@ const MOON_S1: EventDef = {
     {
       id: 'call',
       cost: [{ kind: 'res', key: 'batteryKWh', delta: -2 }],
-      success: [{ kind: 'crew', target: 'all', stat: 'stress', delta: -14 }],
+      success: [{ kind: 'crew', target: 'all', stat: 'stress', delta: -14 }, { kind: 'inc', key: 'earthCalls', by: 1 }],
       weight: 1,
       research: ['R-COMMS'],
     },
@@ -191,7 +198,7 @@ const MOON_S1: EventDef = {
       id: 'science',
       requires: [{ kind: 'any', of: [{ kind: 'item', item: 'spectro' }, { kind: 'trait', trait: 'geologist' }] }],
       crew: { count: 1, skill: 'science', traits: ['geologist'], outside: true },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
       check: { base: 0.6, skill: 'science', traits: ['geologist'], items: [{ item: 'spectro', bonus: 0.15 }] },
       success: [{ kind: 'res', key: 'science', delta: 14 }],
@@ -201,6 +208,12 @@ const MOON_S1: EventDef = {
     {
       id: 'rest',
       success: [{ kind: 'crew', target: 'all', stat: 'fatigue', delta: -15 }],
+      weight: 1,
+    },
+    {
+      id: 'overtime',
+      cost: [{ kind: 'crew', target: 'all', stat: 'fatigue', delta: 12 }],
+      success: [{ kind: 'sys', key: 'lifeSupport', delta: 8 }, { kind: 'sys', key: 'seal', delta: 6 }, { kind: 'sys', key: 'waterRecycler', delta: 6 }],
       weight: 1,
     },
   ],
@@ -228,7 +241,7 @@ const MOON_02: EventDef = {
       id: 'patch',
       requires: [{ kind: 'item', item: 'sealant' }],
       crew: { count: 1, skill: 'technical', traits: ['mechanic'] },
-      hours: 1,
+      hours: 2,
       cost: [{ kind: 'use', item: 'sealant' }],
       check: { base: 0.8, skill: 'technical', traits: ['mechanic'] },
       success: [{ kind: 'env', key: 'leakKgH', value: 0 }, { kind: 'env', key: 'leakGrowth', value: 0 }, { kind: 'sysSet', key: 'seal', value: 90 }],
@@ -239,7 +252,7 @@ const MOON_02: EventDef = {
       id: 'replace',
       requires: [{ kind: 'item', item: 'parts' }],
       crew: { count: 2, skill: 'technical', traits: ['mechanic'] },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'use', item: 'parts' }, { kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
       check: { base: 0.85, skill: 'technical', traits: ['mechanic'] },
       success: [{ kind: 'env', key: 'leakKgH', value: 0 }, { kind: 'env', key: 'leakGrowth', value: 0 }, { kind: 'sysSet', key: 'seal', value: 100 }],
@@ -249,7 +262,7 @@ const MOON_02: EventDef = {
     {
       id: 'clean',
       crew: { count: 2, skill: 'technical', traits: ['mechanic', 'eva'] },
-      hours: 5,
+      hours: 8,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 18 }],
       check: { base: 0.45, skill: 'technical', traits: ['mechanic', 'eva'], earth: true, items: [{ item: 'cleaner', bonus: 0.1 }] },
       success: [{ kind: 'env', key: 'leakKgH', value: 0 }, { kind: 'env', key: 'leakGrowth', value: 0 }, { kind: 'sysSet', key: 'seal', value: 85 }],
@@ -267,6 +280,13 @@ const MOON_02: EventDef = {
       ],
       weight: 3,
     },
+    {
+      id: 'tape',
+      crew: { count: 1, skill: 'technical' },
+      hours: 2,
+      success: [{ kind: 'env', key: 'leakKgH', value: 0.05 }, { kind: 'env', key: 'leakGrowth', value: 0.008 }],
+      weight: 3,
+    },
   ],
 };
 
@@ -282,7 +302,7 @@ const MOON_S2: EventDef = {
     {
       id: 'cleanSuits',
       crew: { count: 2, skill: 'teamwork' },
-      hours: 2,
+      hours: 3,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 8 }],
       success: [{ kind: 'flag', key: 'suitsClean', value: true }],
       weight: 1,
@@ -297,6 +317,13 @@ const MOON_S2: EventDef = {
     {
       id: 'skip',
       success: [{ kind: 'crew', target: 'all', stat: 'fatigue', delta: -8 }],
+      weight: 1,
+    },
+    {
+      id: 'vacuum',
+      requires: [{ kind: 'batteryFrac', min: 0.3 }],
+      cost: [{ kind: 'res', key: 'batteryKWh', delta: -6 }],
+      success: [{ kind: 'flag', key: 'suitsClean', value: true }],
       weight: 1,
     },
   ],
@@ -326,7 +353,7 @@ const MOON_03: EventDef = {
       id: 'waterWall',
       requires: [{ kind: 'any', of: [{ kind: 'research', id: 'R-SPE' }, { kind: 'trait', trait: 'spaceWeather' }] }],
       crew: { count: 2, skill: 'teamwork' },
-      hours: 1,
+      hours: 2,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
       success: [{ kind: 'sys', key: 'shelter', delta: 30 }, { kind: 'shelter', target: 'all', value: true }, { kind: 'env', key: 'speHours', value: 6 }],
       weight: 3,
@@ -336,7 +363,7 @@ const MOON_03: EventDef = {
       id: 'finishSamples',
       requires: [{ kind: 'notFlag', key: 'airlockClosed', value: true }],
       crew: { count: 2, skill: 'science', traits: ['eva', 'geologist'], outside: true },
-      hours: 2,
+      hours: 3,
       cost: [{ kind: 'shelter', target: 'unassigned', value: true }, { kind: 'env', key: 'speHours', value: 6 }],
       check: {
         base: 0.5,
@@ -359,6 +386,14 @@ const MOON_03: EventDef = {
       id: 'shelterNow',
       cost: [{ kind: 'res', key: 'science', delta: -4 }],
       success: [{ kind: 'shelter', target: 'all', value: true }, { kind: 'env', key: 'speHours', value: 6 }],
+      weight: 3,
+    },
+    {
+      id: 'pantry',
+      crew: { count: 2, skill: 'teamwork' },
+      hours: 2,
+      cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 8 }],
+      success: [{ kind: 'sys', key: 'shelter', delta: 15 }, { kind: 'shelter', target: 'all', value: true }, { kind: 'env', key: 'speHours', value: 6 }],
       weight: 3,
     },
   ],
@@ -386,7 +421,7 @@ const MARS_01: EventDef = {
       id: 'swapFilter',
       requires: [{ kind: 'item', item: 'filter' }],
       crew: { count: 1, skill: 'technical' },
-      hours: 1,
+      hours: 2,
       cost: [{ kind: 'use', item: 'filter' }],
       success: [{ kind: 'env', key: 'recyclerWear', value: 0 }, { kind: 'sysSet', key: 'waterRecycler', value: 100 }],
       weight: 3,
@@ -394,7 +429,7 @@ const MARS_01: EventDef = {
     {
       id: 'maintain',
       crew: { count: 1, skill: 'technical', traits: ['mechanic'] },
-      hours: 4,
+      hours: 6,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 14 }],
       check: { base: 0.55, skill: 'technical', traits: ['mechanic'] },
       success: [{ kind: 'env', key: 'recyclerWear', value: 0 }, { kind: 'sys', key: 'waterRecycler', delta: 20 }],
@@ -407,6 +442,13 @@ const MARS_01: EventDef = {
       success: [{ kind: 'flag', key: 'waterRation', value: true }, { kind: 'env', key: 'recyclerWear', value: 0.9 }, { kind: 'gh', mode: 'eco' }],
       weight: 3,
       research: ['R-WATER'],
+    },
+    {
+      id: 'still',
+      requires: [{ kind: 'batteryFrac', min: 0.35 }],
+      cost: [{ kind: 'res', key: 'batteryKWh', delta: -14 }],
+      success: [{ kind: 'res', key: 'waterL', delta: 8 }, { kind: 'env', key: 'recyclerWear', value: 0.9 }],
+      weight: 3,
     },
   ],
 };
@@ -424,7 +466,7 @@ const MARS_S1: EventDef = {
       id: 'analyze',
       requires: [{ kind: 'any', of: [{ kind: 'item', item: 'spectro' }, { kind: 'trait', trait: 'geologist' }] }],
       crew: { count: 1, skill: 'science', traits: ['geologist'] },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
       check: { base: 0.6, skill: 'science', traits: ['geologist'], items: [{ item: 'spectro', bonus: 0.15 }] },
       success: [{ kind: 'res', key: 'science', delta: 16 }],
@@ -434,7 +476,7 @@ const MARS_S1: EventDef = {
     {
       id: 'basic',
       crew: { count: 1, skill: 'science' },
-      hours: 2,
+      hours: 3,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 8 }],
       check: { base: 0.5, skill: 'science' },
       success: [{ kind: 'res', key: 'science', delta: 8 }],
@@ -444,6 +486,12 @@ const MARS_S1: EventDef = {
     {
       id: 'rest',
       success: [{ kind: 'crew', target: 'all', stat: 'fatigue', delta: -12 }, { kind: 'crew', target: 'all', stat: 'stress', delta: -5 }],
+      weight: 1,
+    },
+    {
+      id: 'reply',
+      cost: [{ kind: 'res', key: 'batteryKWh', delta: -3 }],
+      success: [{ kind: 'crew', target: 'all', stat: 'stress', delta: -10 }],
       weight: 1,
     },
   ],
@@ -496,7 +544,7 @@ const MARS_02: EventDef = {
       id: 'clean',
       requires: [{ kind: 'envBelow', key: 'dust', max: 0.55 }],
       crew: { count: 2, skill: 'technical', traits: ['eva'], outside: true },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 14 }],
       check: { base: 0.6, skill: 'technical', traits: ['eva'], items: [{ item: 'cleaner', bonus: 0.2 }] },
       success: [
@@ -557,6 +605,11 @@ const MARS_S2: EventDef = {
       success: [{ kind: 'crew', target: 'all', stat: 'stress', delta: -6 }, { kind: 'crew', target: 'all', stat: 'fatigue', delta: 5 }],
       weight: 1,
     },
+    {
+      id: 'dayOff',
+      success: [{ kind: 'crew', target: 'all', stat: 'stress', delta: -12 }, { kind: 'crew', target: 'all', stat: 'fatigue', delta: -10 }, { kind: 'res', key: 'science', delta: -8 }],
+      weight: 1,
+    },
   ],
 };
 
@@ -573,7 +626,7 @@ const MARS_03: EventDef = {
     {
       id: 'diagnose',
       crew: { count: 1, skill: 'science', traits: ['botanist'] },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
       check: { base: 0.5, skill: 'science', traits: ['botanist'] },
       success: [{ kind: 'env', key: 'wilt', value: 0 }, { kind: 'sys', key: 'greenhouseHealth', delta: 15 }],
@@ -585,7 +638,7 @@ const MARS_03: EventDef = {
       id: 'replant',
       requires: [{ kind: 'item', item: 'seeds' }],
       crew: { count: 1, skill: 'science', traits: ['botanist'] },
-      hours: 2,
+      hours: 3,
       cost: [{ kind: 'use', item: 'seeds' }],
       success: [{ kind: 'env', key: 'wilt', value: 0 }, { kind: 'sysSet', key: 'greenhouseHealth', value: 100 }, { kind: 'sys', key: 'greenhouseGrowth', delta: 15 }],
       weight: 3,
@@ -642,7 +695,7 @@ const RETURN_01: EventDef = {
     {
       id: 'wait',
       requires: [{ kind: 'notFlag', key: 'waited', value: true }, { kind: 'envBelow', key: 'leakKgH', max: 0.001 }],
-      success: [{ kind: 'flag', key: 'waited', value: true }, { kind: 'wait', hours: 24 }],
+      success: [{ kind: 'flag', key: 'waited', value: true }, { kind: 'gh', mode: 'off' }, { kind: 'wait', hours: 24 }],
       weight: 2,
     },
     {
@@ -670,9 +723,11 @@ const RETURN_02: EventDef = {
     {
       id: 'spare',
       requires: [{ kind: 'item', item: 'parts' }],
-      crew: { count: 1, skill: 'technical' },
+      crew: { count: 1, skill: 'technical', traits: ['mechanic', 'pilot'] },
       cost: [{ kind: 'use', item: 'parts' }],
+      check: { base: 0.95, skill: 'technical', traits: ['mechanic', 'pilot'] },
       success: [{ kind: 'flag', key: 'arrival', value: 'smooth' }],
+      failure: [{ kind: 'flag', key: 'arrival', value: 'rough' }, { kind: 'crew', target: 'all', stat: 'stress', delta: 8 }],
       weight: 3,
     },
     {
@@ -683,7 +738,7 @@ const RETURN_02: EventDef = {
         skill: 'technical',
         traits: ['mechanic', 'pilot'],
         earth: true,
-        flags: [{ key: 'margin', value: 'low', bonus: -0.1 }, { key: 'margin', value: 'none', bonus: -0.15 }],
+        flags: [{ key: 'margin', value: 'low', bonus: -0.1 }, { key: 'margin', value: 'none', bonus: -0.15 }, { key: 'heavyPack', value: true, bonus: -0.08 }],
       },
       success: [{ kind: 'flag', key: 'arrival', value: 'smooth' }],
       failure: [
@@ -733,7 +788,7 @@ const EMG_O2: EventDef = {
     {
       id: 'repairLS',
       crew: { count: 1, skill: 'technical', traits: ['mechanic'] },
-      hours: 2,
+      hours: 3,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 12 }],
       check: { base: 0.6, skill: 'technical', traits: ['mechanic'], earth: true, items: [{ item: 'parts', bonus: 0.2 }] },
       success: [{ kind: 'sys', key: 'lifeSupport', delta: 25 }, { kind: 'env', key: 'leakKgH', value: 0 }, { kind: 'env', key: 'leakGrowth', value: 0 }],
@@ -749,6 +804,12 @@ const EMG_O2: EventDef = {
       id: 'abort',
       success: [{ kind: 'abort' }],
       weight: 4,
+    },
+    {
+      id: 'reserve',
+      requires: [{ kind: 'notFlag', key: 'contingencyUsed', value: true }],
+      success: [{ kind: 'res', key: 'o2Kg', delta: 8 }, { kind: 'flag', key: 'contingencyUsed', value: true }],
+      weight: 3,
     },
   ],
 };
@@ -773,7 +834,7 @@ const EMG_MED: EventDef = {
       id: 'medic',
       requires: [{ kind: 'trait', trait: 'medic' }],
       crew: { count: 1, skill: 'science', traits: ['medic'], mustHave: 'medic' },
-      hours: 2,
+      hours: 3,
       success: [{ kind: 'crew', target: 'subject', stat: 'health', delta: 22 }],
       weight: 3,
     },
@@ -794,6 +855,18 @@ const EMG_MED: EventDef = {
       success: [{ kind: 'abort' }],
       weight: 4,
     },
+    {
+      id: 'stabilize',
+      requires: [{ kind: 'notFlag', key: 'contingencyUsed', value: true }],
+      success: [
+        { kind: 'crew', target: 'subject', stat: 'health', delta: 25 },
+        { kind: 'res', key: 'waterL', delta: 20 },
+        { kind: 'res', key: 'o2Kg', delta: 4 },
+        { kind: 'gh', mode: 'eco' },
+        { kind: 'flag', key: 'contingencyUsed', value: true },
+      ],
+      weight: 3,
+    },
   ],
 };
 
@@ -801,6 +874,7 @@ export const EVENTS: EventDef[] = [
   OUT_01, MOON_01, MOON_S1, MOON_02, MOON_S2, MOON_03, MARS_01, MARS_S1, MARS_02, MARS_S2, MARS_03, RETURN_01, RETURN_02, EMG_O2, EMG_MED,
   ...EVENTS_2,
   ...EVENTS_3,
+  ...EVENTS_4,
 ];
 
 export const EVENT_BY_ID: Record<string, EventDef> = Object.fromEntries(EVENTS.map((e) => [e.id, e]));

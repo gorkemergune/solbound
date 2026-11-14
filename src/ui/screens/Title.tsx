@@ -71,6 +71,7 @@ export function TitleScreen() {
           <MissionPatch size={132} />
           <h1 className="hero-title">Solbound</h1>
           <p className="hero-tagline">{t('app.tagline')}</p>
+          <p className="hero-edu">{t('app.eduSim')}</p>
           <ol className="pitch">
             {(['title.pitch1', 'title.pitch2', 'title.pitch3', 'title.pitch4'] as const).map((k, i) => (
               <li key={k}>

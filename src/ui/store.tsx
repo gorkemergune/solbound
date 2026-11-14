@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { applyCommand, createRun, deserialize, serialize, type Command, type Locale, type Mode, type RunState } from '../engine';
-import { translate, type Params } from '../i18n';
+import { initialLocale, isLocaleLoaded, loadLocale, translate, type Params } from '../i18n';
 
 const SAVE_KEY = 'solbound.save.v1';
 const LOCALE_KEY = 'solbound.locale';
@@ -79,12 +79,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const init = useMemo(initialSave, []);
   const [savedRun, setSavedRun] = useState<RunState | null>(init.run);
   const [run, setRun] = useState<RunState | null>(null);
-  const [locale, setLocaleState] = useState<Locale | null>(() => {
-    const v = safeGet(LOCALE_KEY).value;
-    if (v === 'en' || v === 'tr') return v;
-    // first visit: follow the browser language; the switch stays visible at the top of every screen
-    return typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('tr') ? 'tr' : 'en';
-  });
+  // first visit: follow the browser language; the switch stays visible at the top of every screen
+  const [locale, setLocaleState] = useState<Locale | null>(() => initialLocale());
+  const setLocaleRef = useRef<(l: Locale) => void>(() => undefined);
   const [storageOk, setStorageOk] = useState(init.ok);
   const [error, setError] = useState<string | null>(null);
   const [researchOpen, setResearchOpen] = useState<string | null>(null);
@@ -99,13 +96,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = loc;
   }, [loc]);
 
-  // Autosave (debounced). Language is stored separately so switching it never touches the run.
+  // Autosave, throttled: at most every 3 s while the clock runs (the old debounce never fired at 10 ticks/s),
+  // plus a flush when the page is hidden. Language is stored separately so switching it never touches the run.
+  const lastSave = useRef(0);
   useEffect(() => {
     if (!run) return;
+    const wait = Math.max(0, 3000 - (Date.now() - lastSave.current));
     const id = window.setTimeout(() => {
-      const ok = safeSet(SAVE_KEY, serialize(run));
+      lastSave.current = Date.now();
+      const ok = safeSet(SAVE_KEY, serialize(runRef.current ?? run));
       if (!ok) setStorageOk(false);
-    }, 400);
+    }, wait);
     return () => window.clearTimeout(id);
   }, [run]);
 
@@ -122,9 +123,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setLocale = useCallback((l: Locale) => {
+    if (!isLocaleLoaded(l)) {
+      // fetch the dictionary first, then switch (no flash of keys)
+      void loadLocale(l).then(() => setLocaleRef.current(l));
+      return;
+    }
     setLocaleState(l);
     safeSet(LOCALE_KEY, l);
+    // during preparation, generated names follow the language (Turkish crews in Turkish games)
+    const r = runRef.current;
+    if (r && !r.launched) {
+      const res = applyCommand(r, { type: 'localizeNames', locale: l });
+      if (!res.error) {
+        runRef.current = res.state;
+        setRun(res.state);
+      }
+    }
   }, []);
+  setLocaleRef.current = setLocale;
 
   const dispatch = useCallback((cmd: Command) => {
     const before = runRef.current;

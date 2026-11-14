@@ -1,23 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { applyCommand, createRun, launchBlockers, payloadOf } from './commands';
+import { GOAL_SHARE, applyCommand, createRun, estimateStay, launchBlockers, payloadOf } from './commands';
 import { LAUNCH_CAPACITY_KG, PERSONAL_KIT_KG, payload, validateQuantity } from './cargo';
 import { buildSchedule } from './schedule';
 import { CHATS } from './chatter';
-import { EVENTS } from './events';
+import { EVENTS, type Cond } from './events';
 import { generateCandidates } from './characters';
 import { computeOutcome } from './outcome';
-import { eventOf, optionState, returnStatus, successChance, suggestCrew } from './rules';
+import { applyEffects, characterById, eventOf, optionState, returnStatus, successChance, suggestCrew } from './rules';
 import { deserialize, serialize } from './save';
 import { SCENARIOS, SURFACE_START_MINUTE, scenarioFor } from './scenarios';
 import { WATER_PER_KG_O2, tickHour, makeHooks } from './sim';
-import { launchAnyway, must, play, prepared, startPreps, type Policy } from './testkit';
+import { launchAnyway, must, play, playLaunched, prepared, startPreps, type Policy } from './testkit';
 import { buildBigEvents, bigStatus, prepStatusKey } from './bigevents';
-import { crewNames, nameVariety } from './characters';
+import { NAMES, crewNames, nameVariety } from './characters';
 import { SOL_TO_EARTH, clockDrift, earthMinutesElapsed, lunarSun } from './time';
-import type { RunState } from './types';
+import type { ActiveEvent, MissionState, RunState } from './types';
 
 const PREPS = ['radiator', 'insulate', 'clean', 'stow', 'mast', 'berm', 'spares', 'zone', 'beacon'];
-const carefulMoon: Policy = { PREP: PREPS, 'OUT-01': ['full'], 'MOON-01': ['calibrate'], 'MOON-02': ['patch', 'replace'], 'MOON-03': ['waterWall', 'shelterNow'], 'RETURN-01': ['balanced'], 'RETURN-02': ['spare'] };
+const carefulMoon: Policy = { PREP: PREPS, 'REINF-OFFER': ['decline'], 'OUT-01': ['full'], 'MOON-01': ['calibrate'], 'MOON-02': ['patch', 'replace'], 'MOON-03': ['waterWall', 'shelterNow'], 'RETURN-01': ['balanced'], 'RETURN-02': ['spare'] };
 const carefulMars: Policy = { PREP: PREPS, 'OUT-01': ['full'], 'MARS-01': ['swapFilter'], 'MARS-02': ['eco'], 'MARS-03': ['replant'], 'RETURN-01': ['balanced'], 'RETURN-02': ['spare'] };
 
 function toSurface(run: RunState): RunState {
@@ -31,7 +31,8 @@ describe('characters', () => {
   it('is deterministic per seed and independent of names', () => {
     const a = createRun(123, 'en');
     const b = createRun(123, 'tr');
-    expect(a.candidates).toEqual(b.candidates);
+    const noName = (cs: typeof a.candidates) => cs.map(({ name: _n, ...rest }) => rest);
+    expect(noName(a.candidates)).toEqual(noName(b.candidates));
     expect(a.player.skills).toEqual(b.player.skills);
     expect(createRun(124, 'en').candidates).not.toEqual(a.candidates);
   });
@@ -46,12 +47,33 @@ describe('characters', () => {
     }
   });
 
-  it('name generator: no shared first or family names in a crew, large variety', () => {
-    const n = crewNames(3, 16);
-    expect(new Set(n.map((x) => x.split(' ')[0])).size).toBe(16);
-    expect(new Set(n.map((x) => x.split(' ')[1])).size).toBe(16);
-    expect(nameVariety()).toBeGreaterThan(1500);
+  it('names: match the gender of the portrait, follow the game language, no shared first or family names', () => {
+    for (const locale of ['en', 'tr'] as const) {
+      for (const seed of [3, 4, 5]) {
+        const run = createRun(seed, locale);
+        for (const c of [run.player, ...run.candidates]) {
+          const [first, last] = c.name.split(' ');
+          expect(NAMES[locale][c.gender]).toContain(first);
+          expect(NAMES[locale].last).toContain(last);
+        }
+        const firsts = run.candidates.map((c) => c.name.split(' ')[0]);
+        expect(new Set(firsts).size).toBe(16);
+      }
+      expect(nameVariety(locale)).toBeGreaterThan(1000);
+    }
+    expect(crewNames(3, ['a', 'b'], 'tr')).toHaveLength(2);
     expect(createRun(1, 'tr').player.name).not.toBe(createRun(2, 'tr').player.name);
+  });
+
+  it('switching language during preparation re-localises generated names only', () => {
+    let run = createRun(21, 'en');
+    run = must(run, { type: 'renameCandidate', id: 'c02', name: 'Custom Name', locale: 'en' });
+    const before = run.candidates.map((c) => ({ g: c.gender, s: c.skills, seed: c.portraitSeed }));
+    run = must(run, { type: 'localizeNames', locale: 'tr' });
+    expect(NAMES.tr[run.player.gender]).toContain(run.player.name.split(' ')[0]);
+    expect(run.candidates[1].name).toBe('Custom Name');
+    expect(NAMES.tr[run.candidates[0].gender]).toContain(run.candidates[0].name.split(' ')[0]);
+    expect(run.candidates.map((c) => ({ g: c.gender, s: c.skills, seed: c.portraitSeed }))).toEqual(before);
   });
 
   it('keeps a shared skill budget so no candidate tops every skill', () => {
@@ -173,7 +195,14 @@ describe('decisions', () => {
     r = must(r, { type: 'resolve', instanceId: ev.instanceId, optionId: 'calibrate', crewIds: ['player'] });
     expect(r.mission!.systems.solar).toBe(70);
     const success = r.mission!.decisions.at(-1)!.success;
-    r = must(r, { type: 'advance', minutes: 180 });
+    // the task now takes 5 h; resolve anything that opens meanwhile
+    for (let i = 0; i < 40 && r.mission!.tasks.some((t) => t.eventId === 'MOON-01'); i++) {
+      const open = r.mission!.activeEvent;
+      if (open) {
+        const o = eventOf(open.eventId).options.find((x) => optionState(r, x, open).available)!;
+        r = must(r, { type: 'resolve', instanceId: open.instanceId, optionId: o.id, crewIds: suggestCrew(r, o) });
+      } else r = must(r, { type: 'advance', minutes: 60 });
+    }
     expect(r.mission!.systems.solar).toBeGreaterThanOrEqual(success ? 99 : 84);
   });
 
@@ -252,7 +281,9 @@ describe('resource accounting', () => {
     const f = m.lastPower!.servedFraction;
     const prod = s.o2ProductionKgH * f.lifeSupport * (ls0 / 100);
     const crewUse = s.waterPerCrewLH * 4;
-    const expected = w0 + crewUse * s.recyclerRecovery * f.water - crewUse - prod * WATER_PER_KG_O2 - s.greenhouseWaterLH.full * f.greenhouse;
+    const chemist = m.crew.some((c) => characterById(run, c.id).traitId === 'chemist');
+    const recovery = Math.min(0.98, s.recyclerRecovery + (chemist ? 0.02 : 0));
+    const expected = w0 + crewUse * recovery * f.water - crewUse - prod * WATER_PER_KG_O2 - s.greenhouseWaterLH.full * f.greenhouse;
     expect(m.resources.waterL).toBeCloseTo(expected, 6);
     for (let i = 0; i < 72; i++) tickHour(run, makeHooks(run));
     expect(m.resources.batteryKWh).toBeGreaterThanOrEqual(0);
@@ -272,7 +303,7 @@ describe('resource accounting', () => {
   it('Moon and Mars differ in power profile, events and comm delay', () => {
     expect(SCENARIOS.moon.solarKW(0, 1)).toBeGreaterThan(0);
     expect(SCENARIOS.mars.solarKW(0, 1)).toBe(0);
-    const shared = new Set(['CROP', 'WQ', 'SAB']);
+    const shared = new Set(['CROP', 'WQ', 'SAB', 'SETUP', 'FINAL-EVA', 'PACK']);
     const moonIds = buildSchedule(1, SCENARIOS.moon).map((e) => e.eventId);
     const marsIds = buildSchedule(1, SCENARIOS.mars).map((e) => e.eventId);
     expect(moonIds.filter((id) => !shared.has(id)).some((id) => marsIds.includes(id))).toBe(false);
@@ -410,14 +441,21 @@ describe('save', () => {
 });
 
 describe('policies (deterministic fixtures)', () => {
-  it('careful Moon and Mars plans bring everyone home', () => {
+  it('careful Moon and Mars plans bring everyone home; a full success is reachable but not guaranteed (v0.6 difficulty)', () => {
+    const ratings: Record<string, string[]> = { moon: [], mars: [] };
     for (const seed of [1, 42, 777]) {
       const moon = play(prepared({ dest: 'moon', seed, cargo: { parts: 2, sealant: 1, food: 2, shield: 1, medkit: 1, comfort: 1 } }), carefulMoon);
-      expect(computeOutcome(moon).rating).toBe('success');
       const mars = play(prepared({ dest: 'mars', seed, cargo: { filter: 1, battery: 1, food: 2, parts: 1, cleaner: 1, seeds: 1 } }), carefulMars);
-      expect(computeOutcome(mars).rating).toBe('success');
+      for (const [k, r] of [['moon', moon], ['mars', mars]] as const) {
+        const o = computeOutcome(r);
+        expect(o.lost).toEqual([]);
+        expect(o.home).toHaveLength(4);
+        ratings[k].push(o.rating);
+      }
       expect(mars.mission!.echoes.length).toBeGreaterThanOrEqual(2); // preparation changed options
     }
+    expect(ratings.moon).toContain('success');
+    expect(ratings.mars).toContain('success');
   });
 
   it('an empty cargo bay leads to a harder return on Mars (not a full success)', () => {
@@ -505,7 +543,7 @@ describe('30-day mission: countdowns, preparation, time', () => {
     const storm = r.mission!.big.find((b) => b.kind === 'storm')!;
     expect(applyCommand(r, { type: 'prep', bigId: storm.id, actionId: 'stow', crewIds: ['player', 'c01'] }).error).toBe('err.prepClosed');
     // run to the forecast
-    while (r.mission!.activeEvent?.eventId !== 'FC-STORM') {
+    while (bigStatus(storm, r.mission!.minute) !== 'countdown') {
       const ev = r.mission!.activeEvent;
       if (ev) {
         const def = eventOf(ev.eventId);
@@ -513,8 +551,14 @@ describe('30-day mission: countdowns, preparation, time', () => {
         r = must(r, { type: 'resolve', instanceId: ev.instanceId, optionId: o.id, crewIds: suggestCrew(r, o) });
       } else r = must(r, { type: 'advance', minutes: 60 });
     }
-    expect(r.mission!.activeEvent?.eventId).toBe('FC-STORM');
-    r = must(r, { type: 'resolve', instanceId: r.mission!.activeEvent!.instanceId, optionId: 'plan', crewIds: [] });
+    // the forecast does not stop the clock; it is a journal line (and a banner in the UI)
+    if (!r.mission!.activeEvent) r = must(r, { type: 'advance', minutes: 1 });
+    expect(r.mission!.journal.some((j) => j.key === 'ev.FC-STORM.title' && j.tone === 'forecast')).toBe(true);
+    while (r.mission!.activeEvent) {
+      const ev = r.mission!.activeEvent;
+      const o = eventOf(ev.eventId).options.find((x) => optionState(r, x, ev).available)!;
+      r = must(r, { type: 'resolve', instanceId: ev.instanceId, optionId: o.id, crewIds: suggestCrew(r, o) });
+    }
     expect(bigStatus(storm, r.mission!.minute)).toBe('countdown');
     const o = eventOf('PREP-storm').options.find((x) => x.id === 'stow')!;
     const crew = suggestCrew(r, o);
@@ -522,7 +566,14 @@ describe('30-day mission: countdowns, preparation, time', () => {
     expect(r.mission!.flags[prepStatusKey(storm.id, 'stow')]).toBe('doing');
     expect(r.mission!.crew.filter((c) => c.taskId).length).toBe(2);
     expect(applyCommand(r, { type: 'prep', bigId: storm.id, actionId: 'stow', crewIds: crew }).error).toBe('err.alreadyResolved');
-    for (let i = 0; i < 3 && !r.mission!.activeEvent; i++) r = must(r, { type: 'advance', minutes: 60 });
+    // the task takes 3 h; resolve whatever opens meanwhile
+    for (let i = 0; i < 20 && r.mission!.tasks.some((t) => t.eventId === 'PREP-storm'); i++) {
+      const open = (r.mission as MissionState).activeEvent as ActiveEvent | null;
+      if (open) {
+        const o = eventOf(open.eventId).options.find((x) => optionState(r, x, open).available)!;
+        r = must(r, { type: 'resolve', instanceId: open.instanceId, optionId: o.id, crewIds: suggestCrew(r, o) });
+      } else r = must(r, { type: 'advance', minutes: 60 });
+    }
     expect(r.mission!.flags['prep.storm.stow']).toBe(true);
     expect(r.mission!.flags[prepStatusKey(storm.id, 'stow')]).toBe('done');
   });
@@ -537,7 +588,7 @@ describe('30-day mission: countdowns, preparation, time', () => {
     expect(set.up).toBe(true);
     expect(lunarSun(20 * 1440).up).toBe(false);
     for (const radiator of [true, false]) {
-      const run = play(prepared({ seed: 5, dest: 'moon', site: 'equator', cargo: { food: 2, parts: 1 } }), { PREP: radiator ? ['radiator', 'insulate'] : [], NIGHT: ['hibernate'] });
+      const run = play(prepared({ seed: 5, dest: 'moon', site: 'equator', cargo: { food: 2, parts: 1 } }), { PREP: radiator ? ['radiator', 'insulate'] : [], NIGHT: ['hibernate'], 'REINF-OFFER': ['decline'] });
       const night = run.mission!.decisions.find((d) => d.eventId === 'NIGHT');
       expect(night).toBeDefined();
       const prepped = run.mission!.decisions.some((d) => d.eventId === 'PREP-night' && d.optionId === 'radiator' && d.success);
@@ -578,5 +629,114 @@ describe('30-day mission: countdowns, preparation, time', () => {
   it('prep helper used by the balance policies never errors', () => {
     const r = toSurface(prepared({ dest: 'moon', site: 'equator' }));
     expect(() => startPreps(r, PREPS)).not.toThrow();
+  });
+});
+
+describe('v0.6: choices, harvest variety, reinforcement, difficulty', () => {
+  const gated = (c: Cond): boolean => c.kind === 'item' || c.kind === 'trait' || c.kind === 'research' || (c.kind === 'any' && c.of.every(gated));
+
+  it('every decision card offers at least 3 options that need no kit, role or research, and at most 6 in total', () => {
+    for (const ev of EVENTS.filter((e) => e.kind !== 'prep' && e.kind !== 'forecast')) {
+      const open = ev.options.filter((o) => !(o.requires ?? []).some(gated));
+      expect({ id: ev.id, open: open.length >= 3 }).toEqual({ id: ev.id, open: true });
+      expect(ev.options.length).toBeLessThanOrEqual(6);
+    }
+  });
+
+  it('harvest cards rotate and never repeat back to back', () => {
+    const run = play(prepared({ seed: 12, dest: 'moon', site: 'polar', cargo: { food: 2, parts: 1, sealant: 1 } }), carefulMoon);
+    const h = run.mission!.decisions.filter((d) => d.eventId.startsWith('HARVEST')).map((d) => d.eventId);
+    expect(h.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(h).size).toBeGreaterThanOrEqual(2);
+    for (let i = 1; i < h.length; i++) expect(h[i]).not.toBe(h[i - 1]);
+  });
+
+  it('Moon: two live calls bring a reinforcement offer; accepting adds two people and a module', () => {
+    const policy: Policy = { ...carefulMoon, 'MOON-S1': ['call'], 'REINF-OFFER': ['accept'], PREP: [...PREPS, 'site', 'power'], REINF: ['welcome', 'assemble'] };
+    let found = false;
+    for (const seed of [1, 2, 3, 4, 5, 6]) {
+      const run = play(prepared({ seed, dest: 'moon', site: 'polar', cargo: { food: 3, parts: 1, sealant: 1 } }), policy);
+      const m = run.mission!;
+      if (!m.decisions.some((d) => d.eventId === 'REINF-OFFER')) continue;
+      found = true;
+      expect(m.flags.earthCalls).toBeGreaterThanOrEqual(2);
+      expect(m.crew).toHaveLength(6);
+      expect(new Set(m.crew.map((c) => c.id)).size).toBe(6);
+      expect(m.decisions.some((d) => d.eventId === 'REINF')).toBe(true);
+      // never before day 20 (user request)
+      const arrived = m.journal.find((j) => j.key === 'journal.arrived')!;
+      expect(arrived.minute).toBeGreaterThanOrEqual(19 * 1440 + 600);
+    }
+    expect(found).toBe(true);
+    const mars = play(prepared({ seed: 1, dest: 'mars', cargo: { food: 2, filter: 1 } }), { 'MARS-S1': ['reply'] });
+    expect(mars.mission!.decisions.some((d) => d.eventId === 'REINF-OFFER')).toBe(false);
+  });
+
+  it('difficulty: base chances are 15% lower; outside work uses suit consumables', () => {
+    const r = toSurface(prepared({ dest: 'moon' }));
+    expect(successChance(r, { base: 0.6, skill: 'technical' }, []).factors[0].value).toBeCloseTo(0.51, 5);
+    const idle = structuredClone(r);
+    const busy = structuredClone(r);
+    idle.mission!.queue = [];
+    busy.mission!.queue = [];
+    const c = busy.mission!.crew[1];
+    c.taskId = 'MOON-01@x:calibrate';
+    busy.mission!.tasks.push({ id: c.taskId, eventInstanceId: 'MOON-01@x', eventId: 'MOON-01', optionId: 'calibrate', crewIds: [c.id], startedAt: 0, endsAt: 1e9, success: true });
+    tickHour(idle, makeHooks(idle));
+    tickHour(busy, makeHooks(busy));
+    expect(idle.mission!.resources.o2Kg - busy.mission!.resources.o2Kg).toBeCloseTo(0.06, 5);
+    expect(busy.mission!.lastFlows!.eva.people).toBe(1);
+  });
+});
+
+describe('v0.7: stay estimate, return home, V3 test fixes', () => {
+  it('estimates the stay before launch: deterministic, more food helps, goal is 85%', () => {
+    const a = estimateStay(prepared({ seed: 5, dest: 'moon', site: 'polar', cargo: {} }));
+    expect(estimateStay(prepared({ seed: 5, dest: 'moon', site: 'polar', cargo: {} }))).toEqual(a);
+    const b = estimateStay(prepared({ seed: 5, dest: 'moon', site: 'polar', cargo: { food: 2 } }));
+    expect(b.estimate).toBeGreaterThan(a.estimate);
+    expect(a.limiting).toBe('food');
+    expect(b.target).toBe(Math.max(8, Math.min(30, Math.floor(b.estimate * GOAL_SHARE))));
+    const run = launchAnyway(prepared({ seed: 5, dest: 'moon', site: 'polar', cargo: { food: 2 } }));
+    expect(run.mission!.goal.target).toBeGreaterThan(0);
+  });
+
+  it('go home early: the return starts at once and an early return is only a partial success', () => {
+    let r = toSurface(prepared({ dest: 'moon', seed: 3, cargo: { food: 2, parts: 1 } }));
+    expect(applyCommand(r, { type: 'returnHome' }).error).toBeUndefined();
+    r = must(r, { type: 'advance', minutes: 60 * 30 });
+    while (r.mission!.activeEvent && r.phase === 'surface') {
+      const ev = r.mission!.activeEvent;
+      const o = eventOf(ev.eventId).options.find((x) => optionState(r, x, ev).available)!;
+      r = must(r, { type: 'resolve', instanceId: ev.instanceId, optionId: o.id, crewIds: suggestCrew(r, o) });
+    }
+    if (r.phase !== 'surface') return; // an emergency ended it; nothing more to check
+    r = must(r, { type: 'returnHome' });
+    expect(r.phase).toBe('returnPrep');
+    expect(r.mission!.journal.some((j) => j.key === 'journal.returnEarly')).toBe(true);
+    const done = playLaunched(r, { 'RETURN-01': ['safety', 'balanced', 'ration'], 'RETURN-02': ['reroute', 'repair'] });
+    const o = computeOutcome(done);
+    expect(o.daysOnSurface).toBeLessThan(o.goal.target);
+    expect(o.rating).not.toBe('success');
+  });
+
+  it('a temporary greenhouse shutdown restores the previous mode, not "full" (V3: Mars spring trap)', () => {
+    const r = structuredClone(toSurface(prepared({ dest: 'mars', site: 'spring', seed: 4 })));
+    const m = r.mission!;
+    m.queue = [];
+    m.greenhouseMode = 'eco';
+    const hooks = makeHooks(r);
+    applyEffects({ run: r, m, scenario: scenarioFor('mars', 'spring'), event: null, assigned: [] }, [{ kind: 'gh', mode: 'off' }, { kind: 'flag', key: 'hunker', value: true }, { kind: 'env', key: 'dustHours', value: 2 }], hooks);
+    for (let i = 0; i < 3; i++) tickHour(r, hooks);
+    expect(m.greenhouseMode).toBe('eco');
+  });
+
+  it('the contingency reserve rescues once per mission, from any emergency', () => {
+    const o2 = eventOf('EMG-O2').options.find((o) => o.id === 'reserve')!;
+    const water = eventOf('EMG-WATER').options.find((o) => o.id === 'reserve')!;
+    const r = structuredClone(toSurface(prepared({ dest: 'mars', seed: 2 })));
+    expect(optionState(r, o2, null).available).toBe(true);
+    r.mission!.flags.contingencyUsed = true;
+    expect(optionState(r, water, null).available).toBe(false);
   });
 });

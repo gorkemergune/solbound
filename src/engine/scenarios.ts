@@ -53,6 +53,8 @@ export type ScenarioDefinition = {
   greenhouseWaterLH: Record<GreenhouseMode, number>;
   moxieKgH: number;
   returnNeeds: { foodPerCrew: number; o2PerCrew: number; waterPerCrew: number; batteryKWh: number };
+  /** compressed return trip in days (Moon: ascent and cruise; Mars: ascent to the orbiting transfer vehicle, which carries the long cruise supplies) */
+  returnDays: number;
   /** events every run has, each placed somewhere in its day window */
   mandatory: PoolEntry[];
   /** events drawn at random (weighted) to fill the remaining slots */
@@ -171,9 +173,13 @@ function moon(site: 'polar' | 'equator'): ScenarioDefinition {
     greenhouseWaterLH: { full: 0.07, eco: 0.04, off: 0 },
     moxieKgH: 0,
     returnNeeds: { foodPerCrew: 3, o2PerCrew: 2.5, waterPerCrew: 10, batteryKWh: 14 },
+    returnDays: 3,
     mandatory: [
       { eventId: 'MOON-01', days: [1, 1], weight: 1 },
       { eventId: 'CROP', days: [1, 1], weight: 1 },
+      { eventId: 'SETUP', days: [2, 2], weight: 1 },
+      { eventId: 'FINAL-EVA', days: [26, 28], weight: 1 },
+      { eventId: 'PACK', days: [29, 29], weight: 1 },
       { eventId: 'MOON-02', days: [3, 8], weight: 1 },
       // a solar particle event cannot be forecast days ahead, so it stays a surprise
       { eventId: 'MOON-03', days: [9, 26], weight: 1 },
@@ -199,7 +205,7 @@ function mars(site: 'spring' | 'summer'): ScenarioDefinition {
     site,
     commDelay: 'minutes',
     start: {
-      resources: { batteryKWh: 45, batteryCapKWh: 60, o2Kg: 22, waterL: 320, foodCrewDays: 72, science: 0 },
+      resources: { batteryKWh: 45, batteryCapKWh: 60, o2Kg: 22, waterL: 340, foodCrewDays: 72, science: 0 },
       systems: { lifeSupport: 100, waterRecycler: 100, solar: 100, seal: 100, greenhouseHealth: 90, greenhouseGrowth: 40, shelter: 55 },
       env: { ...baseEnv },
       greenhouseMode: 'full',
@@ -211,16 +217,20 @@ function mars(site: 'spring' | 'summer'): ScenarioDefinition {
       thermal: (h) => (h < 5 || h >= 19 ? (summer ? 1.3 : 1.7) : summer ? 0.9 : 1.1),
       water: 0.5,
       greenhouse: { full: 1.3, eco: 0.5, off: 0 },
-      moxie: 0.3,
+      moxie: 0.2,
       sabatier: 0.35,
     },
     greenhouseWaterLH: { full: 0.08, eco: 0.04, off: 0 },
     // Gameplay: a scaled-up, MOXIE-inspired unit. The real MOXIE demo made grams per hour.
     moxieKgH: 0.04,
     returnNeeds: { foodPerCrew: 6, o2PerCrew: 4, waterPerCrew: 20, batteryKWh: 20 },
+    returnDays: 6,
     mandatory: [
       { eventId: 'MARS-01', days: [1, 3], weight: 1 },
       { eventId: 'CROP', days: [1, 1], weight: 1 },
+      { eventId: 'SETUP', days: [2, 2], weight: 1 },
+      { eventId: 'FINAL-EVA', days: [26, 28], weight: 1 },
+      { eventId: 'PACK', days: [29, 29], weight: 1 },
       { eventId: 'MARS-03', days: [8, 22], weight: 1 },
     ],
     pool: MARS_COMMON_POOL.filter((p) => !p.sites || p.sites.includes(site)),
@@ -237,6 +247,8 @@ export function scenarioFor(dest: DestinationId, site: SiteId | null): ScenarioD
 /** Default (first) site per destination, used for previews before a site is picked. */
 export const SCENARIOS: Record<DestinationId, ScenarioDefinition> = { moon: moon('polar'), mars: mars('spring') };
 
+/** The surface month ends on the last day at 14:00, after the midday charge (not at the night-time battery low). */
+export const END_HOUR = 14;
 export function surfaceEndMinute(s: ScenarioDefinition): number {
-  return s.missionDays * MINUTES_PER_DAY;
+  return (s.missionDays - 1) * MINUTES_PER_DAY + END_HOUR * 60;
 }

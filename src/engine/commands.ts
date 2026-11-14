@@ -1,17 +1,17 @@
 import { incompatibleItems, payload, validateQuantity } from './cargo';
-import { fallbackName, generateCandidates, generatePlayer, sanitizeName } from './characters';
+import { fallbackName, generateCandidates, generatePlayer, playerName, sanitizeName } from './characters';
 import { RESEARCH_BY_ID } from './research';
-import { availableCrewFor, characterById, echoesFor, eventOf, log, optionState, scenarioOf, successChance, applyEffects, type Ctx } from './rules';
-import { SITES, SURFACE_START_MINUTE, scenarioFor } from './scenarios';
+import { availableCrewFor, characterById, echoesFor, eventOf, log, optionState, returnStatus, scaledCost, scenarioOf, successChance, applyEffects, type Ctx } from './rules';
+import { MISSION_DAYS, SITES, SURFACE_START_MINUTE, scenarioFor } from './scenarios';
 import { buildSchedule } from './schedule';
 import { PREP_EVENT, bigQueue, bigStatus, buildBigEvents, prepStatusKey } from './bigevents';
 import { bulletinPlan, firstSep, type SpaceWeatherSnapshot } from './spaceweather';
-import { advanceTime, makeHooks, openEvent, rollFor, checkEmergencies, snapshot } from './sim';
+import { advanceTime, endSurface, makeHooks, maybeOfferReinforcement, openEvent, rollFor, checkEmergencies, snapshot, tickHour } from './sim';
 import type { Character, CoverMode, CrewState, DestinationId, GreenhouseMode, ItemId, Locale, MissionState, Mode, Phase, Routine, RunState, SiteId, Speed } from './types';
 import { PREP_PHASES } from './types';
 
-export const SCHEMA_VERSION = 4;
-export const CONTENT_VERSION = '0.5.0-donki';
+export const SCHEMA_VERSION = 6;
+export const CONTENT_VERSION = '0.7.0-goal';
 export const REQUIRED_COMPANIONS = 3;
 
 export type Command =
@@ -35,7 +35,10 @@ export type Command =
   | { type: 'setRoutine'; crewId: string; routine: Routine }
   | { type: 'study'; researchId: string }
   | { type: 'prep'; bigId: string; actionId: string; crewIds: string[] }
-  | { type: 'setSpaceWeather'; snapshot: SpaceWeatherSnapshot | null };
+  | { type: 'setSpaceWeather'; snapshot: SpaceWeatherSnapshot | null }
+  | { type: 'localizeNames'; locale: Locale }
+  /** start the return now (before day 30); the return checklist decides how comfortable it is */
+  | { type: 'returnHome' };
 
 export type CommandResult = { state: RunState; error?: string };
 
@@ -50,14 +53,15 @@ export function createRun(seed: number, locale: Locale, mode: Mode = 'standard')
     phase: 'identity',
     mode,
     player: generatePlayer(s, locale),
-    candidates: generateCandidates(s),
+    candidates: generateCandidates(s, locale),
     crewIds: [],
     destination: null,
     site: null,
     cargo: {},
     mission: null,
     manualPause: false,
-    speed: 1,
+    // 2×: a day passes in 30 s, so a month takes about a quarter of an hour plus decisions
+    speed: 2,
     launched: false,
     spaceWeather: null,
   };
@@ -99,7 +103,44 @@ function newCrewState(run: RunState, id: string): CrewState {
   return { id, health: 100, stress: 15, fatigue: 10, radiation: 0, status: 'active', routine, taskId: null, sheltered: false, warned: false };
 }
 
+/**
+ * Pre-launch endurance estimate: a quiet run of the same physics (no events, greenhouse eaten as it
+ * ripens) until the first return reserve would no longer be met, checked each local noon. The goal is
+ * 85% of it, leaving room for whatever happens up there. Pure and deterministic.
+ */
+export function estimateStay(run: RunState): MissionState['goal'] {
+  const r: RunState = { ...structuredClone({ ...run, spaceWeather: null }), launched: true, phase: 'landing' };
+  r.mission = baseMission(r, true);
+  r.mission.minute = SURFACE_START_MINUTE;
+  const hooks = makeHooks(r);
+  const end = MISSION_DAYS * 1440;
+  let estimate = MISSION_DAYS;
+  let limiting: MissionState['goal']['limiting'] = null;
+  while (r.mission.minute < end) {
+    tickHour(r, hooks);
+    if (r.mission.minute % 1440 === 12 * 60) {
+      const short = returnStatus(r, r.mission).lines.find((l) => !l.ok && l.key !== 'crew');
+      if (short) {
+        estimate = Math.max(0, Math.floor((r.mission.minute - SURFACE_START_MINUTE) / 1440));
+        limiting = short.key as MissionState['goal']['limiting'];
+        break;
+      }
+    }
+  }
+  const target = Math.max(8, Math.min(MISSION_DAYS, Math.floor(estimate * GOAL_SHARE)));
+  return { estimate, target, limiting };
+}
+
+/** The goal is this share of the estimate (room for events). */
+export const GOAL_SHARE = 0.85;
+
 function createMission(run: RunState): MissionState {
+  const m = baseMission(run, false);
+  m.goal = estimateStay(run);
+  return m;
+}
+
+function baseMission(run: RunState, quiet: boolean): MissionState {
   const s = scenarioFor(run.destination!, run.site);
   const items: MissionState['items'] = {};
   for (const [k, v] of Object.entries(run.cargo)) if (v) items[k as ItemId] = v;
@@ -107,14 +148,14 @@ function createMission(run: RunState): MissionState {
   const systems = { ...s.start.systems };
   // Cargo is applied once, at launch. Battery modules add capacity (they store, not produce, energy).
   const batteries = items.battery ?? 0;
-  resources.batteryCapKWh += 25 * batteries;
-  resources.batteryKWh += 20 * batteries;
-  resources.foodCrewDays += 12 * (items.food ?? 0);
+  resources.batteryCapKWh += 30 * batteries;
+  resources.batteryKWh += 25 * batteries;
+  resources.foodCrewDays += 10 * (items.food ?? 0);
   if ((items.shield ?? 0) > 0) systems.shelter = Math.min(100, systems.shelter + 30);
   const crew = ['player', ...run.crewIds].map((id) => newCrewState(run, id));
   const sw = run.spaceWeather;
-  const big = buildBigEvents(run.seed, s, flyingCrew(run), sw);
-  const queue = [...buildSchedule(run.seed, s), ...bigQueue(big)].sort((a, b) => a.atMinute - b.atMinute);
+  const big = quiet ? [] : buildBigEvents(run.seed, s, flyingCrew(run), sw);
+  const queue = quiet ? [] : [...buildSchedule(run.seed, s), ...bigQueue(big)].sort((a, b) => a.atMinute - b.atMinute);
   // Moon: a real solar energetic particle event in the window replaces the random particle-event timing
   const sep = sw && s.id === 'moon' ? firstSep(sw) : null;
   if (sep !== null) for (const q of queue) if (q.eventId === 'MOON-03') q.atMinute = sep;
@@ -142,7 +183,8 @@ function createMission(run: RunState): MissionState {
     echoes: [],
     harvests: 0,
     big,
-    bulletins: sw ? bulletinPlan(sw, s.id) : [],
+    goal: { estimate: MISSION_DAYS, target: MISSION_DAYS, limiting: null },
+    bulletins: sw && !quiet ? bulletinPlan(sw, s.id) : [],
     history: [],
     chatUsed: [],
     nextChatMinute: SURFACE_START_MINUTE + 60,
@@ -155,7 +197,9 @@ function createMission(run: RunState): MissionState {
 
 /** The single entry point for every state change. Never mutates the input. */
 export function applyCommand(input: RunState, cmd: Command): CommandResult {
-  const run: RunState = structuredClone(input);
+  // the NASA snapshot is immutable once attached: share it instead of deep-copying it 10 times a second
+  const { spaceWeather, ...rest } = input;
+  const run: RunState = { ...structuredClone(rest), spaceWeather };
   const res = reduce(run, cmd);
   if (res.error) return { state: input, error: res.error };
   if (cmd.type !== 'advance') run.revision += 1;
@@ -291,6 +335,21 @@ function reduce(run: RunState, cmd: Command): { error?: string } {
     }
     case 'prep':
       return startPrep(run, cmd.bigId, cmd.actionId, cmd.crewIds);
+    case 'returnHome': {
+      const m = run.mission;
+      if (!m || run.phase !== 'surface' || m.activeEvent || m.ended) return { error: 'err.phase' };
+      log(m, run, 'journal.returnEarly', 'info', { day: Math.floor((m.minute - SURFACE_START_MINUTE) / 1440) });
+      endSurface(run);
+      return {};
+    }
+    case 'localizeNames': {
+      // language switched during preparation: generated (not typed) names follow the language
+      if (!prep) return {};
+      if (!run.player.customName) run.player.name = playerName(run.seed, cmd.locale);
+      const fresh = generateCandidates(run.seed, cmd.locale);
+      for (const c of run.candidates) if (!c.customName) c.name = fresh.find((f) => f.id === c.id)?.name ?? c.name;
+      return {};
+    }
     case 'setSpaceWeather':
       if (!prep) return { error: 'err.launched' };
       run.spaceWeather = cmd.snapshot;
@@ -360,7 +419,7 @@ export function resolveDecision(run: RunState, instanceId: string, optionId: str
     });
   }
 
-  applyEffects(ctx, option.cost ?? [], hooks);
+  applyEffects(ctx, scaledCost(option.cost ?? []), hooks);
 
   if (option.hours && run.phase === 'surface') {
     const taskId = `${instanceId}:${optionId}`;
@@ -418,7 +477,7 @@ export function startPrep(run: RunState, bigId: string, actionId: string, crewId
   m.decisions.push({ instanceId: `${instanceId}:${actionId}`, eventId: ev.id, optionId: actionId, crewIds: unique, minute: m.minute, phase: run.phase, probability, roll, success, weight: option.weight });
   for (const e of echoesFor(run, ev, option, unique)) m.echoes.push(e);
   log(m, run, 'journal.prepStarted', 'info', { action: `ev.${ev.id}.${actionId}.label`, names: unique.map((id) => characterById(run, id).name).join(' & ') });
-  applyEffects(ctx, option.cost ?? [], hooks);
+  applyEffects(ctx, scaledCost(option.cost ?? []), hooks);
   if (option.hours) {
     m.flags[statusKey] = 'doing';
     const taskId = `${instanceId}:${actionId}`;
@@ -467,6 +526,7 @@ function afterDecision(run: RunState, hooks: ReturnType<typeof makeHooks>) {
       break;
     }
     case 'surface':
+      maybeOfferReinforcement(run);
       checkEmergencies(run, hooks);
       break;
     case 'returnPrep': {

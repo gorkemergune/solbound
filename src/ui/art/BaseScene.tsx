@@ -2,6 +2,7 @@ import type { KeyboardEvent } from 'react';
 import { characterById, hourOfDay, lunarSun, scenarioOf, type RunState } from '../../engine';
 import { Rng } from '../../engine/rng';
 import { lookFor } from './Portrait';
+import { NightLights, Terrain, TerrainDefs } from './Terrain';
 
 export type ModuleId = 'solar' | 'battery' | 'lifeSupport' | 'hab' | 'airlock' | 'water' | 'greenhouse' | 'shelter';
 
@@ -18,6 +19,22 @@ const TASK_MODULE: Record<string, ModuleId | 'outside'> = {
   'EMG-O2': 'lifeSupport',
   'EMG-MED': 'hab',
   CROP: 'greenhouse',
+  HARVEST: 'greenhouse',
+  'HARVEST-MOLD': 'greenhouse',
+  'HARVEST-FEAST': 'greenhouse',
+  'HARVEST-SEEDS': 'greenhouse',
+  'REINF-OFFER': 'hab',
+  REINF: 'outside',
+  'PREP-crew': 'outside',
+  'PREP-cme': 'shelter',
+  CME: 'shelter',
+  'FC-CME': 'shelter',
+  'FC-STORM': 'solar',
+  'FC-NIGHT': 'hab',
+  'FC-METEOR': 'outside',
+  'FC-DARK': 'solar',
+  'FC-RESUPPLY': 'outside',
+  'RETURN-01': 'hab',
   WQ: 'water',
   SAB: 'lifeSupport',
   WIND: 'outside',
@@ -109,7 +126,20 @@ function StatusLight({ x, y, level }: { x: number; y: number; level: 'ok' | 'war
 
 const lvl = (v: number): 'ok' | 'warn' | 'bad' => (v >= 80 ? 'ok' : v >= 50 ? 'warn' : 'bad');
 
-export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunState; onInspect: (m: ModuleId) => void; label: string; moduleLabel: (m: ModuleId) => string }) {
+export function BaseScene({
+  run,
+  onInspect,
+  label,
+  moduleLabel,
+  focus = null,
+}: {
+  run: RunState;
+  onInspect: (m: ModuleId) => void;
+  label: string;
+  moduleLabel: (m: ModuleId) => string;
+  /** id of the open event: its module is highlighted so the card and the base stay connected */
+  focus?: string | null;
+}) {
   const m = run.mission!;
   const dest = run.destination!;
   const sys = m.systems;
@@ -162,7 +192,7 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
     .filter((c) => c.status === 'active')
     .map((c) => {
       const ch = characterById(run, c.id);
-      const color = lookFor(ch.portraitSeed).suit;
+      const color = lookFor(ch.portraitSeed, ch.gender, ch.profile.age).suit;
       let place: ModuleId | 'outside' | 'inside' = 'inside';
       let busy = false;
       if (c.sheltered) place = 'shelter';
@@ -195,6 +225,7 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
           <stop offset="0" stopColor={ground1} />
           <stop offset="1" stopColor={ground2} />
         </linearGradient>
+        <TerrainDefs />
         <radialGradient id="bs-ghglow" cx="50%" cy="70%" r="60%">
           <stop offset="0" stopColor="#d9ffb0" stopOpacity={0.9 * ghLight * ghServed} />
           <stop offset="1" stopColor="#d9ffb0" stopOpacity="0" />
@@ -212,8 +243,11 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
       )}
       {!mars && (
         <g>
-          <circle cx="830" cy="90" r="34" fill="#2a6fb8" />
-          <path d="M812 78c10-8 24-6 28 4-6 2-14 8-24 6z" fill="#dfeedd" opacity="0.8" />
+          <circle cx="830" cy="90" r="40" fill="#7fc3ff" opacity="0.12" />
+          <circle cx="830" cy="90" r="34" fill="url(#bs-earth)" />
+          <path d="M806 80c10-9 26-7 31 3-7 3-16 9-27 7z M820 108c9 0 17 4 20 9-9 2-18 0-22-4z" fill="#5f9a5a" opacity="0.75" />
+          <path d="M800 92c14-6 30-4 44 2 M806 70c10-3 22-2 30 2" stroke="#ffffff" strokeWidth="3" opacity="0.55" fill="none" strokeLinecap="round" />
+          <circle cx="830" cy="90" r="34" fill="url(#bs-shade)" />
           {!lunarNight && (
             <g transform={lunar ? `translate(${60 + lunar.cycle * 2 * 880} ${300 - Math.sin(lunar.cycle * 2 * Math.PI) * 220})` : 'translate(60 300)'}>
               <circle r="13" fill="#fffbe6" />
@@ -234,6 +268,16 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
       {/* far hills */}
       <path d={mars ? 'M0 360 L90 300 L170 340 L300 270 L420 340 L520 310 L640 350 L760 290 L880 340 L1000 320 V520 H0z' : 'M0 370 C 150 340, 260 360, 400 344 S 700 330, 1000 352 V520 H0z'} fill={mars ? '#9a4f30' : '#6c7178'} opacity="0.8" />
       <path d="M0 400 C 200 388, 400 404, 600 394 S 850 386, 1000 398 V520 H0z" fill="url(#bs-ground)" />
+      <Terrain mars={mars} site={run.site} />
+      {/* module shadows on the ground */}
+      <g pointerEvents="none" fill="#000" opacity="0.22">
+        <ellipse cx="160" cy="412" rx="110" ry="8" />
+        <ellipse cx="370" cy="410" rx="80" ry="7" />
+        <ellipse cx="530" cy="410" rx="95" ry="8" />
+        <ellipse cx="690" cy="410" rx="60" ry="6" />
+        <ellipse cx="815" cy="410" rx="80" ry="7" />
+        <ellipse cx="940" cy="410" rx="48" ry="6" />
+      </g>
       {/* ---- fission unit (equator, gameplay) with its radiator fins ---- */}
       {fission && (
         <g pointerEvents="none" transform="translate(742 282) scale(0.62)">
@@ -396,11 +440,53 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
       {/* night tint on Mars */}
       {mars && sky.night > 0 && <rect width="1000" height="520" fill="#0a1030" opacity={sky.night * 0.35} pointerEvents="none" />}
 
+      {(isNight || lunarNight) && <NightLights />}
+
+      {/* ---- reinforcement module: an inflatable floor on top of the habitat ---- */}
+      {(m.flags.module === 'ready' || m.flags.module === 'cramped' || m.flags.module === 'packed' || m.flags.module === 'shifts') &&
+        (m.flags.module === 'ready' ? (
+          <g pointerEvents="none">
+            <path d="M462 300 c0-26 26-40 58-40 s58 14 58 40 z" fill="#f2efe6" stroke="#9aa4b0" strokeWidth="2.5" />
+            <path d="M470 288 h100 M478 276 h84" stroke="#d7d2c4" strokeWidth="2" />
+            {[500, 540].map((x) => (
+              <rect key={x} x={x - 10} y="272" width="20" height="14" rx="5" fill={isNight || lunarNight ? '#ffd27a' : '#2e4a6b'} />
+            ))}
+          </g>
+        ) : (
+          <g pointerEvents="none" transform="translate(600 392)">
+            <rect x="0" y="0" width="34" height="16" rx="3" fill="#d9c9a3" stroke="#9a8a63" />
+            <path d="M4 8 h26" stroke="#9a8a63" />
+          </g>
+        ))}
+
+      {/* ---- event focus ring ---- */}
+      {focus && (() => {
+        const place = TASK_MODULE[focus.split('@')[0].replace(/#\d+$/, '')];
+        if (!place) return null;
+        const x = MODULE_X[place];
+        return (
+          <g pointerEvents="none" className="focus-ring">
+            <ellipse cx={x} cy={412} rx={place === 'outside' ? 60 : 70} ry={14} fill="none" stroke="#ffcf7a" strokeWidth="3" strokeDasharray="8 6" />
+            <path d={`M${x} 300 l-8 -14 h16 z`} fill="#ffcf7a" />
+          </g>
+        );
+      })()}
+
       {/* ---- crew ---- */}
       <g pointerEvents="none">
         {crewFigs.map(({ c, ch, color, place, busy, n }) => {
           if (place === 'inside') {
-            // one window per person (four seats); a larger crew would share windows
+            // one window per person (four seats); with the reinforcement module two more sit upstairs
+            if (n >= HAB_WINDOWS.length && m.flags.module === 'ready') {
+              const ux = [500, 540][(n - HAB_WINDOWS.length) % 2];
+              return (
+                <g key={c.id} transform={`translate(${ux} 280)`}>
+                  <title>{ch.name}</title>
+                  <circle r="5.5" fill="#eef2f6" />
+                  <rect x="-4" y="-3" width="8" height="4" rx="2" fill={color} />
+                </g>
+              );
+            }
             const x = HAB_WINDOWS[n % HAB_WINDOWS.length] + (n >= HAB_WINDOWS.length ? 6 : 0);
             return (
               <g key={c.id} transform={`translate(${x} 336)`}>

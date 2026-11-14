@@ -1,0 +1,31 @@
+# Refreshes public/donki-latest.json (NASA DONKI, last 30 days) every 6 hours with the repository secret
+# NASA_API_KEY, so the browser never needs a key. Inactive until the secret exists and the file is pushed.
+name: DONKI snapshot
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Download the last 30 days from NASA DONKI
+        env:
+          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
+        run: node scripts/donki-snapshot.ts
+      - name: Commit if the data changed
+        run: |
+          git config user.name "solbound-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/donki-latest.json src/live/donki-fallback.json
+          git diff --cached --quiet || git commit -m "chore: refresh NASA DONKI snapshot"
+          git push

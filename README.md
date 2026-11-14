@@ -2,11 +2,11 @@
 
 **Choose your crew. Pack within the launch mass. Run a lunar or Martian outpost, and bring your people home.**
 
-Solbound is an interactive STEM outpost management game planned for the **METU NASA Space Apps Challenge 2026**. Students become mission commanders and experience how connected engineering systems determine whether a crew survives.
+Solbound is an interactive STEM outpost game for the **METU NASA Space Apps Challenge 2026**: an educational simulation fed by NASA records. Students become mission commanders and experience how connected engineering systems determine whether a crew survives.
 
 > Status: playable 30-day mission on both Moon and Mars (two landing sites / arrival seasons each, randomized event mix per run, countdowns for predictable big events, a shareable recap film at the end). Event context and challenge wording were supplied by the team; this is an independent project, not an official NASA product.
 
-> Current design: v0.2. Start with [the current product and flow documents](docs/00_START_HERE.md). Older v0.1 proposals are retained with historical notices.
+> **Current state:** read [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) first; it is the single up-to-date summary. The v0.2 design ([00_START_HERE](docs/00_START_HERE.md)) and the older v0.1 proposals are kept as history.
 
 ## The mission
 
@@ -16,9 +16,9 @@ The current direction is a personal, story-driven 2D experience inspired by the 
 
 ## Live NASA data
 
-- **Space weather (NASA DONKI):** the title screen shows the last 30 days of real records and refreshes itself every 30 minutes (cached in the browser). When a mission starts, that window is stored with it: mission day 1 is the first day of the window. CMEs that NASA's WSA-ENLIL model sends toward Mars (or Earth–Moon) become countdown events, and other records arrive as bulletins with links to the NASA record. If NASA is unreachable, the game uses the last saved copy or the bundled snapshot in `src/live/donki-fallback.json` (refresh it with `npm run donki:snapshot`).
+- **Space weather (NASA DONKI):** the title screen shows the last 30 days of real records and refreshes itself (every 3 hours; cached in the browser). When a mission starts, that window is stored with it: mission day 1 is the first day of the window. CMEs that NASA's WSA-ENLIL model sends toward Mars (or Earth–Moon) become countdown events, and other records arrive as bulletins with links to the NASA record. If NASA is unreachable, the game uses the last saved copy or the bundled snapshot in `src/live/donki-fallback.json` (refresh it with `npm run donki:snapshot`).
 - **Signal delay:** the Earth–Mars distance is computed in the browser from JPL's *Approximate Positions of the Planets*. Tests check it against JPL Horizons; it agrees to within 0.02%. Horizons itself cannot be called from a browser because it sends no CORS header.
-- **API key:** copy `.env.example` to `.env` and set `NASA_API_KEY` to a free key from https://api.nasa.gov/. `.env` is git-ignored, but the key is built into the browser bundle, so only use a free api.nasa.gov key. Without a key, `DEMO_KEY` is used, which has low rate limits.
+- **API key (none in the browser):** the site first reads its own static `public/donki-latest.json`, written by `npm run donki:snapshot` (key from `.env` or the `NASA_API_KEY` environment variable) or by the optional GitHub Action `.github/workflows/donki-snapshot.yml` (repository secret `NASA_API_KEY`, every 6 hours). Only if that file is older than 6 hours does the browser call NASA itself, with the public `DEMO_KEY`, whose limits apply per visitor IP. Copy `.env.example` to `.env` for the script; `.env` is git-ignored.
 
 ## How it plays
 
@@ -29,15 +29,15 @@ The current direction is a personal, story-driven 2D experience inspired by the 
 5. Prepare the return journey and see how your earlier decisions affect the way home.
 6. Read your mission story and retry with a different plan.
 
-## First playable target
+## What is built
 
-- Complete preparation flow, EN/TR throughout, generated profiles and a pool of 16 candidates with 15 specialties.
-- Meaningfully different Moon/Mars scenarios over 30 days, two sites/seasons per destination, a different event mix every run, countdown events with preparation tasks, base time next to Earth time, and a recap film (video/image) to share.
-- One outbound task, three main and two small surface events per destination, and two return decisions.
-- Visible time and pause state; resources, crew consequences, local saves, and an explanatory ending.
-- Original 2D scenes, character portraits, cargo view, and a responsive outpost interface.
+- Complete preparation flow in EN/TR. Generated, gender-matched profiles and a pool of 16 candidates with 15 specialties; names follow the game language.
+- Moon (polar ridge or equator with the lunar night) and Mars (northern spring or southern summer) over a full 30-day mission, with a different event mix every run.
+- Every decision card has at least three choices that need no kit, role or research; kits and specialists add up to six.
+- Countdown events with preparation tasks, real NASA DONKI CME arrivals, a Moon-only reinforcement crew, and rotating harvest situations.
+- Visible time (base time next to Earth time and signal delay), local saves, an explanatory debrief and a recap film to share.
 
-This slice is implemented and playable; see [implementation notes](docs/IMPLEMENTATION_NOTES.md) for what was verified and what is still open. The 30-day content expansion, the "what if I had chosen differently" comparison and the optional LLM ship computer follow the first playable slice.
+Not built yet: the "what if I had chosen differently" comparison and the optional LLM ship computer. See [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md) and the [implementation notes](docs/IMPLEMENTATION_NOTES.md).
 
 ## Run it
 
@@ -61,7 +61,8 @@ React 19 + TypeScript + Vite, original SVG/CSS scenes and portraits, a pure dete
 
 | Document | Purpose |
 | --- | --- |
-| [Current design v0.2](docs/00_START_HERE.md) | Current scope, flow, systems, story, visual direction, and implementation plan |
+| [Current state](docs/CURRENT_STATE.md) | **Start here.** Single up-to-date summary of scope, values and open work |
+| [Design v0.2 (history)](docs/00_START_HERE.md) | The pre-implementation design contract and reading order |
 | [Implementation notes](docs/IMPLEMENTATION_NOTES.md) | What was built, engineering decisions, gameplay assumptions, test results, open work |
 | [Claude Code prompt](docs/CLAUDE_CODE_PROMPT.md) | Ready-to-use implementation assignment |
 | [Model workflow](docs/MODEL_WORKFLOW.md) | Opus/Fable recommendation and launch commands |
@@ -77,7 +78,7 @@ React 19 + TypeScript + Vite, original SVG/CSS scenes and portraits, a pure dete
 
 ## Development status
 
-The team checkout is `/Users/gorkemparadise/Desktop/solbound`, connected to [gorkemergune/solbound](https://github.com/gorkemergune/solbound) on branch `main`. Local origin and initial commit were verified on 14 November 2026. The implementation work has not been committed or pushed; that is left to the team.
+The repository is [gorkemergune/solbound](https://github.com/gorkemergune/solbound) on branch `main`; the team commits and pushes. Current scope and open items: [docs/CURRENT_STATE.md](docs/CURRENT_STATE.md).
 
 ## Credits and licensing
 

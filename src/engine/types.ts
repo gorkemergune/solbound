@@ -61,6 +61,8 @@ export type Character = {
   name: string;
   /** true when the player typed the name (keeps it through a profile re-roll). */
   customName: boolean;
+  /** used to match name and portrait */
+  gender: 'f' | 'm';
   isPlayer: boolean;
   portraitSeed: number;
   backgroundId: string;
@@ -146,7 +148,7 @@ export type Environment = {
 };
 
 /** Predictable "big" events with a visible countdown and preparation tasks. */
-export type BigKind = 'storm' | 'night' | 'meteor' | 'dark' | 'resupply' | 'cme';
+export type BigKind = 'storm' | 'night' | 'meteor' | 'dark' | 'resupply' | 'cme' | 'crew';
 export type BigEventState = {
   id: string;
   kind: BigKind;
@@ -200,6 +202,8 @@ export type Flows = {
   foodUse: number;
   batteryDelta: number;
   sabatierWater: number;
+  /** suit consumables for people working outside this hour (O₂ kg, cooling water L, recharge kWh) */
+  eva: { people: number; o2: number; water: number; kwh: number };
 };
 
 export type JournalEntry = {
@@ -208,7 +212,7 @@ export type JournalEntry = {
   phase: Phase;
   key: string;
   params?: Record<string, string | number>;
-  tone: 'info' | 'good' | 'warn' | 'bad' | 'echo' | 'loss' | 'chat' | 'sw';
+  tone: 'info' | 'good' | 'warn' | 'bad' | 'echo' | 'loss' | 'chat' | 'sw' | 'forecast';
 };
 
 export type Echo = {
@@ -277,6 +281,8 @@ export type MissionState = {
   echoes: Echo[];
   harvests: number;
   big: BigEventState[];
+  /** pre-launch endurance estimate and the resulting mission goal (days on the surface) */
+  goal: { estimate: number; target: number; limiting: 'food' | 'water' | 'o2' | 'battery' | null };
   /** real space-weather bulletins still to deliver (record index into run.spaceWeather.records) */
   bulletins: { at: number; rec: number }[];
   history: DaySnapshot[];

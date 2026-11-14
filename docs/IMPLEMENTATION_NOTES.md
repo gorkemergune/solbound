@@ -224,3 +224,66 @@ Mentör isteği: halka açık bir NASA API’sinden beslenen, kendini yenileyen 
 | `npm run typecheck` | Hatasız |
 | `npm test` | 51/51 (yeni: Horizons’a karşı formül, DONKI normalizasyonu, CME geri sayımlarının kuralları, veri donması ve determinizm, bültenlerin teslimi, gerçek tarihe göre sinyal gecikmesi) |
 | `npm run build` | Başarılı (JS ≈ 737 kB; 500 kB uyarısı) |
+
+## v0.6 — `eksikler.md` turu: seçimler, zorluk, takviye ekip, görseller, optimizasyon (14 Kasım 2026)
+
+Ayrıntılı madde madde durum: kökteki `eksikler.md`. Güncel kapsamın tek özeti: `docs/CURRENT_STATE.md`.
+
+- **İsim ve avatar:** `Character.gender`; isimler oyun diline göre (TR/EN havuzları cinsiyetli). Portre saç modeli, sakal ve küpe cinsiyete göre seçiliyor; palet sakinleştirildi; yaş 44 üstünde kır saç. Hazırlıkta dil değişince `localizeNames` otomatik isimleri yeni dile çeviriyor.
+- **Seçenekler:** 21 olaya açık seçenek eklendi. Test: kit, rol ya da araştırma gerektirmeyen en az 3 seçenek, toplam en fazla 6. Tahmin kartlarında “ekip brifingi”.
+- **Zorluk:** başarı tabanı ×0,85 (`DIFFICULTY`), görev yorgunluğu ×1,4 (`FATIGUE_COST`), görev saatleri ×1,5 (içerik ve metinler birlikte güncellendi). Dışarıdaki kişi-saat başına 0,06 kg O₂, 0,3 L su, 0,25 kWh (oyun değerleri). Ölçüm: rastgele seçim yapan bir “oyuncu” 24 görevin 8’ini kaybediyor; eski zorlukta da 11’ini kaybediyordu. Kayıplar zorluktan çok riskli seçimlerden geliyor.
+- **Hasat çeşitliliği:** HARVEST, HARVEST-MOLD (kaynak: NASA zinnia küfü), HARVEST-FEAST ve HARVEST-SEEDS seed’e göre dönüşümlü geliyor. Çift hasat hatası düzeltildi.
+- **Takviye ekip (yalnız Ay):** iki canlı görüşmeden sonra REINF-OFFER çıkıyor (kabul / kargo / ret). Kabulde geri sayım ve hazırlık (zemin, enerji hattı) başlıyor. REINF ile iki aday katılıyor. Modül habitatın üstünde bir kat: kendi O₂ üreticisi (0,06 kg/sa), 0,5 kW yaşam desteği, 0,6 (0,3) kW ısı ve 1,2 kW panel. Kurulmazsa sıkışma ya da vardiya. Mars’ta yok (gerekçe R-REINF kartında).
+- **Görseller:** panoramada gezegen ayrıntıları; üs sahnesinde arazi katmanı (memo), gölgeler, gece ışıkları, Dünya ayrıntısı ve takviye katı. Olay kartı sahnenin yanında duruyor ve ilgili modül vurgulanıyor. Aktarma ekranında 7 sn’lik seyir, paralaks ve ilerleme göstergesi var.
+- **NASA verisi:** “Kısmen güncel” durumu; alınamayan listeler “—” gösteriliyor; CME kartında gerçek kayıt / model / oyun etkisi satırları; kesin ifadeler yumuşatıldı.
+- **Optimizasyon:** ekranlar ayrı parçalara bölündü, TR sözlüğü tembel yükleniyor (ilk yük ≈ 737 → 513 kB); kayıt 3 sn’de bir; uzay havası anlık görüntüsü klonlanmıyor.
+- **Belgeler:** `docs/CURRENT_STATE.md` eklendi; `00_START_HERE`, README ve CLAUDE.md ona yönlendiriyor.
+- Kayıt şeması 5, içerik `0.6.0-choices` (eski kayıtlar sürüm uyarısıyla açılmaz).
+
+### v0.6 doğrulama
+
+| Kontrol | Sonuç |
+| --- | --- |
+| `npm run typecheck` | Hatasız |
+| `npm test` | 56/56. Yeni testler: cinsiyetle eşleşen ve dile göre değişen isimler; dil değişiminde yalnız otomatik isimlerin değişmesi; her kartta en az 3 açık seçenek ve en fazla 6 toplam; hasat dönüşümü; Ay takviye ekibi (Mars’ta yok); zorluk ve giysi tüketimi |
+| `npm run build` | Başarılı. Parçalar: açılış ≈ 513 kB (index 213 + Title 300), TR sözlüğü 140 kB (tembel), Mission 68, Prep 23, Debrief 17 kB. 500 kB uyarısı yok |
+| `npm run e2e` | 80/80: Mars/TR masaüstü (canlı NASA, kısmen güncel) ve Ay/EN mobil (NASA engelli). Yeni kontroller: Türkçe ekip isimleri, “—” gösterimi, araştırma ve dil değişiminde tembel yükleme. Test rastgele seçim yaptığı için sonuçlar “Evdeyiz, ama bedeli oldu” ve “Mission lost” çıktı |
+
+## v0.7 — tahmini kalış, “Eve dön”, V3 test düzeltmeleri (14 Kasım 2026)
+
+Ayrıntılı madde listesi `eksikler.md` dosyasında; güncel özet `docs/CURRENT_STATE.md`’de. Kayıt şeması 6, içerik `0.7.0-goal`.
+
+- **Hedef:**
+  - `estimateStay(run)` olaysız bir sessiz çalıştırmayla tahmin üretiyor. Her gün 12:00’de dönüş rezervlerine bakıyor; çalışma başına yaklaşık 4 ms.
+  - `MissionState.goal = { estimate, target, limiting }`, hedef `GOAL_SHARE` (0,85) ile hesaplanıyor.
+  - `outcome`: hedefe ulaşmadan dönen görev `partial` sayılıyor ve `reason.early` ekleniyor.
+- **`returnHome` komutu:** `endSurface` erken çağrılıyor. `endSurface` artık gerçek gün sayısını kaydediyor ve `surfaceEndMinute` (son gün 14:00) kullanıyor.
+- **V3 düzeltmeleri:**
+  - `gh` efekti önceki modu `ghBefore` olarak saklıyor; fırtına, gölge ve gece bitince sera o moda dönüyor.
+  - Dönüş öncesi batarya uyarısı.
+  - Ortak acil durum yedeği (`contingencyUsed`); tıbbi kartlar 12 saatte bir.
+  - RETURN-01 bekleme seçeneği gerçekten şarj ediyor; RETURN-02 yedek hat kontrollü.
+  - Yeni olaylar SETUP, FINAL-EVA ve PACK.
+  - Ekip uyumu (cohesion) ve uzmanlık etkileri.
+  - Eşya dengesi: gıda 10 kişi-gün, MOXIE 24 kg ve su tasarrufu, kalkan 32 kg, batarya +30/25 kWh.
+  - Mars’ın başlangıç suyu 340 L.
+- **Tahminler engellemiyor:** kuyruktaki `FC-*` artık kart açmıyor; `forecast` tonunda günlük satırı ve arayüzde bant olarak çıkıyor.
+- **Arayüz:**
+  - Sahne sabit boyutta; olay kartı sahnenin altında ve geniş ekranda iki sütunlu, yeni kart açılınca otomatik kaydırma.
+  - Aday ekranı sayfalı (3 × 2 / 2 × 2).
+  - “Eve dön” penceresi, hedef çipi, brifing ve yük ekranında tahmin kartı.
+  - Varsayılan hız 2×.
+- **NASA anahtarı:**
+  - `envPrefix` içinden `NASA_` çıkarıldı; `dist/` içinde anahtar yok (aranarak doğrulandı).
+  - `public/donki-latest.json` (`npm run donki:snapshot`) ve `.github/workflows/donki-snapshot.yml` eklendi; tarayıcı yalnız `DEMO_KEY` kullanıyor (sınırı IP başına; başlıkta saatte 10 istek olarak ölçüldü). Yenileme aralığı 3 saat.
+- **Denge raporu:** `realistic()` + `playLaunched()` ile 8 seed, rastgele ekip ve gerçek kütle. Özenli politikayla tam başarı: Ay kutup 6/8, Ay ekvator 4/8, Mars bahar 6/8, Mars yaz 5/8.
+- **Takviye ekip:** iniş en erken 20. gün 10:00 (kullanıcı isteği), teklif 24. güne kadar; `scheduleBig.notBeforeDay`.
+
+### v0.7 doğrulama
+
+| Kontrol | Sonuç |
+| --- | --- |
+| `npm run typecheck` | Hatasız |
+| `npm test` | 61/61. Yeni testler: tahmin (deterministik, gıda tahmini uzatır, hedef %85), “Eve dön” ile erken dönüşün kısmi başarı sayılması, seranın önceki moda dönmesi, yedeğin görev başına bir kez kullanılması, takviye ekibin 20. günden önce inmemesi, gerçekçi denge raporu |
+| `npm run build` | Başarılı; `dist/` içinde NASA anahtarı yok (aranarak doğrulandı) |
+| `npm run e2e` | 90/90. Yeni kontroller: 3 × 2 / 2 × 2 sayfalı aday ekranı ve sayfa düğmesi, kalkıştan önce tahmin ve hedef, kart açılınca sahnenin boyutunun aynı kalması (504 → 504 px masaüstü, 203 → 203 px mobil), saati durdurmayan tahmin bandı, “Eve dön” penceresinin 4 satırı ve erken dönüşün başlaması, NASA’ya ve statik dosyaya ulaşılamayınca paketlenmiş veriye düşülmesi. Sonuçlar: Mars/TR “Evdeyiz, ama bedeli oldu”, Ay/EN erken dönüş “Home, but at a cost” |

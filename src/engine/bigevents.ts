@@ -7,11 +7,11 @@ import type { BigEventState, BigKind, Character, ScheduledEvent } from './types'
 import { cmeBigEvents, type SpaceWeatherSnapshot } from './spaceweather';
 
 /** Days of warning per kind (gameplay values; the sourcing for "can be known" is on the research cards). */
-export const NOTICE_DAYS: Record<BigKind, number> = { storm: 3, night: 5, meteor: 5, dark: 4, resupply: 5, cme: 0 };
+export const NOTICE_DAYS: Record<BigKind, number> = { storm: 3, night: 5, meteor: 5, dark: 4, resupply: 5, cme: 0, crew: 0 };
 /** Event card shown when the countdown starts. */
-export const FORECAST_EVENT: Record<BigKind, string> = { storm: 'FC-STORM', night: 'FC-NIGHT', meteor: 'FC-METEOR', dark: 'FC-DARK', resupply: 'FC-RESUPPLY', cme: 'FC-CME' };
+export const FORECAST_EVENT: Record<BigKind, string> = { storm: 'FC-STORM', night: 'FC-NIGHT', meteor: 'FC-METEOR', dark: 'FC-DARK', resupply: 'FC-RESUPPLY', cme: 'FC-CME', crew: 'REINF-OFFER' };
 /** Pseudo-event holding the preparation tasks of a kind. */
-export const PREP_EVENT: Record<BigKind, string> = { storm: 'PREP-storm', night: 'PREP-night', meteor: 'PREP-meteor', dark: 'PREP-dark', resupply: 'PREP-resupply', cme: 'PREP-cme' };
+export const PREP_EVENT: Record<BigKind, string> = { storm: 'PREP-storm', night: 'PREP-night', meteor: 'PREP-meteor', dark: 'PREP-dark', resupply: 'PREP-resupply', cme: 'PREP-cme', crew: 'PREP-crew' };
 
 const at = (day: number, hour: number) => (day - 1) * MINUTES_PER_DAY + hour * 60;
 

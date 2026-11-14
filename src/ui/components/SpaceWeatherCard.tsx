@@ -23,18 +23,22 @@ export function SpaceWeatherCard({ dest, compact = false }: { dest?: Destination
   const flares = s.records.filter((r) => r.kind === 'flr' && /^[MX]/.test(r.cls ?? '')).length;
   const lastCme = [...s.records].reverse().find((r) => r.kind === 'cme');
   const au = marsDistanceAU(now);
-  const rows: [number | string, string][] = [
-    [c.cme, t('sw.cmes')],
-    [toMars, t('sw.toMars')],
-    [toEarth, t('sw.toEarth')],
-    [c.gst, t('sw.storms')],
-    [c.sep, t('sw.seps')],
+  // a list that could not be fetched is "unknown", never "0"
+  const failed = new Set(s.failed);
+  const val = (ep: string, n: number) => (failed.has(ep) ? '—' : n);
+  const rows: [number | string, string, boolean][] = [
+    [val('CME', c.cme), t('sw.cmes'), failed.has('CME')],
+    [val('CME', toMars), t('sw.toMars'), failed.has('CME')],
+    [val('CME', toEarth), t('sw.toEarth'), failed.has('CME')],
+    [val('GST', c.gst), t('sw.storms'), failed.has('GST')],
+    [val('SEP', c.sep), t('sw.seps'), failed.has('SEP')],
+    [val('FLR', flares), t('sw.flares'), failed.has('FLR')],
   ];
-  if (!s.failed.includes('FLR')) rows.push([flares, t('sw.flares')]);
+  const shownStatus = status === 'ok' && failed.size ? 'partial' : status;
   return (
     <section className={`sw-card ${compact ? 'compact' : ''}`} aria-live="polite" data-testid="sw-card">
       <header>
-        <span className={`sw-dot st-${status}`} aria-hidden="true" />
+        <span className={`sw-dot st-${shownStatus}`} aria-hidden="true" />
         <h3>
           {t('sw.title')} <span className="sw-badge">{t('sw.by')}</span>
         </h3>
@@ -43,21 +47,25 @@ export function SpaceWeatherCard({ dest, compact = false }: { dest?: Destination
         </button>
       </header>
       <p className="fine sw-meta">
-        <span className="sw-status">{t(`sw.status.${status}`)}</span> · {t('sw.window', { start: s.rangeStart, end: s.rangeEnd })} ·{' '}
+        <span className="sw-status">{t(`sw.status.${shownStatus}`)}</span> · {t('sw.window', { start: s.rangeStart, end: s.rangeEnd })} ·{' '}
         <span className="sw-source-label">{t('sw.fetched', { time: hhmm(s.fetchedAt, locale), source: t(`sw.source.${s.source}`) })}</span>
         {lastCheck && <> · {t('sw.lastCheck', { time: hhmm(lastCheck, locale) })}</>}
       </p>
       <ul className="sw-counts">
         {rows
           .filter(([, label]) => !dest || (dest === 'mars' ? label !== t('sw.toEarth') : label !== t('sw.toMars')))
-          .map(([n, label]) => (
-            <li key={label}>
+          .map(([n, label, missing]) => (
+            <li key={label} className={missing ? 'missing' : ''}>
               <strong>{n}</strong>
-              <span>{label}</span>
+              <span>
+                {label}
+                {missing && <em> · {t('sw.unknown')}</em>}
+              </span>
             </li>
           ))}
       </ul>
-      {s.failed.includes('FLR') && <p className="fine">{t('sw.flrMissing')}</p>}
+      {failed.size > 0 && <p className="fine warn-line">{t('sw.failedList', { list: s.failed.map((e) => t(`sw.ep.${e}`)).join(', ') })}</p>}
+      <p className="fine">{t('app.eduSim')}</p>
       {lastCme && <p className="fine">{t('sw.latest', { date: lastCme.time.slice(0, 16).replace('T', ' '), speed: lastCme.speed ?? '?' })}</p>}
       {(!dest || dest === 'mars') && (
         <p className="fine sw-signal">{t('sw.signalToday', { au: formatFixed(locale, au, 3), min: formatFixed(locale, lightMinutes(au), 1) })}</p>

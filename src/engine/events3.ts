@@ -13,6 +13,8 @@ const forecast = (id: string, illustration: string, research: string[]): EventDe
   options: [
     { id: 'plan', success: [], weight: 1 },
     { id: 'noted', success: [], weight: 1 },
+    // a crew briefing now: calmer people, but a working hour lost for everyone
+    { id: 'briefing', success: [{ kind: 'crew', target: 'all', stat: 'stress', delta: -8 }, { kind: 'crew', target: 'all', stat: 'fatigue', delta: 4 }], weight: 1 },
   ],
 });
 
@@ -33,7 +35,7 @@ const harvestEarly = (kind: BigKind): EventOption => ({
   id: 'harvest',
   requires: [{ kind: 'sysMin', key: 'greenhouseGrowth', min: 50 }],
   crew: { count: 1, skill: 'science', traits: ['botanist', 'nutrition'] },
-  hours: 2,
+  hours: 3,
   success: [{ kind: 'harvestNow', fraction: 1 }, flag(kind, 'harvest')],
   weight: 1,
   research: ['R-CROPS'],
@@ -51,7 +53,7 @@ const PREP_STORM: EventDef = {
     {
       id: 'clean',
       crew: { count: 2, skill: 'technical', traits: ['eva', 'power'], outside: true },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
       check: { base: 0.7, skill: 'technical', traits: ['eva', 'power'], items: [{ item: 'cleaner', bonus: 0.15 }] },
       success: [{ kind: 'sysSet', key: 'solar', value: 100 }, flag('storm', 'clean')],
@@ -62,7 +64,7 @@ const PREP_STORM: EventDef = {
     {
       id: 'stow',
       crew: { count: 2, skill: 'teamwork' },
-      hours: 2,
+      hours: 3,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 6 }],
       success: [flag('storm', 'stow')],
       weight: 1,
@@ -84,7 +86,7 @@ const PREP_NIGHT: EventDef = {
     {
       id: 'insulate',
       crew: { count: 2, skill: 'teamwork' },
-      hours: 4,
+      hours: 6,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
       success: [flag('night', 'insulate')],
       weight: 1,
@@ -93,7 +95,7 @@ const PREP_NIGHT: EventDef = {
     {
       id: 'radiator',
       crew: { count: 1, skill: 'technical', traits: ['power', 'mechanic', 'eva'], outside: true },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 12 }],
       check: { base: 0.65, skill: 'technical', traits: ['power', 'mechanic', 'eva'], items: [{ item: 'cleaner', bonus: 0.15 }], earth: true },
       success: [flag('night', 'radiator')],
@@ -118,7 +120,7 @@ const PREP_METEOR: EventDef = {
     {
       id: 'berm',
       crew: { count: 2, skill: 'technical', traits: ['eva', 'rover'], outside: true },
-      hours: 5,
+      hours: 8,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 14 }],
       check: { base: 0.75, skill: 'technical', traits: ['rover', 'eva'] },
       success: [flag('meteor', 'berm')],
@@ -129,7 +131,7 @@ const PREP_METEOR: EventDef = {
     {
       id: 'spares',
       crew: { count: 1, skill: 'technical' },
-      hours: 1,
+      hours: 2,
       success: [flag('meteor', 'spares')],
       weight: 1,
     },
@@ -149,7 +151,7 @@ const PREP_DARK: EventDef = {
     {
       id: 'mast',
       crew: { count: 2, skill: 'technical', traits: ['eva', 'power'], outside: true },
-      hours: 4,
+      hours: 6,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 12 }],
       check: { base: 0.6, skill: 'technical', traits: ['power', 'eva'], earth: true },
       success: [flag('dark', 'mast')],
@@ -174,7 +176,7 @@ const PREP_RESUPPLY: EventDef = {
     {
       id: 'zone',
       crew: { count: 2, skill: 'teamwork', outside: true },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 8 }],
       success: [flag('resupply', 'zone')],
       weight: 1,
@@ -182,7 +184,7 @@ const PREP_RESUPPLY: EventDef = {
     {
       id: 'beacon',
       crew: { count: 1, skill: 'technical', traits: ['comms', 'pilot'] },
-      hours: 2,
+      hours: 3,
       check: { base: 0.6, skill: 'technical', traits: ['comms', 'pilot'], earth: true },
       success: [flag('resupply', 'beacon')],
       weight: 1,
@@ -226,7 +228,7 @@ const NIGHT: EventDef = {
       id: 'wasteHeat',
       requires: [{ kind: 'any', of: [{ kind: 'research', id: 'R-FISSION' }, { kind: 'trait', trait: 'power' }, { kind: 'trait', trait: 'mechanic' }] }],
       crew: { count: 1, skill: 'technical', traits: ['power', 'mechanic'] },
-      hours: 3,
+      hours: 5,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
       check: { base: 0.6, skill: 'technical', traits: ['power', 'mechanic'], earth: true },
       success: [{ kind: 'flag', key: 'wasteHeat', value: true }],
@@ -259,7 +261,7 @@ const METEOR: EventDef = {
       id: 'repair',
       requires: [{ kind: 'envMin', key: 'heatHours', min: 1 }, { kind: 'any', of: [{ kind: 'item', item: 'sealant' }, { kind: 'flag', key: 'prep.meteor.spares', value: true }] }],
       crew: { count: 1, skill: 'technical', traits: ['eva', 'mechanic'], outside: true },
-      hours: 2,
+      hours: 3,
       check: { base: 0.6, skill: 'technical', traits: ['eva', 'mechanic'], flags: [{ key: 'prep.meteor.spares', value: true, bonus: 0.25 }], hazard: 0.05 },
       success: [{ kind: 'env', key: 'heatHours', value: 0 }],
       failure: [{ kind: 'env', key: 'heatHours', value: 14 }, { kind: 'crew', target: 'assigned', stat: 'health', delta: -8 }],
@@ -268,7 +270,7 @@ const METEOR: EventDef = {
     {
       id: 'observe',
       crew: { count: 1, skill: 'science', traits: ['geologist', 'spaceWeather'] },
-      hours: 2,
+      hours: 3,
       success: [{ kind: 'res', key: 'science', delta: 12 }],
       weight: 3,
       research: ['R-METEOR'],
@@ -276,7 +278,7 @@ const METEOR: EventDef = {
     {
       id: 'eva',
       crew: { count: 2, skill: 'science', traits: ['eva', 'geologist'], outside: true },
-      hours: 3,
+      hours: 5,
       check: { base: 0.6, skill: 'science', traits: ['eva', 'geologist'], flags: [{ key: 'prep.meteor.berm', value: true, bonus: 0.15 }], hazard: 0.15 },
       success: [{ kind: 'res', key: 'science', delta: 20 }],
       failure: [{ kind: 'res', key: 'science', delta: 6 }, { kind: 'crew', target: 'assigned', stat: 'health', delta: -16 }, { kind: 'crew', target: 'assigned', stat: 'stress', delta: 10 }],
@@ -330,14 +332,14 @@ const RESUPPLY: EventDef = {
       id: 'near',
       requires: [{ kind: 'any', of: [{ kind: 'flag', key: 'prep.resupply.zone', value: true }, { kind: 'flag', key: 'prep.resupply.beacon', value: true }] }],
       crew: { count: 1, skill: 'teamwork' },
-      hours: 1,
+      hours: 2,
       success: DELIVERY,
       weight: 3,
     },
     {
       id: 'retrieve',
       crew: { count: 2, skill: 'technical', traits: ['rover', 'pilot', 'eva'], outside: true },
-      hours: 4,
+      hours: 6,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 14 }],
       check: { base: 0.6, skill: 'technical', traits: ['rover', 'pilot'] },
       success: DELIVERY,
@@ -367,13 +369,19 @@ const EMG_WATER: EventDef = {
     {
       id: 'repair',
       crew: { count: 1, skill: 'technical', traits: ['mechanic', 'chemist'] },
-      hours: 2,
+      hours: 3,
       check: { base: 0.6, skill: 'technical', traits: ['mechanic', 'chemist'], items: [{ item: 'filter', bonus: 0.2 }], earth: true },
       success: [{ kind: 'sys', key: 'waterRecycler', delta: 25 }, { kind: 'env', key: 'recyclerWear', value: 0 }],
       failure: [{ kind: 'sys', key: 'waterRecycler', delta: 5 }],
       weight: 3,
     },
     { id: 'abort', success: [{ kind: 'abort' }], weight: 4 },
+    {
+      id: 'reserve',
+      requires: [{ kind: 'notFlag', key: 'contingencyUsed', value: true }],
+      success: [{ kind: 'res', key: 'waterL', delta: 40 }, { kind: 'flag', key: 'contingencyUsed', value: true }],
+      weight: 3,
+    },
   ],
 };
 
@@ -391,7 +399,7 @@ const PREP_CME: EventDef = {
     {
       id: 'wall',
       crew: { count: 2, skill: 'teamwork' },
-      hours: 2,
+      hours: 3,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 8 }],
       success: [flag('cme', 'wall')],
       weight: 1,
@@ -440,7 +448,7 @@ const CME: EventDef = {
     {
       id: 'measure',
       crew: { count: 1, skill: 'science', traits: ['spaceWeather', 'comms'] },
-      hours: 2,
+      hours: 3,
       cost: [{ kind: 'shelter', target: 'unassigned', value: true }],
       check: { base: 0.7, skill: 'science', traits: ['spaceWeather', 'comms'] },
       success: [{ kind: 'res', key: 'science', delta: 14 }, { kind: 'shelter', target: 'assigned', value: true }],

@@ -99,6 +99,7 @@ function OptionChips({ run, option, available }: { run: RunState; option: EventO
   const chips: string[] = [];
   chips.push(option.hours && run.phase === 'surface' ? t('event.duration', { h: option.hours }) : t('event.instant'));
   if (option.crew) chips.push(t('event.assign', { n: option.crew.count }));
+  if (option.crew?.outside && option.hours) chips.push(t('event.outsideCost'));
   if (available && option.check) {
     const p = successChance(run, option.check, suggestCrew(run, option)).p;
     chips.push(t('event.chance', { pct: Math.round(p * 100) }));
@@ -166,9 +167,10 @@ export function EventCard({ run }: { run: RunState }) {
   };
 
   const sw = ev.id === 'CME' || ev.id === 'FC-CME' ? swParams(run, active.instanceId) : null;
+  const arrived = ev.id === 'REINF' ? String([...m.journal].reverse().find((j) => j.key === 'journal.arrived')?.params?.names ?? '') : '';
   const titleParams = {
     name: subjectName ?? '',
-    names: subjectNames,
+    names: subjectNames || arrived,
     dest: destName(t, run),
     days: ev.kind === 'forecast' ? forecastDays(run, m.minute, ev.id, active.instanceId) : 0,
     ...(sw ?? {}),
@@ -184,7 +186,7 @@ export function EventCard({ run }: { run: RunState }) {
       </div>
       <div className="event-body">
         <p className="speaker">
-          {speakerChar ? <Portrait seed={speakerChar.portraitSeed} size={36} /> : null}
+          {speakerChar ? <Portrait seed={speakerChar.portraitSeed} gender={speakerChar.gender} age={speakerChar.profile.age} size={36} /> : null}
           <span>
             <RichText text={t(`ev.${ev.id}.say`, { name: speaker })} />
           </span>
@@ -192,6 +194,22 @@ export function EventCard({ run }: { run: RunState }) {
         <p>
           <RichText text={t(`ev.${ev.id}.body`, titleParams)} />
         </p>
+        {sw && (
+          <ul className="prov" aria-label="NASA">
+            <li className="p-record">
+              <strong>{t('prov.record')}</strong>
+              {t('prov.recordText', sw)}
+            </li>
+            <li className="p-model">
+              <strong>{t('prov.model')}</strong>
+              {t('prov.modelText', sw)}
+            </li>
+            <li className="p-game">
+              <strong>{t('prov.game')}</strong>
+              {t('prov.gameText')}
+            </li>
+          </ul>
+        )}
         {sw?.link && (
           <p className="sw-source">
             <span className="sw-badge">NASA DONKI</span>{' '}
@@ -296,7 +314,7 @@ export function EventCard({ run }: { run: RunState }) {
                           else setCrewSel([...crewSel.slice(1), c.id]);
                         }}
                       >
-                        <Portrait seed={ch.portraitSeed} size={40} />
+                        <Portrait seed={ch.portraitSeed} gender={ch.gender} age={ch.profile.age} size={40} />
                         <span className="pick-name">{ch.name}</span>
                         <span className="pick-meta">
                           {t(`skill.${opt.crew!.skill}`)} {ch.skills[opt.crew!.skill]} · {t('crewPanel.fatigue')} {Math.round(c.fatigue)}

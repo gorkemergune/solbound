@@ -33,6 +33,7 @@ const ICON: Record<BigKind | 'return', string> = {
   meteor: 'M4 20l7-7M14 4l6 6-8 8-6-6zM14 4l-3 3',
   dark: 'M3 18h18M6 18l4-8 3 5 2-3 3 6M17 6a2 2 0 1 0 0 .1',
   resupply: 'M12 3l7 4v6c0 4-3 7-7 8-4-1-7-4-7-8V7zM9 12l2 2 4-4',
+  crew: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20c0-3 3-5 6-5s6 2 6 5M17 11a2.5 2.5 0 1 0 0-5M16 15c3 0 5 2 5 5',
   cme: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2',
   return: 'M12 3l3 6h-6zM12 9v9M8 21h8',
 };
@@ -72,6 +73,11 @@ export function CountdownChips({ run, onOpen }: { run: RunState; onOpen: () => v
           </button>
         );
       })}
+      {run.phase === 'surface' && (
+        <span role="listitem" className={`cd-chip cd-goal ${(m.minute - 360) / 1440 >= m.goal.target ? 'reached' : ''}`} title={t('goal.explain')}>
+          {(m.minute - 360) / 1440 >= m.goal.target ? `✓ ${t('goal.reached')}` : `◎ ${t('goal.chip', { d: m.goal.target })}`}
+        </span>
+      )}
       {run.phase === 'surface' && (
         <span role="listitem" className="cd-chip cd-return">
           <KindIcon kind="return" />
@@ -173,7 +179,7 @@ function PrepAction({ run, big, option, kind }: { run: RunState; big: BigEventSt
                 const on = valid.includes(c.id);
                 return (
                   <button key={c.id} type="button" className={`crew-pick ${on ? 'on' : ''}`} aria-pressed={on} onClick={() => toggle(c.id)} title={ch.name}>
-                    <Portrait seed={ch.portraitSeed} size={26} />
+                    <Portrait seed={ch.portraitSeed} gender={ch.gender} age={ch.profile.age} size={26} />
                     <span>{ch.name.split(' ')[0]}</span>
                   </button>
                 );
@@ -274,7 +280,7 @@ export function CrewAboard({ run }: { run: RunState }) {
           const ch = characterById(run, id);
           return (
             <li key={id}>
-              <Portrait seed={ch.portraitSeed} size={40} title={ch.name} />
+              <Portrait seed={ch.portraitSeed} gender={ch.gender} age={ch.profile.age} size={40} title={ch.name} />
               <span>{ch.name.split(' ')[0]}</span>
             </li>
           );

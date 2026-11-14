@@ -1,6 +1,8 @@
-# Solbound — güncel ürün kararı ve okuma sırası
+# Solbound — v0.2 tasarım sözleşmesi ve okuma sırası
 
-Sürüm: v0.2 · 14 Kasım 2026 · Durum: uygulama öncesi tasarım ve geliştirme sözleşmesi.
+> **Güncel durum için önce [CURRENT_STATE.md](CURRENT_STATE.md) dosyasını okuyun.** Bu belge uygulama öncesi v0.2 tasarımıdır ve tarihsel kayıt olarak korunur. O zamandan beri değişenler: 12 → 16 aday, 100V → 520 kg kütle bütçesi, 3 günlük demo → tam 30 günlük görev, canlı NASA DONKI verisi, geri sayımlı büyük olaylar, özet filmi. Aşağıdaki tablolarda bu eski değerler geçer.
+
+Sürüm: v0.2 · 14 Kasım 2026 · Durum: tarihsel tasarım sözleşmesi (uygulama bunun ötesine geçti).
 
 ## Ürün cümlesi
 
@@ -50,7 +52,7 @@ Bunlar kullanıcının kesin kararı olarak sunulmaz; ilk prototip için değiş
 6. [Claude Code geliştirme promptu](CLAUDE_CODE_PROMPT.md)
 7. [Model seçimi ve çalışma şekli](MODEL_WORKFLOW.md)
 
-`PROMPT.txt` ve `docs/MAIN.txt` kullanıcı tarafından hazırlanmış bağlam dosyalarıdır; korunur. Sonraki doğrudan kullanıcı talimatı her zaman belge önerilerinden üstündür. Eski `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md` ve `CLAUDE_DISCOVERY_TASK.md` tarihsel ilk öneriyi gösterir; 12-sol, yalnız Mars ve yalnız tur-onayı kapsamı güncel ürün hedefi değildir. Bilimsel kaynaklar için `RESEARCH.md` kullanılır; eski süre/kapsam varsayımları burada güncellenmiştir.
+`docs/BRAINSTORM.md` ve `docs/MAIN.md` (eski adlarıyla `PROMPT.txt` ve `docs/MAIN.txt`) kullanıcı tarafından hazırlanmış bağlam dosyalarıdır; korunur. Sonraki doğrudan kullanıcı talimatı her zaman belge önerilerinden üstündür. Eski `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md` ve `CLAUDE_DISCOVERY_TASK.md` tarihsel ilk öneriyi gösterir; 12-sol, yalnız Mars ve yalnız tur-onayı kapsamı güncel ürün hedefi değildir. Bilimsel kaynaklar için `RESEARCH.md` kullanılır; eski süre/kapsam varsayımları burada güncellenmiştir.
 
 ## Ürünün ayırt edici üç mekanizması
 

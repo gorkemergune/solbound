@@ -6,6 +6,10 @@ import './ui/styles.css';
 import { App } from './ui/App';
 import { StoreProvider } from './ui/store';
 import { SpaceWeatherProvider } from './live/useSpaceWeather';
+import { initialLocale, loadLocale } from './i18n';
+
+// load the starting language before the first paint (Turkish is a lazy chunk)
+await loadLocale(initialLocale()).catch(() => undefined);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

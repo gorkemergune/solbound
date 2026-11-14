@@ -138,6 +138,8 @@ export const RESEARCH: ResearchCard[] = [
     gameRules: ['meteorNotice'],
   },
   { id: 'R-RESUPPLY', appliesTo: ['moon', 'mars'], kind: 'gameplay', sources: [], accessedAt: '2026-11-14', unlocks: [], gameRules: ['resupplyContents'] },
+  { id: 'R-MOLD', appliesTo: ['moon', 'mars'], kind: 'sourced', sources: [{ title: 'NASA — NASA Teams Persevere Through Plant Challenges in Space', url: 'https://www.nasa.gov/humans-in-space/nasa-teams-persevere-through-plant-challenges-in-space/' }], accessedAt: '2026-11-14', unlocks: [], gameRules: [] },
+  { id: 'R-REINF', appliesTo: ['moon'], kind: 'gameplay', sources: [], accessedAt: '2026-11-14', unlocks: [], gameRules: ['evaCost', 'difficulty'] },
   {
     id: 'R-DONKI',
     appliesTo: ['moon', 'mars'],

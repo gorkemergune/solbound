@@ -16,6 +16,7 @@ export type Outcome = {
   /** why the rating is not a full success (i18n keys) */
   reasons: string[];
   missionDays: number;
+  goal: { estimate: number; target: number; limiting: string | null };
   /** days actually spent on the surface */
   daysOnSurface: number;
   harvests: number;
@@ -33,11 +34,15 @@ export function computeOutcome(run: RunState): Outcome {
   const evacuated = m.crew.filter((c) => c.status === 'evacuated').map((c) => c.id);
   const lost = m.crew.filter((c) => c.status === 'deceased').map((c) => c.id);
 
+  const endMinute = typeof m.flags.surfaceEndMinute === 'number' ? (m.flags.surfaceEndMinute as number) : (m.ended?.minute ?? m.minute);
+  const daysOnSurface = Math.min(s.missionDays, Math.max(0, (endMinute - 360) / 1440));
   let rating: Rating;
   if (m.ended?.reason === 'playerLost' || (lost.length > 0 && home.length === 0)) rating = 'lost';
   else if (lost.length) rating = 'partial';
   else if (m.ended?.reason === 'aborted') rating = 'aborted';
   else if (evacuated.length || m.flags.arrival === 'rough' || m.flags.margin === 'none') rating = 'partial';
+  // the goal set before launch (85% of the estimated endurance) must be reached for a full success
+  else if (daysOnSurface + 1e-9 < m.goal.target) rating = 'partial';
   else rating = 'success';
 
   const reasons: string[] = [];
@@ -46,6 +51,7 @@ export function computeOutcome(run: RunState): Outcome {
   if (m.ended?.reason === 'aborted') reasons.push('reason.aborted');
   if (m.flags.margin === 'none') reasons.push('reason.ration');
   if (m.flags.arrival === 'rough') reasons.push('reason.rough');
+  if (m.ended?.reason === 'complete' && daysOnSurface + 1e-9 < m.goal.target) reasons.push('reason.early');
 
   const main = m.decisions.filter((d) => d.weight >= 3);
   const keyDecisions = (main.length >= 3 ? main : m.decisions)
@@ -76,7 +82,8 @@ export function computeOutcome(run: RunState): Outcome {
     lessons: lessons.slice(0, 5),
     reasons,
     missionDays: s.missionDays,
-    daysOnSurface: Math.min(s.missionDays, Math.max(0, Math.round(((m.ended?.minute ?? m.minute) - 360) / 1440 * 10) / 10)),
+    daysOnSurface: Math.round(daysOnSurface * 10) / 10,
+    goal: m.goal,
     harvests: m.harvests,
     bigEvents: m.big
       .filter((b) => m.resolved.includes(`${b.hitEventId}@${b.id}`))

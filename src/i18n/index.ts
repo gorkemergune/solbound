@@ -1,15 +1,35 @@
 import type { Locale } from '../engine/types';
 import { en, type TKey } from './en';
-import { tr } from './tr';
 
 export type { TKey };
-const DICTS = { en, tr } as const;
+// English is bundled (it is also the fallback); Turkish is a separate chunk loaded on demand.
+const DICTS: Partial<Record<Locale, Record<string, string>>> = { en };
+
+export function isLocaleLoaded(locale: Locale): boolean {
+  return !!DICTS[locale];
+}
+
+export async function loadLocale(locale: Locale): Promise<void> {
+  if (DICTS[locale]) return;
+  if (locale === 'tr') DICTS.tr = (await import('./tr')).tr;
+}
+
+/** The language to start in: the saved choice, else the browser language. */
+export function initialLocale(): Locale {
+  try {
+    const v = window.localStorage.getItem('solbound.locale');
+    if (v === 'en' || v === 'tr') return v;
+  } catch {
+    /* storage blocked */
+  }
+  return typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('tr') ? 'tr' : 'en';
+}
 
 export type Params = Record<string, string | number | undefined>;
 
 /** Parameterised translation. Never concatenates sentences; unknown keys return the key itself. */
 export function translate(locale: Locale, key: string, params?: Params): string {
-  const dict = DICTS[locale] as Record<string, string>;
+  const dict = DICTS[locale] ?? (en as Record<string, string>);
   let s = dict[key] ?? (en as Record<string, string>)[key] ?? key;
   if (params) {
     s = s.replace(/\{(\w+)\}/g, (_, p: string) => {

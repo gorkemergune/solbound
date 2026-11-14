@@ -1,11 +1,21 @@
 import { decisionRoll } from './rng';
 import { activeCrew, applyEffects, characterById, dayOf, eventOf, harvest, hasTrait, log, scenarioOf, type Ctx, type EffectHooks } from './rules';
-import { CROPS, surfaceEndMinute } from './scenarios';
+import { CROPS, SURFACE_START_MINUTE, surfaceEndMinute } from './scenarios';
 import { maybeChat } from './chatter';
+import { HARVEST_VARIANTS } from './events4';
 import { Rng, deriveSeed } from './rng';
-import type { DaySnapshot, MissionState, PowerReport, RunState } from './types';
+import type { DaySnapshot, GreenhouseMode, MissionState, PowerReport, RunState } from './types';
 
 const clamp = (v: number, lo = 0, hi = 100) => Math.min(hi, Math.max(lo, v));
+
+/** Per person per hour outside (gameplay values, not suit specifications): suit O₂, sublimator cooling water, recharge. */
+export const EVA_O2_KG_H = 0.06;
+export const EVA_WATER_L_H = 0.3;
+export const EVA_KWH_H = 0.25;
+/** Reinforcement module (gameplay): extra O2 generation and the power it needs. */
+export const MODULE_O2_KG_H = 0.06;
+export const MODULE_LS_KW = 0.5;
+export const MODULE_SOLAR_KW = 1.2;
 
 /** Electrolysis: 2 H2O -> 2 H2 + O2, so about 1.125 kg of water per kg of O2 (derived from molar masses). */
 export const WATER_PER_KG_O2 = 36.03 / 32.0;
@@ -49,7 +59,9 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
   const solarNow = s.solarKW(hour, day);
   const solarGen = solarNow * (env.darkHours > 0 ? env.darkFactor : 1) * (1 - env.dust) * (sys.solar / 100);
   const baseGen = s.baseKW * (1 - env.fissionLoss);
-  const gen = solarGen + baseGen;
+  // the reinforcement module unfolds its own small array (gameplay)
+  const moduleGen = m.flags.module === 'ready' && solarNow > 0.5 ? MODULE_SOLAR_KW * (env.darkHours > 0 ? env.darkFactor : 1) : 0;
+  const gen = solarGen + baseGen + moduleGen;
   const night = solarGen < 1;
   // Lunar night at the equator: heaters run on fission power; insulation, waste heat and a quiet base help.
   const lunarNight = s.baseKW > 0 && solarNow <= 0;
@@ -60,7 +72,12 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
   if (m.flags.loadShift) waterLoad = night ? 0 : s.loads.water * 1.7;
   const loads: Record<LoadKey, number> = {
     lifeSupport: s.loads.lifeSupport,
-    thermal: Math.max(0.8, s.loads.thermal(hour, day) - nightRelief) + (env.heatHours > 0 ? 1.0 : 0) + (coverHeatLoss ? 0.5 : 0),
+    thermal:
+      Math.max(0.8, s.loads.thermal(hour, day) - nightRelief) +
+      (env.heatHours > 0 ? 1.0 : 0) +
+      (coverHeatLoss ? 0.5 : 0) +
+      // reinforcement module: heated volume (less with the prepared power run)
+      (m.flags.module === 'ready' ? (m.flags.modulePower ? 0.3 : 0.6) + MODULE_LS_KW : 0),
     water: waterLoad,
     sabatier: m.h2Mode === 'sabatier' ? s.loads.sabatier : 0,
     moxie: (m.items.moxie ?? 0) > 0 ? s.loads.moxie : 0,
@@ -98,7 +115,7 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
       env.darkFactor = 0;
       if (m.flags.shadowEssentials) {
         m.flags.shadowEssentials = false;
-        m.greenhouseMode = 'full';
+        m.greenhouseMode = (m.flags.ghBefore as GreenhouseMode | undefined) ?? 'full';
         log(m, run, 'journal.ghRestored', 'info');
       }
     }
@@ -108,13 +125,25 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
     if (env.heatHours <= 0) log(m, run, 'journal.heatOver', 'good');
   }
 
+  // ---- suits: people working outside use suit O₂, cooling water and battery recharge (gameplay values) ----
+  const outside = crew.filter((c) => {
+    if (!c.taskId) return false;
+    const t = m.tasks.find((x) => x.id === c.taskId);
+    return !!t && !!eventOf(t.eventId).options.find((o) => o.id === t.optionId)?.crew?.outside;
+  }).length;
+  const eva = { people: outside, o2: outside * EVA_O2_KG_H, water: outside * EVA_WATER_L_H, kwh: outside * EVA_KWH_H };
+  r.batteryKWh = Math.max(0, r.batteryKWh - eva.kwh);
+
   // ---- oxygen ----
-  const o2Prod = s.o2ProductionKgH * served.lifeSupport * (sys.lifeSupport / 100);
+  // the reinforcement module brings its own oxygen generator (it runs on the module's power share)
+  const o2Prod = (s.o2ProductionKgH + (m.flags.module === 'ready' ? MODULE_O2_KG_H * served.thermal : 0)) * served.lifeSupport * (sys.lifeSupport / 100);
   const moxieProd = loads.moxie > 0 ? s.moxieKgH * served.moxie : 0;
+  // electrolysis makes less when MOXIE covers part of the demand (it would only fill the tanks otherwise)
+  const electroO2 = Math.max(0, o2Prod - moxieProd * 0.8);
   const o2Use = s.o2PerCrewKgH * n;
   const leak = env.leakKgH;
   if (env.leakKgH > 0) env.leakKgH = Math.min(1, env.leakKgH + env.leakGrowth);
-  r.o2Kg += o2Prod + moxieProd - o2Use - leak;
+  r.o2Kg += electroO2 + moxieProd - o2Use - leak - eva.o2;
 
   // ---- water ----
   // Quartermaster on board: 10% lower food and water use (gameplay rule).
@@ -122,36 +151,40 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
   // Nutritionist: meals planned to the gram, 8% less food used (gameplay rule)
   const nut = hasTrait(run, m, 'nutrition') ? 0.92 : 1;
   const crewWater = s.waterPerCrewLH * n * (m.flags.waterRation ? 0.7 : 1) * qm;
-  const recovered = crewWater * s.recyclerRecovery * (sys.waterRecycler / 100) * served.water;
+  // an ISRU chemist tunes the processor: +2 points of water recovery (gameplay rule)
+  const recovery = Math.min(0.98, s.recyclerRecovery + (hasTrait(run, m, 'chemist') ? 0.02 : 0));
+  const recovered = crewWater * recovery * (sys.waterRecycler / 100) * served.water;
   const ghWater = s.greenhouseWaterLH[m.greenhouseMode] * served.greenhouse * (m.flags.nutrientLoop ? 0.6 : 1);
   // Sabatier (R-LOOP): electrolysis hydrogen + exhaled CO2 -> water + methane. ~0.56 kg water back per kg O2 made (derived).
-  const sabatierWater = m.h2Mode === 'sabatier' ? o2Prod * SABATIER_WATER_PER_KG_O2 * served.sabatier : 0;
+  const sabatierWater = m.h2Mode === 'sabatier' ? electroO2 * SABATIER_WATER_PER_KG_O2 * served.sabatier : 0;
   if (m.h2Mode === 'sabatier') sys.lifeSupport = clamp(sys.lifeSupport - 0.12);
-  r.waterL += recovered + sabatierWater - crewWater - o2Prod * WATER_PER_KG_O2 - ghWater;
+  r.waterL += recovered + sabatierWater - crewWater - electroO2 * WATER_PER_KG_O2 - ghWater - eva.water;
   sys.waterRecycler = clamp(sys.waterRecycler - env.recyclerWear);
 
   // ---- food & greenhouse ----
   r.foodCrewDays -= (n / 24) * qm * nut;
   m.lastFlows = {
-    o2Prod,
+    o2Prod: electroO2,
     moxieProd,
     o2Use,
     leak,
     waterRecovered: recovered,
     crewWater,
-    electrolysisWater: o2Prod * WATER_PER_KG_O2,
+    electrolysisWater: electroO2 * WATER_PER_KG_O2,
     greenhouseWater: ghWater,
     foodUse: (n / 24) * qm * nut,
     batteryDelta: r.batteryKWh - battery0,
     sabatierWater,
+    eva,
   };
-  sys.greenhouseHealth = clamp(sys.greenhouseHealth - env.wilt - (coverHeatLoss ? 0.4 : 0));
+  sys.greenhouseHealth = clamp(sys.greenhouseHealth - (env.wilt + (coverHeatLoss ? 0.4 : 0)) * (hasTrait(run, m, 'botanist') ? 0.7 : 1));
   const modeFactor = m.greenhouseMode === 'full' ? 1 : m.greenhouseMode === 'eco' ? 0.4 : 0;
   const lightFactor = mars && coverClosed && sunUp ? 0.15 : 1;
   if (sys.greenhouseGrowth < 100) {
     sys.greenhouseGrowth = Math.min(
       100,
-      sys.greenhouseGrowth + CROPS[m.crop].growthPerH * modeFactor * served.greenhouse * lightFactor * (sys.greenhouseHealth / 100) * (m.flags.nutrientLoop ? 1.2 : 1),
+      sys.greenhouseGrowth +
+        CROPS[m.crop].growthPerH * modeFactor * served.greenhouse * lightFactor * (sys.greenhouseHealth / 100) * (m.flags.nutrientLoop ? 1.2 : 1) * (hasTrait(run, m, 'botanist') ? 1.15 : 1),
     );
   }
   // Ripe crops wait for the crew's decision (HARVEST event); outside surface ops they are simply eaten.
@@ -169,13 +202,18 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
       log(m, run, 'journal.stormThins', 'good');
       if (m.flags.hunker) {
         m.flags.hunker = false;
-        m.greenhouseMode = 'full';
+        m.greenhouseMode = (m.flags.ghBefore as GreenhouseMode | undefined) ?? 'full';
         log(m, run, 'journal.ghRestored', 'info');
       }
     }
   }
 
   // ---- solar particle event ----
+  // space-weather analyst: the all-clear comes 2 h sooner once per particle event (gameplay rule)
+  if (env.speHours > 2 && !m.flags.speCutDone && hasTrait(run, m, 'spaceWeather')) {
+    env.speHours -= 2;
+    m.flags.speCutDone = true;
+  }
   if (env.speHours > 0) {
     for (const c of crew) {
       if (c.sheltered) {
@@ -187,6 +225,7 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
     }
     env.speHours -= 1;
     if (env.speHours <= 0) {
+      delete m.flags.speCutDone;
       for (const c of crew) c.sheltered = false;
       log(m, run, 'journal.speOver', 'good');
     }
@@ -219,12 +258,19 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
 
   // ---- crew routines ----
   const isNight = hour >= 22 || hour < 6;
+  // six people in a four-person habitat
+  if (m.flags.module === 'cramped' || m.flags.module === 'packed') for (const c of crew) c.stress = clamp(c.stress + 0.25);
+  if (m.flags.module === 'shifts') for (const c of crew) c.fatigue = clamp(c.fatigue + 0.2);
+  // team cohesion: a crew with high teamwork gains stress more slowly (each 10 points above 50 → 5% less);
+  // a mediator on board takes another 15% off for everyone (gameplay rules)
+  const avgTeam = crew.reduce((a, c) => a + characterById(run, c.id).skills.teamwork, 0) / Math.max(1, n);
+  const cohesion = Math.min(1.25, Math.max(0.75, 1 - (avgTeam - 50) / 200)) * (hasTrait(run, m, 'mediator') ? 0.85 : 1);
   for (const c of crew) {
     const ch = characterById(run, c.id);
-    const resist = (ch.traitId === 'steady' ? 0.6 : 1) * (1 - (Math.min(ch.profile.experienceYears, 16) / 16) * 0.25);
+    const resist = cohesion * (ch.traitId === 'steady' ? 0.6 : 1) * (1 - (Math.min(ch.profile.experienceYears, 16) / 16) * 0.25);
     if (!isNight) c.stress = clamp(c.stress + 0.2 * resist);
     if (c.taskId) {
-      c.fatigue = clamp(c.fatigue + 2.5);
+      c.fatigue = clamp(c.fatigue + 2.5 * (ch.traitId === 'steady' ? 0.85 : 1));
     } else if (c.sheltered) {
       c.fatigue = clamp(c.fatigue - 1);
       c.stress = clamp(c.stress + 0.4 * resist);
@@ -319,7 +365,7 @@ export function closeBigEvents(run: RunState) {
     if (b.kind === 'night') {
       m.env.fissionLoss = 0;
       if (m.flags.nightMode === 'hibernate' || m.flags.nightMode === 'eco') {
-        m.greenhouseMode = 'full';
+        m.greenhouseMode = (m.flags.ghBefore as GreenhouseMode | undefined) ?? 'full';
         log(m, run, 'journal.ghRestored', 'info');
       }
       delete m.flags.nightMode;
@@ -429,9 +475,14 @@ export function checkEmergencies(run: RunState, hooks: EffectHooks) {
     openEvent(run, 'EMG-O2', `EMG-O2@${day}`, hooks);
     return;
   }
+  // Return power: warn in the last stretch before the goal if the battery is below the return need at midday
+  if (hourOfDay(m.minute) === 13 && day >= m.goal.target - 4 && m.resources.batteryKWh < s.returnNeeds.batteryKWh && !m.flags[`battWarn@${day}`]) {
+    m.flags[`battWarn@${day}`] = true;
+    log(m, run, 'journal.batteryReturnWarn', 'warn', { have: Math.round(m.resources.batteryKWh), need: s.returnNeeds.batteryKWh });
+  }
   // Water: warn, then offer a decision, before the tanks run dry.
   const f = m.lastFlows;
-  const waterRate = f ? f.waterRecovered + f.sabatierWater - f.crewWater - f.electrolysisWater - f.greenhouseWater : 0;
+  const waterRate = f ? f.waterRecovered + f.sabatierWater - f.crewWater - f.electrolysisWater - f.greenhouseWater - (f.eva?.water ?? 0) : 0;
   const waterLeft = waterRate < -1e-6 ? m.resources.waterL / -waterRate : Infinity;
   if (waterLeft < 72 && !m.flags[`waterWarn@${day}`]) {
     m.flags[`waterWarn@${day}`] = true;
@@ -442,15 +493,47 @@ export function checkEmergencies(run: RunState, hooks: EffectHooks) {
     openEvent(run, 'EMG-WATER', `EMG-WATER@${day}`, hooks);
     return;
   }
-  for (const c of activeCrew(m)) {
-    if (c.health < 35 && !c.warned) {
-      c.warned = true;
-      openEvent(run, 'EMG-MED', `EMG-MED@${c.id}@${Math.floor(m.minute)}`, hooks, c.id);
+  const lastMed = typeof m.flags.lastMed === 'number' ? (m.flags.lastMed as number) : -1e9;
+  if (m.minute - lastMed >= 12 * 60) {
+    const sick = activeCrew(m).filter((c) => c.health < 35 && !c.warned).sort((a, b) => a.health - b.health);
+    if (sick.length) {
+      // the worst case gets the card; the others are warned in the journal (fewer interruptions)
+      for (const c of sick) c.warned = true;
+      for (const c of sick.slice(1)) log(m, run, 'journal.alsoSick', 'warn', { name: characterById(run, c.id).name });
+      m.flags.lastMed = m.minute;
+      openEvent(run, 'EMG-MED', `EMG-MED@${sick[0].id}@${Math.floor(m.minute)}`, hooks, sick[0].id);
       return;
     }
   }
-  // Ripe greenhouse: the crew decides what to do with the harvest.
-  if (m.systems.greenhouseGrowth >= 100) openEvent(run, 'HARVEST', `HARVEST@${Math.floor(m.minute)}`, hooks);
+  // Ripe greenhouse: the crew decides what to do with the harvest (a different kind of harvest card each time).
+  // (not while a harvest task from the previous card is still running: that would harvest twice)
+  if (m.systems.greenhouseGrowth >= 100 && !m.tasks.some((t) => t.eventId.startsWith('HARVEST'))) {
+    const id = harvestVariant(run);
+    if (openEvent(run, id, `${id}@${Math.floor(m.minute)}`, hooks)) m.flags.lastHarvest = id;
+  }
+}
+
+/** First harvest: the classic card; afterwards a seeded rotation, never the same card twice in a row. */
+export function harvestVariant(run: RunState): string {
+  const m = run.mission!;
+  if (!m.flags.lastHarvest) return 'HARVEST';
+  const order = new Rng(deriveSeed(run.seed, 'harvest-order')).shuffle([...HARVEST_VARIANTS]);
+  const n = m.harvests;
+  for (let k = 0; k < order.length; k++) {
+    const id = order[(n + k) % order.length];
+    if (id !== m.flags.lastHarvest) return id;
+  }
+  return 'HARVEST';
+}
+
+/** Moon: after two live calls Earth offers a reinforcement crew (once, while there is time for it to matter). */
+export function maybeOfferReinforcement(run: RunState) {
+  const m = run.mission!;
+  // the crew lands on day 20 at the earliest; the offer is open until day 24 so they still have time to matter
+  if (run.destination !== 'moon' || m.flags.reinfOffered || (m.flags.earthCalls as number) < 2 || m.minute > 24 * 1440) return;
+  m.flags.reinfOffered = true;
+  m.queue.push({ eventId: 'REINF-OFFER', atMinute: m.minute + 90, instanceId: 'REINF-OFFER' });
+  m.queue.sort((a, b) => a.atMinute - b.atMinute);
 }
 
 export function makeHooks(run: RunState): EffectHooks {
@@ -499,6 +582,15 @@ export function advanceTime(run: RunState, deltaMinutes: number) {
     const next = m.queue[0];
     if (next && next.atMinute <= m.minute + 1e-9) {
       m.queue.shift();
+      // forecasts no longer stop the clock: they become a journal line and a banner with a link to the plan
+      if (next.eventId.startsWith('FC-')) {
+        const id = next.instanceId ?? next.eventId;
+        if (!m.resolved.includes(id)) {
+          m.resolved.push(id);
+          log(m, run, `ev.${next.eventId}.title`, 'forecast', { instance: id });
+        }
+        continue;
+      }
       if (openEvent(run, next.eventId, next.instanceId ?? next.eventId, hooks)) return;
       continue;
     }
@@ -526,8 +618,10 @@ export function endSurface(run: RunState) {
   for (const c of m.crew) c.sheltered = false;
   m.env.speHours = 0;
   run.phase = 'returnPrep';
-  snapshot(run, scenarioOf(run).missionDays);
-  log(m, run, 'journal.surfaceDone', 'good', { days: scenarioOf(run).missionDays });
+  const days = Math.min(scenarioOf(run).missionDays, Math.max(0, Math.round(((m.minute - SURFACE_START_MINUTE) / 1440) * 10) / 10));
+  m.flags.surfaceEndMinute = m.minute;
+  snapshot(run, Math.ceil(days));
+  log(m, run, 'journal.surfaceDone', 'good', { days: Math.floor(days) });
   openEvent(run, 'RETURN-01', 'RETURN-01', hooks);
 }
 

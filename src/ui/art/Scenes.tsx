@@ -144,7 +144,7 @@ export function TransitScene({ dest, direction, progress }: { dest: DestinationI
   const dy = 2 * (1 - t) * (cy - from.y) + 2 * t * (to.y - cy);
   const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
   return (
-    <svg className="scene-svg" viewBox="0 0 1600 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <svg className="scene-svg" viewBox="0 0 1600 700" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
       <defs>
         <radialGradient id="tr-earth" cx="40%" cy="35%" r="65%">
           <stop offset="0" stopColor="#8fd0ff" />
@@ -166,12 +166,20 @@ export function TransitScene({ dest, direction, progress }: { dest: DestinationI
         </radialGradient>
       </defs>
       <rect width="1600" height="700" fill="#070b17" />
-      <Stars seed={dest === 'mars' ? 21 : 23} count={200} w={1600} h={700} />
+      {/* parallax: far and near star layers drift as the ship moves */}
+      <g transform={`translate(${-p * 120} 0)`}>
+        <Stars seed={dest === 'mars' ? 21 : 23} count={200} w={1800} h={700} />
+      </g>
+      <g transform={`translate(${-p * 420} 0)`} opacity="0.8">
+        <Stars seed={dest === 'mars' ? 31 : 33} count={60} w={2200} h={700} />
+      </g>
       <circle cx="160" cy="520" r="90" fill="url(#tr-earth)" />
       <path d="M110 490c26-20 64-12 70 10-16 6-36 18-60 12z" fill="#dfeedd" opacity="0.7" />
       <circle cx="1440" cy="360" r={dest === 'mars' ? 70 : 58} fill="url(#tr-dest)" />
       <path d={`M${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`} stroke="#f5b041" strokeOpacity="0.4" strokeWidth="2.5" strokeDasharray="5 12" fill="none" />
-      <g>
+      {/* engine trail behind the ship */}
+      <path d={`M${from.x} ${from.y} Q ${cx} ${cy} ${to.x} ${to.y}`} stroke="#ffb347" strokeWidth="3" fill="none" strokeDasharray={`${p * 1900} 4000`} opacity="0.55" />
+      <g className="ship-float">
         <Ship x={x} y={y} scale={0.9} rotate={angle} />
       </g>
     </svg>

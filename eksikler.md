@@ -1,7 +1,7 @@
-ilk siteye girince kullanıcı karşılama ui'ı çok dandik ve sade daha çok gelişmeli.  dil çok ortada değil de yukarda olmalı. ana sayfada oyun hakkında ufak çaplı hikaye yaz isteyen butona tıklayıp okuyabilir
+ekip seçimi sayfasını sayfalandırmışsın o gözükmüyor yana kaymak onu eski haline getir. sayfanı aşağı kaydırdıkça yandaki ekip proffili de onunla beraber kaysın.
 
-insanları içine çekecek ve NASA logosu cisimleri barındıran birşey lazım
+uzaya inince yanlarda siyah boşluklar var onu kaldır ve ana ortam ekranının yüksekliğini biraz düş. alttaki karar kısmı biraz daha gözüksün. bug2.png'de olan bugu gösterdim
 
-ilk gün taski 07.00'de geldi, günün ikinci taski 16.00'da geldi. bu sırada kişi 20sn falan bekliyor. bu yüzden bu bekleme aralarında astronotlar aralarında sohbet eklenmeli ve hız x8 x16 de eklenmeli
+sana dediğim taskleri hangi ekip arkadaşı yapsını ayarlamamışsın. ekip arkadaşı ayarlama kısmı ilk başta 2x2 olcak sonradan 2 kişi daha geline 3x2 olucak
 
-biz yanımıza 100V hacimlik alıyoruz ama nasa'nın verilerinde hacimden ziyade önemli olan ağırlık. seçilecek astronotlara ve kendimize de ağırlık ata. uzay gemisi örneğin 400kg alıcak, kişiler kilosunun harici onlara yardımcı kit, kıyafet, makine parçası kalan yerlere de extra malzemeler alacaklar bunu düzeltelim.
+bu sefer genel olarak sekmeler, ui'lar çok büyük olmuş biraz küçültmemiz ve sekmeler açıldığında sığması lazım

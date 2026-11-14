@@ -2,6 +2,7 @@
 import { applyCommand, createRun, type Command } from './commands';
 import { eventOf, optionState, suggestCrew } from './rules';
 import { PREP_EVENT, bigStatus, prepStatusKey } from './bigevents';
+import { Rng, deriveSeed } from './rng';
 import type { DestinationId, ItemId, Mode, RunState, SiteId } from './types';
 
 export function must(run: RunState, cmd: Command): RunState {
@@ -75,6 +76,58 @@ export function startPreps(run: RunState, actions: string[]): RunState {
       const res = applyCommand(r, { type: 'prep', bigId: b.id, actionId: id, crewIds: suggestCrew(r, o) });
       if (!res.error) r = res.state;
     }
+  }
+  return r;
+}
+
+/**
+ * A realistic setup for balance reports: three crew picked by the seed, cargo packed through the real
+ * mass check (items that no longer fit are skipped), launched through the normal command.
+ */
+export function realistic(opts: { seed: number; dest: DestinationId; site?: SiteId; cargo: Partial<Record<ItemId, number>> }): RunState {
+  let run = createRun(opts.seed, 'en', 'standard');
+  run = must(run, { type: 'goTo', phase: 'destination' });
+  run = must(run, { type: 'setDestination', destination: opts.dest });
+  if (opts.site) run = must(run, { type: 'setSite', site: opts.site });
+  run = must(run, { type: 'goTo', phase: 'crew' });
+  const ids = new Rng(deriveSeed(opts.seed, 'balance-crew')).shuffle(run.candidates.map((c) => c.id)).slice(0, 3);
+  for (const id of ids) run = must(run, { type: 'toggleCrew', id });
+  run = must(run, { type: 'goTo', phase: 'cargo' });
+  for (const [k, v] of Object.entries(opts.cargo)) {
+    for (let q = 1; q <= (v ?? 0); q++) {
+      const res = applyCommand(run, { type: 'setCargo', itemId: k, qty: q });
+      if (res.error) break;
+      run = res.state;
+    }
+  }
+  run = must(run, { type: 'goTo', phase: 'briefing' });
+  return must(run, { type: 'launch' });
+}
+
+/** Play an already launched run with a policy. */
+export function playLaunched(run: RunState, policy: Policy, stepMinutes = 60): RunState {
+  let r = run;
+  let guard = 0;
+  while (r.phase !== 'debrief' && guard++ < 6000) {
+    const m = r.mission!;
+    if (m.activeEvent) {
+      const ev = eventOf(m.activeEvent.eventId);
+      const prefs = [...(policy[ev.id] ?? []), ...ev.options.map((o) => o.id)];
+      const opt = prefs.map((id) => ev.options.find((o) => o.id === id)!).find((o) => o && optionState(r, o, m.activeEvent).available);
+      if (!opt) throw new Error(`no available option for ${ev.id}`);
+      r = must(r, { type: 'resolve', instanceId: m.activeEvent.instanceId, optionId: opt.id, crewIds: suggestCrew(r, opt) });
+      continue;
+    }
+    if (r.phase === 'landing') {
+      r = must(r, { type: 'beginSurface' });
+      continue;
+    }
+    if (r.phase === 'surface') {
+      r = startPreps(r, policy.PREP ?? []);
+      r = must(r, { type: 'advance', minutes: stepMinutes });
+      continue;
+    }
+    throw new Error(`stuck in ${r.phase}`);
   }
   return r;
 }

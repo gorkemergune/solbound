@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   bigStatus,
   RESEARCH,
@@ -24,6 +24,7 @@ import { journalText, swLink } from '../text';
 import { useMissionClock, type PauseReason } from '../useMissionClock';
 import { Brand } from './Title';
 import { CountdownChips, CrewAboard, PrepPanel, TimeAwareness } from './MissionExtras';
+import { ReturnHomeModal } from '../components/ReturnHome';
 
 // ---------------- transit (outbound / return flight) ----------------
 
@@ -31,7 +32,8 @@ export function TransitScreen({ direction }: { direction: 'out' | 'back' }) {
   const { run, t, pending } = useStore();
   const r = run!;
   const [progress, setProgress] = useState(0);
-  const target = 0.5;
+  // cruise to the midpoint before the first decision (~7 s), then the rest of the way after it
+  const target = pending ? 1 : 0.5;
   const reduced = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   useEffect(() => {
     if (reduced) {
@@ -39,29 +41,39 @@ export function TransitScreen({ direction }: { direction: 'out' | 'back' }) {
       return;
     }
     let raf = 0;
+    const from = progress;
     const start = performance.now();
+    const ms = target === 1 ? 3500 : 7000;
     const step = (now: number) => {
-      const p = Math.min(target, ((now - start) / 2600) * target);
-      setProgress(p);
-      if (p < target) raf = requestAnimationFrame(step);
+      const k = Math.min(1, (now - start) / ms);
+      const eased = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      setProgress(from + (target - from) * eased);
+      if (k < 1) raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [reduced]);
-  const arrived = progress >= target - 1e-3;
+  }, [reduced, target]); // eslint-disable-line react-hooks/exhaustive-deps
+  const arrived = progress >= 0.5 - 1e-3;
   const showEvent = r.mission?.activeEvent && !pending;
   return (
     <div className={`transit theme-${r.destination}`}>
       <MiniHeader title={direction === 'out' ? t('transit.outbound', { dest: t(`dest.${r.destination}`) }) : t('transit.return')} />
       <main id="main" className="transit-main">
         <div className="transit-scene">
-          <TransitScene dest={r.destination!} direction={direction} progress={pending ? 1 : progress} />
+          <TransitScene dest={r.destination!} direction={direction} progress={progress} />
+          <div className="transit-progress" aria-live="off">
+            <strong>{direction === 'out' ? t('transit.cruise', { dest: t(`dest.${r.destination}`) }) : t('transit.return')}</strong>
+            <span>{t('transit.toGo', { p: Math.round(progress * 100) })}</span>
+            <span className="tp-bar">
+              <span style={{ width: `${Math.round(progress * 100)}%` }} />
+            </span>
+          </div>
           <CrewAboard run={r} />
           <p className="transit-note fine">
             {t('transit.compressed')} {t(r.destination === 'mars' ? 'transit.realMars' : 'transit.realMoon')}
           </p>
           {!arrived && !pending && (
-            <button type="button" className="btn ghost skip" onClick={() => setProgress(target)}>
+            <button type="button" className="btn ghost skip" onClick={() => setProgress(0.5)}>
               {t('app.skip')} »
             </button>
           )}
@@ -112,7 +124,7 @@ function ChatBubble({ run }: { run: RunState }) {
         const ch = c ? characterById(run, c.id) : null;
         return (
           <p key={i} className={`chat-line ${i % 2 ? 'b' : 'a'}`}>
-            {ch && <Portrait seed={ch.portraitSeed} size={30} />}
+            {ch && <Portrait seed={ch.portraitSeed} gender={ch.gender} age={ch.profile.age} size={30} />}
             <span>
               <RichText text={line} />
             </span>
@@ -182,8 +194,9 @@ function ResourceStrip({ run }: { run: RunState }) {
   const m = run.mission!;
   const r = m.resources;
   const f = m.lastFlows;
-  const o2Rate = f ? f.o2Prod + f.moxieProd - f.o2Use - f.leak : 0;
-  const waterRate = f ? f.waterRecovered + f.sabatierWater - f.crewWater - f.electrolysisWater - f.greenhouseWater : 0;
+  const ev = f?.eva ?? { people: 0, o2: 0, water: 0, kwh: 0 };
+  const o2Rate = f ? f.o2Prod + f.moxieProd - f.o2Use - f.leak - ev.o2 : 0;
+  const waterRate = f ? f.waterRecovered + f.sabatierWater - f.crewWater - f.electrolysisWater - f.greenhouseWater - ev.water : 0;
   const foodRate = f ? -f.foodUse : 0;
   const left = (h: number) => (h === Infinity ? t('res.stable') : h > 72 ? t('res.daysLeft', { d: formatFixed(locale, h / 24, 0) }) : t('res.hoursLeft', { h: Math.floor(h) }));
   const fx = (v: number, d = 2) => (v >= 0 ? '+' : '−') + formatFixed(locale, Math.abs(v), d);
@@ -216,6 +229,7 @@ function ResourceStrip({ run }: { run: RunState }) {
           {f.moxieProd > 0 && <span>{t('power.moxie')}: {fx(f.moxieProd)} kg/h</span>}
           <span>{t('crewPanel.title')}: {fx(-f.o2Use)} kg/h</span>
           {f.leak > 0 && <span>{t('sys.seal')}: {fx(-f.leak)} kg/h</span>}
+          {ev.people > 0 && <span>{t('eva.suits', { n: ev.people })}: {fx(-ev.o2)} kg/h</span>}
           <em>{t('rule.o2Production')}</em>
         </>
       ),
@@ -233,6 +247,7 @@ function ResourceStrip({ run }: { run: RunState }) {
           <span>O₂ (elektroliz/electrolysis): {fx(-f.electrolysisWater)} L/h</span>
           <span>{t('power.greenhouse')}: {fx(-f.greenhouseWater)} L/h</span>
           {f.sabatierWater > 0 && <span>{t('power.sabatier')}: {fx(f.sabatierWater)} L/h</span>}
+          {ev.people > 0 && <span>{t('eva.suits', { n: ev.people })}: {fx(-ev.water)} L/h</span>}
           <em>{t('rule.electrolysisWater')}</em>
         </>
       ),
@@ -285,7 +300,7 @@ function ResourceStrip({ run }: { run: RunState }) {
   );
 }
 
-function Hud({ run, reason, onPlan }: { run: RunState; reason: PauseReason; onPlan: () => void }) {
+function Hud({ run, reason, onPlan, onReturn }: { run: RunState; reason: PauseReason; onPlan: () => void; onReturn: () => void }) {
   const { t, dispatch, quitToTitle } = useStore();
   const m = run.mission!;
   const s = scenarioOf(run);
@@ -323,6 +338,9 @@ function Hud({ run, reason, onPlan }: { run: RunState; reason: PauseReason; onPl
           <div className="hud-controls">
             <button type="button" className="btn" onClick={() => dispatch({ type: 'setPause', paused: !run.manualPause })} aria-pressed={run.manualPause}>
               {run.manualPause ? `▶ ${t('hud.resume')}` : `❚❚ ${t('hud.pause')}`}
+            </button>
+            <button type="button" className="btn ghost go-home" onClick={onReturn} disabled={!!run.mission?.activeEvent}>
+              ⌂ {t('ret.button')}
             </button>
             <div className="speed" role="group" aria-label={t('hud.speed', { x: run.speed })}>
               <span className="speed-label">{t('hud.speedLabel')}</span>
@@ -466,7 +484,7 @@ function CrewPanel({ run }: { run: RunState }) {
         return (
           <article key={c.id} className={`crew-card status-${c.status}`}>
             <div className="crew-card-head">
-              <Portrait seed={ch.portraitSeed} size={48} title={ch.name} />
+              <Portrait seed={ch.portraitSeed} gender={ch.gender} age={ch.profile.age} size={48} title={ch.name} />
               <div>
                 <strong>
                   {ch.name}
@@ -660,6 +678,11 @@ export function SurfaceScreen() {
   const reason = useMissionClock();
   const [tab, setTab] = useState<Tab>('base');
   const [inspect, setInspect] = useState<ModuleId | null>(null);
+  const [returning, setReturning] = useState(false);
+  // forecasts no longer stop the clock: the newest one shows as a banner for a day and a half
+  const lastFc = [...m.journal].reverse().find((j) => j.tone === 'forecast');
+  const [hiddenFc, setHiddenFc] = useState<number | null>(null);
+  const showFc = lastFc && m.minute - lastFc.minute < 36 * 60 && hiddenFc !== lastFc.id;
   const showEvent = !!m.activeEvent && !pending;
   const crewActive = activeCrew(m).length;
   // "Open the preparation plan" on a forecast card switches to the Plan tab
@@ -668,14 +691,37 @@ export function SurfaceScreen() {
     if (lastDecision?.eventId.startsWith('FC-') && lastDecision.optionId === 'plan') setTab('prep');
   }, [lastDecision?.instanceId]); // eslint-disable-line react-hooks/exhaustive-deps
   const prepLive = m.big.some((b) => bigStatus(b, m.minute) === 'countdown');
+  // a new card below the scene: bring it into view if it starts below the fold
+  const dockRef = useRef<HTMLDivElement>(null);
+  const cardKey = pending ? 'pending' : m.activeEvent?.instanceId;
+  useEffect(() => {
+    const el = dockRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top;
+    if (top > window.innerHeight - 160) el.scrollIntoView({ behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  }, [cardKey]);
   return (
     <div className={`surface theme-${r.destination}`}>
-      <Hud run={r} reason={reason} onPlan={() => setTab('prep')} />
+      <Hud run={r} reason={reason} onPlan={() => setTab('prep')} onReturn={() => setReturning(true)} />
+      {returning && <ReturnHomeModal run={r} onClose={() => setReturning(false)} />}
       <main id="main" className="surface-main">
-        <div className="scene-wrap">
+        <div className={`scene-wrap ${showEvent || pending ? 'has-event' : ''}`}>
+          {showFc && lastFc && (
+            <div className="fc-banner" role="status">
+              <span className="fc-tag">📡 {t('fc.banner')}</span>
+              <span className="fc-text">{journalText(t, r, lastFc)}</span>
+              <button type="button" className="btn small primary" onClick={() => setTab('prep')}>
+                {t('fc.open')}
+              </button>
+              <button type="button" className="btn small ghost" onClick={() => setHiddenFc(lastFc.id)}>
+                {t('fc.dismiss')}
+              </button>
+            </div>
+          )}
           <div className="scene-stage">
             <BaseScene
               run={r}
+              focus={showEvent ? m.activeEvent!.eventId : null}
               label={`${t('base.title')} — ${t(`dest.${r.destination}`)}`}
               moduleLabel={(mm) => t('base.inspect', { module: t(`base.module.${mm}`) })}
               onInspect={(mm) => {
@@ -686,12 +732,12 @@ export function SurfaceScreen() {
             <ChatBubble run={r} />
           </div>
           {(showEvent || pending) && (
-            <div className="event-dock">
+            <div className="event-dock" ref={dockRef}>
               {pending ? <ResultCard run={r} /> : <EventCard key={m.activeEvent!.instanceId} run={r} />}
             </div>
           )}
           <div className="scene-caption fine">
-            {t(`phase.${r.phase}`)} · {crewActive}/4 · {t(`site.${r.site}`)}
+            {t(`phase.${r.phase}`)} · {crewActive}/{m.crew.length} · {t(`site.${r.site}`)}
           </div>
           <section className="recent-log" aria-label={t('journal.title')}>
             <h3>{t('journal.title')}</h3>

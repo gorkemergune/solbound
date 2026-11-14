@@ -93,7 +93,7 @@ describe('NASA DONKI snapshot', () => {
     expect(a.mission!.journal).toEqual(b.mission!.journal);
     expect(a.mission!.journal.filter((j) => j.tone === 'sw').length).toBe(bulletinPlan(snap, 'mars').length);
     expect(a.mission!.decisions.some((d) => d.eventId === 'CME')).toBe(true);
-    expect(a.mission!.decisions.some((d) => d.eventId === 'FC-CME')).toBe(true);
+    expect(a.mission!.journal.some((j) => j.key === 'ev.FC-CME.title' && j.tone === 'forecast')).toBe(true);
     // after launch the data cannot be swapped
     expect(applyCommand(a, { type: 'setSpaceWeather', snapshot: null }).error).toBe('err.launched');
   });

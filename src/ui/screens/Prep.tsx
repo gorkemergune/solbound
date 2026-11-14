@@ -28,6 +28,7 @@ import { Landscape } from '../art/Scenes';
 import { InfoTip, LangSwitch, StatBar } from '../components/common';
 import { RichText } from '../components/RichText';
 import { SpaceWeatherCard } from '../components/SpaceWeatherCard';
+import { StayGoal } from '../components/StayGoal';
 import { useSpaceWeather } from '../../live/useSpaceWeather';
 import { newSeed, useLocale, useStore } from '../store';
 import { Brand } from './Title';
@@ -159,7 +160,7 @@ function IdentityScreen() {
     <div className="identity">
       <section className="id-hero">
         <div className="id-portrait">
-          <Portrait seed={p.portraitSeed} size={220} title={p.name} />
+          <Portrait seed={p.portraitSeed} gender={p.gender} age={p.profile.age} size={220} title={p.name} />
         </div>
         <div className="id-head">
           <h1>{t('identity.heading')}</h1>
@@ -280,6 +281,19 @@ function DestinationScreen() {
 
 // ---------------- crew ----------------
 
+function useMedia(query: string): boolean {
+  const get = () => typeof window !== 'undefined' && !!window.matchMedia?.(query).matches;
+  const [v, setV] = useState(get);
+  useEffect(() => {
+    const mq = window.matchMedia?.(query);
+    if (!mq) return;
+    const on = () => setV(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, [query]);
+  return v;
+}
+
 /**
  * Details open and close only with the Details button (never on hover or focus), so several cards
  * can stay open side by side for comparison. `allOpen` is the "show / hide all" switch.
@@ -301,7 +315,7 @@ function CandidateCard({ c, selected, full, allOpen }: { c: Character; selected:
   return (
     <article className={`cand ${selected ? 'sel' : ''} ${open ? 'open' : ''}`}>
       <div className="cand-top">
-        <Portrait seed={c.portraitSeed} size={64} title={c.name} />
+        <Portrait seed={c.portraitSeed} gender={c.gender} age={c.profile.age} size={64} title={c.name} />
         <div className="cand-id">
           {editing ? (
             <span className="rename">
@@ -368,7 +382,7 @@ function CrewSummary() {
           const c = team[i];
           return (
             <div key={i} className={`seat ${c ? 'filled' : ''}`}>
-              {c ? <Portrait seed={c.portraitSeed} size={52} title={c.name} /> : <span className="seat-empty" aria-hidden="true" />}
+              {c ? <Portrait seed={c.portraitSeed} gender={c.gender} age={c.profile.age} size={52} title={c.name} /> : <span className="seat-empty" aria-hidden="true" />}
               <span className="fine">{c ? (c.isPlayer ? t('crew.you') : c.name) : t('crew.empty')}</span>
             </div>
           );
@@ -398,6 +412,13 @@ function CrewScreen() {
   const r = run!;
   const full = r.crewIds.length >= 3;
   const [allOpen, setAllOpen] = useState({ v: false, n: 0 });
+  // paged grid: 3 × 2 on wide screens, 2 × 2 otherwise (no long scrolling)
+  const wide = useMedia('(min-width: 1100px)');
+  const per = wide ? 6 : 4;
+  const pages = Math.ceil(r.candidates.length / per);
+  const [page, setPage] = useState(0);
+  const p = Math.min(page, pages - 1);
+  const shown = r.candidates.slice(p * per, p * per + per);
   return (
     <div className="crew-screen">
       <div className="crew-head">
@@ -411,10 +432,36 @@ function CrewScreen() {
         </div>
       </div>
       <div className="crew-layout">
-        <div className="cand-grid">
-          {r.candidates.map((c) => (
-            <CandidateCard key={c.id} c={c} selected={r.crewIds.includes(c.id)} full={full} allOpen={allOpen} />
-          ))}
+        <div className="cand-pages">
+          <div className={`cand-grid paged ${wide ? 'cols-3' : 'cols-2'}`}>
+            {shown.map((c) => (
+              <CandidateCard key={c.id} c={c} selected={r.crewIds.includes(c.id)} full={full} allOpen={allOpen} />
+            ))}
+          </div>
+          <nav className="pager" aria-label={t('crew.page', { p: p + 1, n: pages })}>
+            <button type="button" className="btn small" disabled={p === 0} onClick={() => setPage(p - 1)}>
+              ← {t('crew.prev')}
+            </button>
+            <span className="pager-dots">
+              {Array.from({ length: pages }, (_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={i === p ? 'on' : ''}
+                  aria-current={i === p ? 'page' : undefined}
+                  aria-label={t('crew.page', { p: i + 1, n: pages })}
+                  onClick={() => setPage(i)}
+                >
+                  {/* a dot shows whether someone on that page is already picked */}
+                  {r.candidates.slice(i * per, i * per + per).some((c) => r.crewIds.includes(c.id)) ? '●' : '○'}
+                </button>
+              ))}
+            </span>
+            <span className="fine pager-label">{t('crew.page', { p: p + 1, n: pages })}</span>
+            <button type="button" className="btn small" disabled={p >= pages - 1} onClick={() => setPage(p + 1)}>
+              {t('crew.next')} →
+            </button>
+          </nav>
         </div>
         <CrewSummary />
       </div>
@@ -457,7 +504,7 @@ function MassBar() {
       <div className="mass-crew">
         {flyingCrew(run!).map((c) => (
           <span key={c.id} className="mass-person" title={c.name}>
-            <Portrait seed={c.portraitSeed} size={30} title={c.name} />
+            <Portrait seed={c.portraitSeed} gender={c.gender} age={c.profile.age} size={30} title={c.name} />
             <span>{c.profile.massKg}+{PERSONAL_KIT_KG}</span>
           </span>
         ))}
@@ -490,6 +537,7 @@ function CargoScreen() {
       <div className="cargo-layout">
         <aside className="card cargo-bay">
           <MassBar />
+          {r.crewIds.length === 3 && <StayGoal run={r} compact />}
           <ul className="cargo-legend">
             {ITEMS.filter((i) => (r.cargo[i.id] ?? 0) > 0).map((i) => (
               <li key={i.id}>
@@ -606,6 +654,7 @@ function BriefingScreen() {
         </div>
       </div>
       <div className="brief-sw">
+        <StayGoal run={r} />
         <SpaceWeatherCard dest={dest} compact />
       </div>
       <div className="brief-grid">
@@ -619,7 +668,7 @@ function BriefingScreen() {
           <ul className="brief-crew">
             {team.map((c) => (
               <li key={c.id}>
-                <Portrait seed={c.portraitSeed} size={52} title={c.name} />
+                <Portrait seed={c.portraitSeed} gender={c.gender} age={c.profile.age} size={52} title={c.name} />
                 <div>
                   <strong>
                     {c.name}

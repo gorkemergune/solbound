@@ -1,5 +1,6 @@
 import type { Check, Cond, CrewTarget, Effect, EventDef, EventOption } from './events';
 import { EVENT_BY_ID } from './events';
+import { Rng, deriveSeed } from './rng';
 import type { ScenarioDefinition } from './scenarios';
 import { CROPS, scenarioFor } from './scenarios';
 import type { ActiveEvent, Character, CrewState, Echo, JournalEntry, MissionState, RunState, SkillKey } from './types';
@@ -219,6 +220,15 @@ export type Factor = { key: string; value: number; params?: Record<string, strin
 
 export const P_MIN = 0.05;
 export const P_MAX = 0.95;
+/** v0.6 difficulty: every check's base chance is 15% lower than the written value (gameplay tuning). */
+export const DIFFICULTY = 0.85;
+/** v0.6: tasks tire people more (fatigue costs ×1.4, gameplay tuning). */
+export const FATIGUE_COST = 1.4;
+
+/** Costs as applied: fatigue costs scaled by FATIGUE_COST. */
+export function scaledCost(effects: Effect[]): Effect[] {
+  return effects.map((e) => (e.kind === 'crew' && e.stat === 'fatigue' && e.delta > 0 ? { ...e, delta: Math.round(e.delta * FATIGUE_COST) } : e));
+}
 
 /**
  * Gameplay formula (not a NASA probability):
@@ -227,7 +237,7 @@ export const P_MAX = 0.95;
 export function successChance(run: RunState, check: Check, crewIds: string[]): { p: number; factors: Factor[] } {
   const m = run.mission!;
   const s = scenarioOf(run);
-  const factors: Factor[] = [{ key: 'base', value: check.base }];
+  const factors: Factor[] = [{ key: 'base', value: check.base * DIFFICULTY }];
   const crew = crewIds.map((id) => m.crew.find((c) => c.id === id)!).filter(Boolean);
   const chars = crew.map((c) => characterById(run, c.id));
   if (chars.length) {
@@ -237,7 +247,7 @@ export function successChance(run: RunState, check: Check, crewIds: string[]): {
     factors.push({ key: 'skill', value: fit, params: { skill: check.skill } });
     if (chars.length > 1) {
       const tw = chars.reduce((a, c) => a + c.skills.teamwork, 0) / chars.length;
-      factors.push({ key: 'teamwork', value: ((tw - 50) / 100) * 0.1 });
+      factors.push({ key: 'teamwork', value: ((tw - 50) / 100) * 0.25 });
     }
     const traitHolder = chars.find((c) => check.traits?.includes(c.traitId));
     if (traitHolder) factors.push({ key: 'trait', value: 0.15, params: { trait: traitHolder.traitId, name: traitHolder.name } });
@@ -252,7 +262,10 @@ export function successChance(run: RunState, check: Check, crewIds: string[]): {
   for (const f of check.flags ?? []) {
     if (m.flags[f.key] === f.value) factors.push({ key: `flag.${f.key}.${String(f.value)}`, value: f.bonus });
   }
-  if (check.earth && s.commDelay === 'seconds') factors.push({ key: 'earth', value: 0.08 });
+  if (check.earth && s.commDelay === 'seconds') {
+    factors.push({ key: 'earth', value: 0.08 });
+    if (hasTrait(run, m, 'comms')) factors.push({ key: 'earthComms', value: 0.06 });
+  }
   // Mars: Earth answers 4–21 minutes late, but a communications officer makes the support usable
   else if (check.earth && hasTrait(run, m, 'comms')) factors.push({ key: 'earthComms', value: 0.05 });
   if (check.hazard) factors.push({ key: 'hazard', value: -check.hazard });
@@ -335,6 +348,8 @@ export function applyEffects(ctx: Ctx, effects: Effect[], hooks: EffectHooks) {
         m.env[e.key] = e.value;
         break;
       case 'gh':
+        // remember what it was, so temporary modes (storm, shadow, night) can restore it instead of forcing "full"
+        if (m.greenhouseMode !== e.mode) m.flags.ghBefore = m.greenhouseMode;
         m.greenhouseMode = e.mode;
         break;
       case 'flag':
@@ -352,6 +367,32 @@ export function applyEffects(ctx: Ctx, effects: Effect[], hooks: EffectHooks) {
       case 'rest':
         for (const c of targets(ctx, e.target)) c.routine = 'rest';
         break;
+      case 'inc':
+        m.flags[e.key] = (typeof m.flags[e.key] === 'number' ? (m.flags[e.key] as number) : 0) + e.by;
+        break;
+      case 'scheduleBig': {
+        // announced right now (the offer card is the announcement); the hit opens `days` later
+        const id = e.big === 'crew' ? 'crew' : `resupply${m.big.filter((b) => b.kind === 'resupply').length + 1}`;
+        // e.g. the reinforcement crew never lands before day 20 (10:00), and never sooner than `days` from now
+        const earliest = e.notBeforeDay ? (e.notBeforeDay - 1) * 1440 + 10 * 60 : 0;
+        const startAt = Math.max(m.minute + e.days * 1440, earliest);
+        const hitEventId = e.big === 'crew' ? 'REINF' : 'RESUPPLY';
+        m.big.push({ id, kind: e.big, announceAt: m.minute, startAt, endAt: startAt + 60, hitEventId, closed: false });
+        m.queue.push({ eventId: hitEventId, atMinute: startAt, instanceId: `${hitEventId}@${id}` });
+        m.queue.sort((a, b) => a.atMinute - b.atMinute);
+        break;
+      }
+      case 'arrive': {
+        // the reinforcement crew are candidates who stayed on Earth, picked from the seed
+        const left = run.candidates.filter((c) => !m.crew.some((x) => x.id === c.id));
+        const pick = new Rng(deriveSeed(run.seed, 'reinforce')).shuffle(left.map((c) => c.id)).slice(0, e.count);
+        for (const id of pick) {
+          const sk = characterById(run, id).skills;
+          m.crew.push({ id, health: 100, stress: 20, fatigue: 30, radiation: 0, status: 'active', routine: sk.science > sk.technical ? 'science' : 'maintenance', taskId: null, sheltered: false, warned: false });
+        }
+        log(m, run, 'journal.arrived', 'good', { names: pick.map((id) => characterById(run, id).name).join(' & ') });
+        break;
+      }
       case 'addItem':
         m.items[e.item] = (m.items[e.item] ?? 0) + e.qty;
         log(m, run, 'journal.itemAdded', 'good', { item: e.item, qty: e.qty });

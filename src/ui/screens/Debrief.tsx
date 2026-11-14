@@ -40,7 +40,7 @@ export function DebriefScreen() {
             <h2>{t(`debrief.rating.${o.rating}`)}</h2>
             <p>{t(`debrief.rating.${o.rating}.desc`)}</p>
             <p className="science">
-              {t('debrief.days', { d: Math.round(o.daysOnSurface) })} · {t('debrief.science', { v: o.science })}
+              {t('debrief.days', { d: Math.ceil(o.daysOnSurface - 1e-6) })} · {t('debrief.science', { v: o.science })}
             </p>
             {o.rating !== 'success' && o.reasons.length > 0 && (
               <div className="reasons">
@@ -65,7 +65,7 @@ export function DebriefScreen() {
               const st = status(c.id);
               return (
                 <li key={c.id} className={`st-${st}`}>
-                  <Portrait seed={ch.portraitSeed} size={64} title={ch.name} />
+                  <Portrait seed={ch.portraitSeed} gender={ch.gender} age={ch.profile.age} size={64} title={ch.name} />
                   <strong>{ch.name}</strong>
                   <span className="badge">{t(`debrief.status.${st}`)}</span>
                   <span className="fine">

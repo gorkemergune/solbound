@@ -11,7 +11,7 @@ const H = 720;
 const SCENES = [3, 3.5, 3, 6, 4.5, 3.5, 3.5]; // seconds
 export const RECAP_SECONDS = SCENES.reduce((a, b) => a + b, 0);
 
-type Person = { name: string; trait: string; seed: number; status: string };
+type Person = { name: string; trait: string; seed: number; gender: 'f' | 'm'; age: number; status: string };
 type Marker = { day: number; label: string; kind: string };
 type RecapData = {
   dest: 'moon' | 'mars';
@@ -93,8 +93,8 @@ function earth(ctx: CanvasRenderingContext2D, x: number, y: number, r: number) {
   ctx.fill();
 }
 
-function face(ctx: CanvasRenderingContext2D, seed: number, x: number, y: number, r: number, dim = false) {
-  const l = lookFor(seed);
+function face(ctx: CanvasRenderingContext2D, p: Person, x: number, y: number, r: number, dim = false) {
+  const l = lookFor(p.seed, p.gender, p.age);
   ctx.save();
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -211,12 +211,13 @@ export function drawFrame(ctx: CanvasRenderingContext2D, t: number, d: RecapData
       heading(ctx, d.labels.crew, p);
       d.crew.forEach((c, i) => {
         const a = ease(p * 3 - i * 0.35);
-        const col = i % 2;
-        const row = Math.floor(i / 2);
-        const x = 200 + col * 320;
+        const cols = d.crew.length > 4 ? 3 : 2;
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = cols === 3 ? 130 + col * 230 : 200 + col * 320;
         const y = 230 + row * 230;
         ctx.globalAlpha = a;
-        face(ctx, c.seed, x, y - 10 + (1 - a) * 30, 70);
+        face(ctx, c, x, y - 10 + (1 - a) * 30, cols === 3 ? 62 : 70);
         ctx.globalAlpha = 1;
         text(ctx, c.name, x, y + 95, 24, { weight: 700, alpha: a });
         text(ctx, c.trait, x, y + 125, 18, { alpha: a, color: '#c9d2dc' });
@@ -345,8 +346,10 @@ export function drawFrame(ctx: CanvasRenderingContext2D, t: number, d: RecapData
       text(ctx, `${d.mission} · ${d.site}`, W / 2, 120, 20, { color: '#c9d2dc' });
       text(ctx, d.rating, W / 2, 200, 46, { weight: 800, alpha: ease(p * 2), color: colour, font: '"Space Grotesk Variable", system-ui, sans-serif' });
       text(ctx, d.home, W / 2, 248, 22, { alpha: ease(p * 2 - 0.3) });
-      d.crew.forEach((c, i) => face(ctx, c.seed, W / 2 - 165 + i * 110, 330, 40, c.status !== 'home'));
-      d.crew.forEach((c, i) => text(ctx, c.name.split(' ')[0], W / 2 - 165 + i * 110, 392, 15, { color: '#c9d2dc' }));
+      const step = d.crew.length > 4 ? 100 : 110;
+      const fx = (i: number) => W / 2 + (i - (d.crew.length - 1) / 2) * step;
+      d.crew.forEach((c, i) => face(ctx, c, fx(i), 330, 40, c.status !== 'home'));
+      d.crew.forEach((c, i) => text(ctx, c.name.split(' ')[0], fx(i), 392, 15, { color: '#c9d2dc' }));
       d.numbers.slice(0, 4).forEach((n, i) => {
         const x = 120 + i * 160;
         text(ctx, String(Math.round(n.v)), x, 470, 40, { weight: 800, font: '"Space Grotesk Variable", system-ui, sans-serif' });
@@ -370,7 +373,7 @@ function useRecapData(run: RunState): RecapData {
     };
     const crew: Person[] = m.crew.map((c) => {
       const ch = characterById(run, c.id);
-      return { name: ch.name, trait: t(`trait.${ch.traitId}`), seed: ch.portraitSeed, status: status(c.id) };
+      return { name: ch.name, trait: t(`trait.${ch.traitId}`), seed: ch.portraitSeed, gender: ch.gender, age: ch.profile.age, status: status(c.id) };
     });
     const markers: Marker[] = [
       ...m.big.filter((b) => m.resolved.includes(`${b.hitEventId}@${b.id}`)).map((b) => ({ day: b.startAt / 1440, label: t(`big.${b.kind}`), kind: 'big' })),
@@ -388,7 +391,7 @@ function useRecapData(run: RunState): RecapData {
     return {
       dest,
       title: 'Solbound',
-      mission: t('recap.s.mission', { days: Math.round(o.daysOnSurface), dest: destName }),
+      mission: t('recap.s.mission', { days: Math.ceil(o.daysOnSurface - 1e-6), dest: destName }),
       site: t(`site.${run.site}`),
       commander: run.player.name,
       crew,
@@ -429,7 +432,7 @@ export function shareText(run: RunState, t: (k: string, p?: Record<string, strin
     crew: run.mission!.crew.length,
     dest: t(`dest.${run.destination}`),
     site: t(`site.${run.site}`),
-    days: Math.round(o.daysOnSurface),
+    days: Math.ceil(o.daysOnSurface - 1e-6),
     harvests: o.harvests,
     big: o.bigEvents.length,
     science: o.science,

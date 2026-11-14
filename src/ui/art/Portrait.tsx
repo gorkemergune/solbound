@@ -1,21 +1,22 @@
 import { memo } from 'react';
 import { Rng } from '../../engine/rng';
 
-const SKIN = ['#f6dcc6', '#f3d2b8', '#ecc19f', '#e8b896', '#d9a47c', '#d29a72', '#c48a63', '#b97c56', '#9c6644', '#8e5a3c', '#6b4129', '#55331f'];
-const HAIR = ['#1a1614', '#2b211c', '#3b2a20', '#56381f', '#6a4528', '#8a5a32', '#a8773f', '#d8b36a', '#e6cf9a', '#8b8b8b', '#c9c9c9', '#b2462e', '#7a2e2e', '#2b2d42'];
-const SUIT = ['#e07a3f', '#3f8fe0', '#2bb39a', '#e0b43f', '#b05ce0', '#e0566e', '#5c7ee0', '#77b84a', '#e08fb0', '#4fc1d8'];
-const BG = [
-  ['#203050', '#101a30'],
-  ['#2a2540', '#15122a'],
-  ['#1f3a3a', '#0f2222'],
-  ['#3a2a24', '#1e1410'],
-  ['#28324a', '#121a2c'],
-  ['#30283a', '#18121e'],
-  ['#3a2030', '#1c0f18'],
-  ['#1c3324', '#0d1a12'],
+// Natural, muted palettes (v0.6): realistic skin and hair, mission-style suit accents, dark backgrounds.
+const SKIN = ['#f6dcc6', '#f1d0b5', '#ecc19f', '#e3b08c', '#d9a47c', '#c99068', '#b97c56', '#a26a47', '#8e5a3c', '#774a31', '#5f3a26', '#4a2d1e'];
+const HAIR = ['#1a1614', '#241b17', '#33251d', '#4a3324', '#5e4029', '#765034', '#9a7148', '#c7a46c', '#7a3a24'];
+const GRAY = ['#8f8a86', '#a9a49f', '#c4c0bb'];
+const SUIT = ['#d9733b', '#3f7fc4', '#2e9e8a', '#c9a23a', '#6b7a8f', '#7a8f4a', '#b5543f', '#4f6fa8'];
+const BG: [string, string][] = [
+  ['#1e2c46', '#0f1828'],
+  ['#1d3438', '#0e1d20'],
+  ['#2a2f3d', '#141822'],
+  ['#2b2a36', '#15141c'],
+  ['#1f2b36', '#0f161e'],
 ];
-const SCARF = ['#3f6fb0', '#8a3a5a', '#2f7a6a', '#b0783f', '#5a4a8a', '#7a7a7a'];
-const IRIS = ['#3b2a20', '#5a3a1f', '#2f5a7a', '#3f6a3a', '#6a6a6a'];
+const SCARF = ['#3f5f8a', '#6a3f52', '#2f6a5e', '#8a6a3f', '#4a4a6a', '#5e5e5e'];
+const IRIS = ['#3b2a20', '#5a3a1f', '#2f5a7a', '#3f6a3a', '#5e5e5e'];
+/** hair styles that read as feminine / masculine (0 crop, 1 side part, 2 curls, 3 bun, 4 long, 5 shaved, 6 ponytail, 7 afro, 8 headscarf, 9 braids) */
+const STYLES = { f: [1, 2, 3, 4, 4, 6, 6, 7, 8, 9], m: [0, 0, 1, 1, 2, 5, 7] } as const;
 
 export type PortraitLook = {
   skin: string;
@@ -31,7 +32,7 @@ export type PortraitLook = {
   eyeShape: number;
   iris: string;
   facialHair: number; // 0 none, 1 stubble, 2 moustache, 3 beard
-  blush: boolean;
+  lashes: boolean;
   earrings: boolean;
   headset: boolean;
   scarf: string;
@@ -39,31 +40,36 @@ export type PortraitLook = {
   faceW: number;
 };
 
-/** Looks are derived only from the portrait seed, so a person looks the same on every screen. */
-export function lookFor(seed: number): PortraitLook {
+/**
+ * Looks come only from the portrait seed, gender and age, so a person looks the same on every screen.
+ * The suit colour is drawn first: it is also used for the figure on the base scene.
+ */
+export function lookFor(seed: number, gender: 'f' | 'm' = 'm', age = 35): PortraitLook {
   const r = new Rng(seed);
-  const hairStyle = r.int(0, 9);
+  const suit = r.pick(SUIT);
+  const f = gender === 'f';
+  const hairStyle = r.pick(STYLES[gender]);
+  const grayChance = age >= 44 ? 0.6 : age >= 38 ? 0.2 : 0;
   return {
+    suit,
     skin: r.pick(SKIN),
-    hair: r.pick(HAIR),
-    suit: r.pick(SUIT),
-    bg: r.pick(BG) as [string, string],
+    hair: r.next() < grayChance ? r.pick(GRAY) : r.pick(HAIR),
+    bg: r.pick(BG),
     hairStyle,
-    glasses: r.next() < 0.28 ? r.int(1, 2) : 0,
-    freckles: r.next() < 0.25,
+    glasses: r.next() < 0.25 ? r.int(1, 2) : 0,
+    freckles: r.next() < 0.15,
     brow: r.int(0, 2),
     smile: r.int(0, 3),
     eyeGap: r.int(0, 2),
     eyeShape: r.int(0, 2),
     iris: r.pick(IRIS),
-    // facial hair never with the headscarf style
-    facialHair: hairStyle !== 8 && r.next() < 0.3 ? r.int(1, 3) : 0,
-    blush: r.next() < 0.3,
-    earrings: r.next() < 0.2,
-    headset: r.next() < 0.22,
+    facialHair: !f && r.next() < 0.35 ? r.int(1, 3) : 0,
+    lashes: f,
+    earrings: f && hairStyle !== 8 && r.next() < 0.3,
+    headset: r.next() < 0.15,
     scarf: r.pick(SCARF),
     patch: r.int(0, 3),
-    faceW: r.int(16, 19),
+    faceW: f ? r.int(16, 17) : r.int(17, 19),
   };
 }
 
@@ -136,8 +142,8 @@ function HairFront({ l }: { l: PortraitLook }) {
   }
 }
 
-function PortraitBase({ seed, size = 72, title, helmet = true }: { seed: number; size?: number; title?: string; helmet?: boolean }) {
-  const l = lookFor(seed);
+function PortraitBase({ seed, gender, age, size = 72, title, helmet = true }: { seed: number; gender?: 'f' | 'm'; age?: number; size?: number; title?: string; helmet?: boolean }) {
+  const l = lookFor(seed, gender, age);
   const gap = 8 + l.eyeGap;
   const eyeRy = l.eyeShape === 0 ? 2.6 : l.eyeShape === 1 ? 2.1 : 3;
   const id = `p${seed}`;
@@ -194,17 +200,16 @@ function PortraitBase({ seed, size = 72, title, helmet = true }: { seed: number;
           <circle cx={50 - gap + 0.8} cy="48" r="0.6" fill="#fff" />
           <circle cx={50 + gap + 0.8} cy="48" r="0.6" fill="#fff" />
         </g>
+        {l.lashes && (
+          <g stroke="#1d1d24" strokeWidth="1" strokeLinecap="round">
+            <path d={`M${50 - gap - 2.6} 46.6l-1.4-1.2M${50 + gap + 2.6} 46.6l1.4-1.2`} />
+          </g>
+        )}
         <g stroke={l.hairStyle === 8 ? '#3b2a20' : l.hair} strokeWidth="2" strokeLinecap="round" fill="none">
           <path d={`M${50 - gap - 4} ${43 - l.brow} q4 -2 8 0`} />
           <path d={`M${50 + gap - 4} ${43 - l.brow} q4 -2 8 0`} />
         </g>
         <path d="M50 50 q-2 5 0 6 q1.5 0.4 2.5 -0.4" stroke="#00000033" strokeWidth="1.3" fill="none" strokeLinecap="round" />
-        {l.blush && (
-          <g fill="#e0566e" opacity="0.18">
-            <ellipse cx={50 - gap - 2} cy="56" rx="3.5" ry="2" />
-            <ellipse cx={50 + gap + 2} cy="56" rx="3.5" ry="2" />
-          </g>
-        )}
         {l.glasses === 1 && (
           <g stroke="#2b2b33" strokeWidth="1.6" fill="none">
             <circle cx={50 - gap} cy="49" r="5" />

@@ -61,69 +61,63 @@ export const BACKGROUNDS = [
 
 export const MOTIVATIONS = ['curiosity', 'family', 'service', 'adventure', 'legacy'] as const;
 
-// Name pools grouped by language/region so first and family names match. Names never determine
-// skills or traits (those are seeded independently).
-type NameGroup = { first: string[]; last: string[] };
-const NAME_GROUPS: Record<string, NameGroup> = {
+// Name pools per game language, split by gender so a name always matches its portrait. Turkish games
+// get Turkish crews; English games get plain, common English names. Names never determine skills or
+// traits (those come from separate seeded streams), and a person keeps their gender and face when the
+// language changes; only the name is re-localised.
+export type Gender = 'f' | 'm';
+type NamePool = { f: string[]; m: string[]; last: string[] };
+export const NAMES: Record<Locale, NamePool> = {
   tr: {
-    first: ['Ayşe', 'Elif', 'Zeynep', 'Selin', 'Defne', 'Ece', 'Nehir', 'İpek', 'Su', 'Melis', 'Derin', 'Ada', 'Can', 'Yusuf', 'Emre', 'Bora', 'Arda', 'Deniz', 'Kerem', 'Mert', 'Efe', 'Barış', 'Umut', 'Kaan', 'Ilgın', 'Tuna', 'Güneş', 'Doruk', 'Eylül', 'Alp'],
-    last: ['Demir', 'Kaya', 'Arslan', 'Yıldız', 'Özdemir', 'Aydın', 'Aksoy', 'Tunç', 'Kılıç', 'Şahin', 'Polat', 'Koç', 'Erdem', 'Uslu', 'Çelik', 'Yılmaz', 'Doğan', 'Kurt', 'Öztürk', 'Aslan', 'Karaca', 'Ergün', 'Bulut', 'Tekin'],
+    f: ['Ayşe', 'Elif', 'Zeynep', 'Selin', 'Defne', 'Ece', 'Nehir', 'İpek', 'Melis', 'Derin', 'Ada', 'Eylül', 'Ilgın', 'Zehra', 'Esra', 'Merve', 'Büşra', 'Ceren', 'Gizem', 'Sena', 'Damla', 'Aslı', 'Pınar', 'Gül'],
+    m: ['Can', 'Yusuf', 'Emre', 'Bora', 'Arda', 'Kerem', 'Mert', 'Efe', 'Barış', 'Kaan', 'Alp', 'Doruk', 'Burak', 'Onur', 'Serkan', 'Volkan', 'Oğuz', 'Tolga', 'Murat', 'Hakan', 'Cem', 'Ozan', 'Berk', 'Selim'],
+    last: ['Demir', 'Kaya', 'Arslan', 'Yıldız', 'Özdemir', 'Aydın', 'Aksoy', 'Tunç', 'Kılıç', 'Şahin', 'Polat', 'Koç', 'Erdem', 'Uslu', 'Çelik', 'Yılmaz', 'Doğan', 'Kurt', 'Öztürk', 'Aslan', 'Karaca', 'Bulut', 'Tekin', 'Güneş', 'Acar', 'Korkmaz', 'Avcı', 'Ateş', 'Kara', 'Sönmez'],
   },
   en: {
-    first: ['Alex', 'Sam', 'Jordan', 'Riley', 'Morgan', 'Casey', 'Taylor', 'Jamie', 'Avery', 'Quinn', 'Harper', 'Rowan', 'Elliot', 'Skyler', 'Drew', 'Parker', 'Reese', 'Logan', 'Emerson', 'Hayden'],
-    last: ['Rivera', 'Blake', 'Chen', 'Hale', 'Lund', 'Reed', 'Quinn', 'Okoye', 'Brooks', 'Carter', 'Hughes', 'Foster', 'Bennett', 'Ward', 'Price', 'Sullivan', 'Hayes', 'Murphy'],
+    f: ['Emma', 'Olivia', 'Sarah', 'Anna', 'Laura', 'Kate', 'Lucy', 'Grace', 'Emily', 'Hannah', 'Rachel', 'Claire', 'Megan', 'Julia', 'Amy', 'Nora', 'Ellie', 'Rose', 'Maya', 'Helen'],
+    m: ['James', 'Daniel', 'Michael', 'David', 'Ryan', 'Mark', 'Adam', 'Ben', 'Tom', 'Sam', 'Jack', 'Luke', 'Chris', 'Matt', 'Paul', 'Peter', 'Nick', 'Owen', 'Ethan', 'Leo'],
+    last: ['Carter', 'Brooks', 'Hayes', 'Bennett', 'Walker', 'Mitchell', 'Parker', 'Collins', 'Reed', 'Turner', 'Morgan', 'Foster', 'Price', 'Ward', 'Hughes', 'Cooper', 'Bailey', 'Ellis', 'Grant', 'Shaw', 'Porter', 'Lane', 'Fisher', 'Wells', 'Hart', 'Hunt', 'Young', 'Stone', 'Baker', 'Gray'],
   },
-  jp: { first: ['Kenji', 'Hana', 'Yuki', 'Haruto', 'Aiko', 'Ren', 'Sora', 'Mei'], last: ['Sato', 'Tanaka', 'Suzuki', 'Watanabe', 'Ito', 'Nakamura', 'Kobayashi'] },
-  ng: { first: ['Amara', 'Chidi', 'Ngozi', 'Tunde', 'Ifeoma', 'Emeka', 'Zainab', 'Femi'], last: ['Okafor', 'Adeyemi', 'Nwosu', 'Balogun', 'Eze', 'Okonkwo'] },
-  gh: { first: ['Kwame', 'Ama', 'Kofi', 'Efua', 'Yaw', 'Akosua'], last: ['Mensah', 'Owusu', 'Boateng', 'Asante', 'Appiah'] },
-  fr: { first: ['Lucas', 'Chloé', 'Camille', 'Léa', 'Hugo', 'Manon', 'Théo'], last: ['Moreau', 'Martin', 'Dubois', 'Lefèvre', 'Girard', 'Fontaine'] },
-  es: { first: ['Mateo', 'Diego', 'Lucía', 'Valentina', 'Sofía', 'Javier', 'Camila', 'Andrés'], last: ['Rojas', 'Alvarez', 'García', 'Morales', 'Castillo', 'Vargas', 'Herrera'] },
-  in: { first: ['Priya', 'Arjun', 'Ravi', 'Ananya', 'Kavya', 'Rohan', 'Ishaan', 'Meera'], last: ['Nair', 'Mehta', 'Patel', 'Iyer', 'Reddy', 'Kapoor', 'Rao'] },
-  no: { first: ['Jonas', 'Ingrid', 'Astrid', 'Erik', 'Sigrid', 'Lars', 'Freya'], last: ['Berg', 'Larsen', 'Hansen', 'Johansen', 'Lindqvist', 'Dahl'] },
-  de: { first: ['Noah', 'Lena', 'Felix', 'Mia', 'Paul', 'Greta', 'Jonas'], last: ['Fischer', 'Weber', 'Schneider', 'Wagner', 'Becker', 'Hoffmann'] },
-  ar: { first: ['Leila', 'Omar', 'Yara', 'Karim', 'Nour', 'Samir', 'Rania', 'Hadi'], last: ['Haddad', 'Khalil', 'Mansour', 'Nasser', 'Saleh', 'Farah'] },
-  kr: { first: ['Hana', 'Minjun', 'Jiwoo', 'Seoyeon', 'Doyun', 'Haeun'], last: ['Kim', 'Park', 'Lee', 'Choi', 'Jung', 'Kang'] },
-  cn: { first: ['Wei', 'Lin', 'Xiao', 'Mei', 'Jun', 'Yan', 'Hao'], last: ['Wang', 'Zhang', 'Liu', 'Chen', 'Zhao', 'Huang'] },
-  br: { first: ['Tomás', 'Beatriz', 'Rafael', 'Larissa', 'Gabriel', 'Isabela'], last: ['Silva', 'Santos', 'Oliveira', 'Costa', 'Pereira', 'Almeida'] },
-  it: { first: ['Sofia', 'Marco', 'Giulia', 'Luca', 'Chiara', 'Matteo'], last: ['Rossi', 'Bianchi', 'Romano', 'Colombo', 'Ricci', 'Greco'] },
-  pl: { first: ['Mira', 'Jakub', 'Zofia', 'Tomasz', 'Ola', 'Piotr'], last: ['Novak', 'Kowalski', 'Wiśniewska', 'Zieliński', 'Horvat', 'Petrov'] },
-  ke: { first: ['Wanjiru', 'Otieno', 'Achieng', 'Kamau', 'Njeri', 'Baraka'], last: ['Mwangi', 'Odhiambo', 'Kiptoo', 'Wambui', 'Kariuki'] },
-  mx: { first: ['Ximena', 'Santiago', 'Renata', 'Emiliano', 'Paola'], last: ['Hernández', 'López', 'Ramírez', 'Flores', 'Torres'] },
 };
 
-const CREW_GROUPS = Object.keys(NAME_GROUPS);
-const PLAYER_GROUPS: Record<Locale, string[]> = { tr: ['tr'], en: ['en'] };
-
-function nameFrom(rng: Rng, groups: string[]): string {
-  const g = NAME_GROUPS[rng.pick(groups)];
-  return `${rng.pick(g.first)} ${rng.pick(g.last)}`;
-}
-
-/** A seeded list of distinct names (no two crew members share a first or family name). */
-export function crewNames(seed: number, count: number): string[] {
-  const rng = new Rng(deriveSeed(seed, 'names'));
-  const out: string[] = [];
-  const firsts = new Set<string>();
-  const lasts = new Set<string>();
-  let guard = 0;
-  while (out.length < count && guard++ < 2000) {
-    const n = nameFrom(rng, CREW_GROUPS);
-    const [f, l] = n.split(' ');
-    if (firsts.has(f) || lasts.has(l)) continue;
-    firsts.add(f);
-    lasts.add(l);
-    out.push(n);
+function nameFor(rng: Rng, locale: Locale, gender: Gender, used?: { f: Set<string>; l: Set<string> }): string {
+  const pool = NAMES[locale];
+  for (let i = 0; i < 200; i++) {
+    const f = rng.pick(pool[gender]);
+    const l = rng.pick(pool.last);
+    if (used && (used.f.has(f) || used.l.has(l))) continue;
+    used?.f.add(f);
+    used?.l.add(l);
+    return `${f} ${l}`;
   }
-  return out;
+  return `${rng.pick(pool[gender])} ${rng.pick(pool.last)}`;
 }
 
-export function playerName(rng: Rng, locale: Locale) {
-  return nameFrom(rng, PLAYER_GROUPS[locale]);
+/** Gender of a generated person: seeded and independent of language (so the face never changes). */
+export function genderOf(seed: number, id: string): Gender {
+  return new Rng(deriveSeed(seed, 'gender', id)).next() < 0.5 ? 'f' : 'm';
+}
+
+/** Distinct, gender-matched names for a crew pool (no shared first or family names). */
+export function crewNames(seed: number, ids: string[], locale: Locale, reserved: string[] = []): string[] {
+  const rng = new Rng(deriveSeed(seed, 'names', locale));
+  const used = { f: new Set<string>(), l: new Set<string>() };
+  for (const r of reserved) {
+    const [f, l] = r.split(' ');
+    used.f.add(f);
+    if (l) used.l.add(l);
+  }
+  return ids.map((id) => nameFor(rng, locale, genderOf(seed, id), used));
+}
+
+export function playerName(seed: number, locale: Locale): string {
+  return nameFor(new Rng(deriveSeed(seed, 'player-name', locale)), locale, genderOf(seed, 'player'));
 }
 
 /** How many distinct names the generator can produce (shown in docs/tests). */
-export function nameVariety(): number {
-  return Object.values(NAME_GROUPS).reduce((a, g) => a + g.first.length * g.last.length, 0);
+export function nameVariety(locale: Locale): number {
+  const p = NAMES[locale];
+  return (p.f.length + p.m.length) * p.last.length;
 }
 
 const SKILL_KEYS: SkillKey[] = ['technical', 'science', 'teamwork'];
@@ -156,7 +150,8 @@ export function generatePlayer(seed: number, locale: Locale): Character {
   const traitId = rng.pick(TRAITS);
   return {
     id: 'player',
-    name: playerName(rng, locale),
+    name: playerName(seed, locale),
+    gender: genderOf(seed, 'player'),
     customName: false,
     isPlayer: true,
     portraitSeed: deriveSeed(seed, 'portrait', 'player'),
@@ -169,14 +164,16 @@ export function generatePlayer(seed: number, locale: Locale): Character {
 
 export const CANDIDATE_COUNT = 16;
 
-export function generateCandidates(seed: number, count = CANDIDATE_COUNT): Character[] {
+export function generateCandidates(seed: number, locale: Locale = 'en', count = CANDIDATE_COUNT): Character[] {
   const rng = new Rng(deriveSeed(seed, 'candidates'));
   // Every trait appears at least once; the remainder are seeded extras.
   const traits = rng.shuffle([...TRAITS, ...rng.shuffle(TRAITS).slice(0, Math.max(0, count - TRAITS.length))]).slice(0, count);
-  const names = crewNames(seed, count);
+  const ids = traits.map((_, i) => `c${String(i + 1).padStart(2, '0')}`);
+  const names = crewNames(seed, ids, locale, [playerName(seed, locale)]);
   return traits.map((traitId, i) => ({
-    id: `c${String(i + 1).padStart(2, '0')}`,
+    id: ids[i],
     name: names[i],
+    gender: genderOf(seed, ids[i]),
     customName: false,
     isPlayer: false,
     portraitSeed: deriveSeed(seed, 'portrait', i),
@@ -193,6 +190,6 @@ export function sanitizeName(raw: string): string {
 }
 
 export function fallbackName(seed: number, id: string, locale: Locale): string {
-  const rng = new Rng(deriveSeed(seed, 'fallback-name', id));
-  return id === 'player' ? playerName(rng, locale) : nameFrom(rng, CREW_GROUPS);
+  if (id === 'player') return playerName(seed, locale);
+  return nameFor(new Rng(deriveSeed(seed, 'fallback-name', id)), locale, genderOf(seed, id));
 }
