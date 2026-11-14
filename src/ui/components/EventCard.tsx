@@ -297,17 +297,36 @@ export function EventCard({ run }: { run: RunState }) {
             )}
             {opt.crew && (
               <div className="crew-pick">
-                <h4>{t('event.crewPick')}</h4>
-                <div className="crew-pick-list">
-                  {availableCrewFor(run, opt).map((c) => {
+                <h4>
+                  {t('event.crewPick')} <span className="fine">({t('assign.count', { n: crewSel.length, of: opt.crew.count })})</span>
+                </h4>
+                {/* the whole crew as a grid (2 × 2 for four people, 3 × 2 for six); busy people are shown but greyed out */}
+                <div className={`crew-pick-list cols-${m.crew.filter((c) => c.status === 'active').length > 4 ? 3 : 2}`}>
+                  {m.crew
+                    .filter((c) => c.status === 'active')
+                    .map((c) => {
                     const ch = characterById(run, c.id);
                     const on = crewSel.includes(c.id);
+                    const free = availableCrewFor(run, opt).some((x) => x.id === c.id);
+                    const why = free
+                      ? null
+                      : (active.subjects ?? []).includes(c.id)
+                        ? t('assign.away')
+                        : c.taskId
+                          ? t('assign.busy')
+                          : c.sheltered
+                            ? t('assign.sheltered')
+                            : opt.crew!.mustHave && ch.traitId !== opt.crew!.mustHave
+                              ? t('assign.needs', { trait: t(`trait.${opt.crew!.mustHave}`) })
+                              : t('assign.cannotOutside');
                     return (
                       <button
                         key={c.id}
                         type="button"
-                        className={`pick ${on ? 'on' : ''}`}
+                        className={`pick ${on ? 'on' : ''} ${free ? '' : 'busy'}`}
                         aria-pressed={on}
+                        disabled={!free}
+                        title={why ?? undefined}
                         onClick={() => {
                           if (on) setCrewSel(crewSel.filter((x) => x !== c.id));
                           else if (crewSel.length < opt.crew!.count) setCrewSel([...crewSel, c.id]);
@@ -320,6 +339,7 @@ export function EventCard({ run }: { run: RunState }) {
                           {t(`skill.${opt.crew!.skill}`)} {ch.skills[opt.crew!.skill]} · {t('crewPanel.fatigue')} {Math.round(c.fatigue)}
                         </span>
                         {opt.crew!.traits?.includes(ch.traitId) && <span className="pick-trait">{t(`trait.${ch.traitId}`)}</span>}
+                        {why && <span className="pick-why">{why}</span>}
                       </button>
                     );
                   })}

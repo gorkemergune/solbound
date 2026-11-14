@@ -12,7 +12,7 @@ NASA kayıtlarından beslenen, hikâye ağırlıklı bir **eğitim simülasyonu*
 
 | Konu | Şu an |
 | --- | --- |
-| Aday havuzu | 16 aday, 15 uzmanlık. Ekranda sayfalı gösterilir (geniş ekranda 3 × 2, dar ekranda 2 × 2). |
+| Aday havuzu | 16 aday, 15 uzmanlık; tek ızgara, sağdaki ekip profili kaydırırken sabit kalır. Görev atama alanı 4 kişide 2 × 2, 6 kişide 3 × 2. |
 | İsimler | Oyun diline göre (TR → Türk isimleri, EN → yaygın İngilizce isimler); cinsiyet portreyle eşleşir. |
 | Yük | 520 kg fırlatma kütlesi: vücut kütlesi + kişi başı 20 kg kit + ek yük. |
 | Görev süresi | En fazla 30 yüzey günü (son gün 14:00’te biter). “Eve dön” düğmesiyle istenen an dönülebilir. |

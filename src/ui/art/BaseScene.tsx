@@ -215,7 +215,8 @@ export function BaseScene({
   const dustParticles = mars && env.dust > 0.2 ? Array.from({ length: 26 }, (_, i) => ({ x: r.next() * 1000, y: 80 + r.next() * 330, d: 3 + (i % 5) })) : [];
 
   return (
-    <svg viewBox="0 0 1000 520" className="base-scene" role="group" aria-label={label}>
+    // the top of the sky is empty: show y 90–520 so the scene is lower and fills the width (no side bars)
+    <svg viewBox="0 90 1000 430" className="base-scene" role="group" aria-label={label}>
       <defs>
         <linearGradient id="bs-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor={sky.top} />
@@ -243,20 +244,22 @@ export function BaseScene({
       )}
       {!mars && (
         <g>
-          <circle cx="830" cy="90" r="40" fill="#7fc3ff" opacity="0.12" />
-          <circle cx="830" cy="90" r="34" fill="url(#bs-earth)" />
-          <path d="M806 80c10-9 26-7 31 3-7 3-16 9-27 7z M820 108c9 0 17 4 20 9-9 2-18 0-22-4z" fill="#5f9a5a" opacity="0.75" />
-          <path d="M800 92c14-6 30-4 44 2 M806 70c10-3 22-2 30 2" stroke="#ffffff" strokeWidth="3" opacity="0.55" fill="none" strokeLinecap="round" />
-          <circle cx="830" cy="90" r="34" fill="url(#bs-shade)" />
+          <g transform="translate(0 70)">
+            <circle cx="830" cy="90" r="40" fill="#7fc3ff" opacity="0.12" />
+            <circle cx="830" cy="90" r="34" fill="url(#bs-earth)" />
+            <path d="M806 80c10-9 26-7 31 3-7 3-16 9-27 7z M820 108c9 0 17 4 20 9-9 2-18 0-22-4z" fill="#5f9a5a" opacity="0.75" />
+            <path d="M800 92c14-6 30-4 44 2 M806 70c10-3 22-2 30 2" stroke="#ffffff" strokeWidth="3" opacity="0.55" fill="none" strokeLinecap="round" />
+            <circle cx="830" cy="90" r="34" fill="url(#bs-shade)" />
+          </g>
           {!lunarNight && (
-            <g transform={lunar ? `translate(${60 + lunar.cycle * 2 * 880} ${300 - Math.sin(lunar.cycle * 2 * Math.PI) * 220})` : 'translate(60 300)'}>
+            <g transform={lunar ? `translate(${60 + lunar.cycle * 2 * 880} ${300 - Math.sin(lunar.cycle * 2 * Math.PI) * 160})` : 'translate(60 300)'}>
               <circle r="13" fill="#fffbe6" />
               <circle r="34" fill="#fffbe6" opacity="0.07" />
             </g>
           )}
         </g>
       )}
-      {mars && sky.night < 0.8 && <circle cx={180 + ((hour - 5) / 14) * 640} cy={250 - Math.sin(Math.PI * Math.min(1, Math.max(0, (hour - 5) / 14))) * 170} r="13" fill="#fff6e0" opacity={(1 - env.dust) * (1 - sky.night)} />}
+      {mars && sky.night < 0.8 && <circle cx={180 + ((hour - 5) / 14) * 640} cy={260 - Math.sin(Math.PI * Math.min(1, Math.max(0, (hour - 5) / 14))) * 130} r="13" fill="#fff6e0" opacity={(1 - env.dust) * (1 - sky.night)} />}
       {/* SPE streaks */}
       {env.speHours > 0 && (
         <g className="spe" aria-hidden="true">

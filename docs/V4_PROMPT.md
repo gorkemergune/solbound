@@ -66,7 +66,8 @@ Tarayıcı aracı varsa `npm run build && npm run e2e` çalıştır ve sonucu ya
 
 - Olay kartı geldiğinde üs sahnesi küçülüyor mu? Kullanıcının bildirdiği “bug1.png” hatası.
 - Altı kişilik ekipte kart ya da sahne kayıyor mu?
-- Aday ekranı 3 × 2 / 2 × 2 sayfalı mı?
+- Aday ekranında 16 aday tek ızgarada mı ve sağdaki ekip profili kaydırırken sabit kalıyor mu? Görev atama alanı 4 kişide 2 × 2, 6 kişide 3 × 2 mi?
+- Sahnenin yanlarında siyah boşluk var mı? 1280–1440 px genişlikte sekmeler sığıyor mu?
 - Mobilde (390 px) yatay taşma var mı?
 
 ## Rapor biçimi (`docs/V4_TEST.md`)

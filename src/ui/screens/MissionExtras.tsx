@@ -178,7 +178,7 @@ function PrepAction({ run, big, option, kind }: { run: RunState; big: BigEventSt
                 const ch = characterById(run, c.id);
                 const on = valid.includes(c.id);
                 return (
-                  <button key={c.id} type="button" className={`crew-pick ${on ? 'on' : ''}`} aria-pressed={on} onClick={() => toggle(c.id)} title={ch.name}>
+                  <button key={c.id} type="button" className={`prep-pick ${on ? 'on' : ''}`} aria-pressed={on} onClick={() => toggle(c.id)} title={ch.name}>
                     <Portrait seed={ch.portraitSeed} gender={ch.gender} age={ch.profile.age} size={26} />
                     <span>{ch.name.split(' ')[0]}</span>
                   </button>

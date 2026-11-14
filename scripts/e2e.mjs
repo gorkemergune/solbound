@@ -35,7 +35,19 @@ async function noHorizontalOverflow(page, label) {
   check(`no horizontal overflow: ${label}`, over <= 1, `overflow=${over}px`);
 }
 
+let assignChecked = false;
 async function resolveOpenEvent(page, prefix, i) {
+  // once per run: pick an option that needs crew and check the assignment grid (2 × 2 for four people)
+  if (!assignChecked) {
+    const crewOpt = page.locator('.event-card .option:not(.locked)', { hasText: /(görevlendir|assign)/i }).first();
+    if (await crewOpt.count()) {
+      assignChecked = true;
+      await crewOpt.click();
+      const cls = (await page.locator('.crew-pick-list').getAttribute('class')) ?? '';
+      const picks = await page.locator('.crew-pick-list .pick').count();
+      check(`${prefix} task assignment shows the whole crew as a grid`, /cols-2/.test(cls) && picks === 4, `${cls} · ${picks}`);
+    }
+  }
   // vary choices, but never pick "end the mission" so the run reaches day 30
   const all = page.locator('.event-card .option:not(.locked)');
   const safe = all.filter({ hasNotText: /(ascent vehicle|End the mission|Kalkış aracına|Görevi bitir)/ });
@@ -51,6 +63,7 @@ async function resolveOpenEvent(page, prefix, i) {
 }
 
 async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
+  assignChecked = false;
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: 1, acceptDownloads: true });
   const ctx2 = ctx;
   const page = await ctx2.newPage();
@@ -130,10 +143,8 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
     const names = await page.locator('.cand-id h3').allTextContents();
     check(`${prefix} Turkish game shows Turkish crew names`, names.some((n) => /[çğıöşüÇĞİÖŞÜ]|Can |Ece |Ada |Efe /.test(n)), names.slice(0, 4).join(', '));
   }
-  // paged grid: 3 × 2 on wide screens, 2 × 2 on narrow ones (no long scrolling)
-  const perPage = await page.locator('.cand').count();
-  check(`${prefix} candidates are paged (${viewport.width >= 1100 ? '3 × 2' : '2 × 2'})`, perPage === (viewport.width >= 1100 ? 6 : 4), `${perPage} on the page`);
-  check(`${prefix} 4th companion blocked`, disabledAdds === perPage - 3, `${disabledAdds} disabled`);
+  const cards = await page.locator('.cand').count();
+  check(`${prefix} all 16 candidates in one grid; 4th companion blocked`, cards === 16 && disabledAdds === 13, `${cards} cards, ${disabledAdds} disabled`);
   // bug fix: hovering never opens details; the Details button does, and several can stay open
   await page.locator('.cand').nth(1).hover();
   await page.waitForTimeout(300);
@@ -145,11 +156,14 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
   await shot(page, `${prefix}-04-crew`);
   await page.locator('.cand').nth(1).locator('.details-btn').click();
   check(`${prefix} details close only via the button`, (await page.locator('.cand-details').count()) === 2);
-  const firstName = await page.locator('.cand-id h3').first().textContent();
-  await page.locator('.pager .btn').last().click();
-  const nextName = await page.locator('.cand-id h3').first().textContent();
-  check(`${prefix} the pager shows the next candidates`, firstName !== nextName, `${firstName} → ${nextName}`);
-  await page.locator('.pager .btn').first().click();
+  if (viewport.width > 1100) {
+    // the crew profile stays in view while the list scrolls
+    await page.mouse.wheel(0, 1200);
+    await page.waitForTimeout(300);
+    const top = (await page.locator('.crew-summary').boundingBox())?.y ?? -1;
+    check(`${prefix} crew profile scrolls along (sticky)`, top >= 0 && top < 120, `top=${Math.round(top)}`);
+    await page.mouse.wheel(0, -1200);
+  }
   await noHorizontalOverflow(page, `${prefix} crew`);
   await page.getByRole('button', { name: new RegExp('^' + L.next + ' →$') }).click();
 

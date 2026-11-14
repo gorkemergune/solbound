@@ -281,18 +281,6 @@ function DestinationScreen() {
 
 // ---------------- crew ----------------
 
-function useMedia(query: string): boolean {
-  const get = () => typeof window !== 'undefined' && !!window.matchMedia?.(query).matches;
-  const [v, setV] = useState(get);
-  useEffect(() => {
-    const mq = window.matchMedia?.(query);
-    if (!mq) return;
-    const on = () => setV(mq.matches);
-    mq.addEventListener('change', on);
-    return () => mq.removeEventListener('change', on);
-  }, [query]);
-  return v;
-}
 
 /**
  * Details open and close only with the Details button (never on hover or focus), so several cards
@@ -412,13 +400,6 @@ function CrewScreen() {
   const r = run!;
   const full = r.crewIds.length >= 3;
   const [allOpen, setAllOpen] = useState({ v: false, n: 0 });
-  // paged grid: 3 × 2 on wide screens, 2 × 2 otherwise (no long scrolling)
-  const wide = useMedia('(min-width: 1100px)');
-  const per = wide ? 6 : 4;
-  const pages = Math.ceil(r.candidates.length / per);
-  const [page, setPage] = useState(0);
-  const p = Math.min(page, pages - 1);
-  const shown = r.candidates.slice(p * per, p * per + per);
   return (
     <div className="crew-screen">
       <div className="crew-head">
@@ -432,36 +413,10 @@ function CrewScreen() {
         </div>
       </div>
       <div className="crew-layout">
-        <div className="cand-pages">
-          <div className={`cand-grid paged ${wide ? 'cols-3' : 'cols-2'}`}>
-            {shown.map((c) => (
-              <CandidateCard key={c.id} c={c} selected={r.crewIds.includes(c.id)} full={full} allOpen={allOpen} />
-            ))}
-          </div>
-          <nav className="pager" aria-label={t('crew.page', { p: p + 1, n: pages })}>
-            <button type="button" className="btn small" disabled={p === 0} onClick={() => setPage(p - 1)}>
-              ← {t('crew.prev')}
-            </button>
-            <span className="pager-dots">
-              {Array.from({ length: pages }, (_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className={i === p ? 'on' : ''}
-                  aria-current={i === p ? 'page' : undefined}
-                  aria-label={t('crew.page', { p: i + 1, n: pages })}
-                  onClick={() => setPage(i)}
-                >
-                  {/* a dot shows whether someone on that page is already picked */}
-                  {r.candidates.slice(i * per, i * per + per).some((c) => r.crewIds.includes(c.id)) ? '●' : '○'}
-                </button>
-              ))}
-            </span>
-            <span className="fine pager-label">{t('crew.page', { p: p + 1, n: pages })}</span>
-            <button type="button" className="btn small" disabled={p >= pages - 1} onClick={() => setPage(p + 1)}>
-              {t('crew.next')} →
-            </button>
-          </nav>
+        <div className="cand-grid">
+          {r.candidates.map((c) => (
+            <CandidateCard key={c.id} c={c} selected={r.crewIds.includes(c.id)} full={full} allOpen={allOpen} />
+          ))}
         </div>
         <CrewSummary />
       </div>

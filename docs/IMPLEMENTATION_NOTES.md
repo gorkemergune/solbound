@@ -287,3 +287,11 @@ Ayrıntılı madde listesi `eksikler.md` dosyasında; güncel özet `docs/CURREN
 | `npm test` | 61/61. Yeni testler: tahmin (deterministik, gıda tahmini uzatır, hedef %85), “Eve dön” ile erken dönüşün kısmi başarı sayılması, seranın önceki moda dönmesi, yedeğin görev başına bir kez kullanılması, takviye ekibin 20. günden önce inmemesi, gerçekçi denge raporu |
 | `npm run build` | Başarılı; `dist/` içinde NASA anahtarı yok (aranarak doğrulandı) |
 | `npm run e2e` | 90/90. Yeni kontroller: 3 × 2 / 2 × 2 sayfalı aday ekranı ve sayfa düğmesi, kalkıştan önce tahmin ve hedef, kart açılınca sahnenin boyutunun aynı kalması (504 → 504 px masaüstü, 203 → 203 px mobil), saati durdurmayan tahmin bandı, “Eve dön” penceresinin 4 satırı ve erken dönüşün başlaması, NASA’ya ve statik dosyaya ulaşılamayınca paketlenmiş veriye düşülmesi. Sonuçlar: Mars/TR “Evdeyiz, ama bedeli oldu”, Ay/EN erken dönüş “Home, but at a cost” |
+
+## v0.7b — arayüz düzeltmeleri (14 Kasım 2026)
+
+- **Aday ekranı:** sayfalama kaldırıldı, 16 aday tek ızgarada. Ekip profili `position: sticky` ile kaydırırken yerinde kalıyor; `.prep-main` için `overflow-x: auto` → `clip` yapıldı (sticky’yi bozuyordu).
+- **Üs sahnesi:** `viewBox` `0 90 1000 430` (boş gökyüzü kırpıldı); yükseklik sınırı ve yanlardaki siyah şeritler kaldırıldı. Dünya, Mars Güneşi ve Ay Güneşi’nin yörüngesi aşağı alındı.
+- **Görev atama:** bütün aktif ekip ızgara olarak gösteriliyor (4 kişide 2 sütun, 6 kişide 3 sütun); seçilemeyenler gri ve nedeni yazıyor. Plan sekmesindeki düğme sınıfı `prep-pick` olarak ayrıldı; adı `crew-pick` iken karar kartındaki alanı bozuyordu.
+- **Kompakt arayüz:** temel yazı 15 px (1700 px ve üstünde 16), sağ panel 340 px, sekmeler sığıyor ve gerekirse yana kayıyor.
+- Doğrulama (kısa, kullanıcı isteğiyle): typecheck hatasız, `npm test` 61/61, build başarılı. 1373 px’te ölçüm: sahne 1033 × 444, taşma 0, profil kaydırınca üstten 76 px’te sabit. E2E’nin ilk bölümü 38/38 geçti (tek ızgara, yapışkan profil, 2 × 2 görev atama); uzun 30 günlük oynatma ayrıntılı test oturumuna bırakıldı.
