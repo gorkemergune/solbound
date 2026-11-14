@@ -307,6 +307,8 @@ export type RunState = {
   crewIds: string[];
   destination: DestinationId | null;
   site: SiteId | null;
+  /** landing-site profile, picked at random at launch and revealed on landing */
+  landing: string | null;
   cargo: Partial<Record<ItemId, number>>;
   mission: MissionState | null;
   manualPause: boolean;

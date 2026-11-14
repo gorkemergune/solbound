@@ -45,8 +45,8 @@ const HARVEST_FEAST: EventDef = {
   speaker: 'teamwork',
   research: ['R-CROPS'],
   options: [
-    { id: 'feast', success: [{ kind: 'harvest', fraction: 0.7, regrow: 0 }, { kind: 'crew', target: 'all', stat: 'stress', delta: -16 }], weight: 2 },
-    { id: 'store', success: [{ kind: 'harvest', fraction: 1, regrow: 0 }, { kind: 'crew', target: 'all', stat: 'stress', delta: 4 }], weight: 2 },
+    { id: 'feast', success: [{ kind: 'harvest', fraction: 0.6, regrow: 0 }, { kind: 'crew', target: 'all', stat: 'stress', delta: -22 }, { kind: 'crew', target: 'all', stat: 'health', delta: 5 }], weight: 2 },
+    { id: 'store', success: [{ kind: 'harvest', fraction: 1.1, regrow: 0 }, { kind: 'crew', target: 'all', stat: 'stress', delta: 10 }], weight: 2 },
     {
       id: 'broadcast',
       cost: [{ kind: 'res', key: 'batteryKWh', delta: -3 }],
@@ -254,4 +254,41 @@ const PACK: EventDef = {
   ],
 };
 
-export const EVENTS_4: EventDef[] = [HARVEST_MOLD, HARVEST_FEAST, HARVEST_SEEDS, REINF_OFFER, PREP_CREW, REINF, SETUP, FINAL_EVA, PACK];
+// ---------- stress at the limit: someone breaks down (stress ≥ 98) ----------
+
+const CREW_CRISIS: EventDef = {
+  id: 'CREW-CRISIS',
+  destination: 'both',
+  phase: 'surface',
+  kind: 'emergency',
+  illustration: 'crew',
+  speaker: 'teamwork',
+  research: [],
+  options: [
+    {
+      id: 'talk',
+      crew: { count: 1, skill: 'teamwork', traits: ['mediator', 'medic', 'steady'] },
+      hours: 2,
+      check: { base: 0.7, skill: 'teamwork', traits: ['mediator', 'medic', 'steady'] },
+      success: [{ kind: 'crew', target: 'subject', stat: 'stress', delta: -40 }],
+      failure: [{ kind: 'crew', target: 'subject', stat: 'stress', delta: -15 }, { kind: 'crew', target: 'all', stat: 'stress', delta: 4 }],
+      weight: 3,
+    },
+    { id: 'dayOff', success: [{ kind: 'rest', target: 'subject' }, { kind: 'crew', target: 'subject', stat: 'stress', delta: -30 }, { kind: 'res', key: 'science', delta: -6 }], weight: 3 },
+    {
+      id: 'comfort',
+      requires: [{ kind: 'item', item: 'comfort' }],
+      cost: [{ kind: 'use', item: 'comfort' }],
+      success: [{ kind: 'crew', target: 'all', stat: 'stress', delta: -25 }],
+      weight: 3,
+    },
+    {
+      id: 'push',
+      success: [{ kind: 'crew', target: 'subject', stat: 'health', delta: -15 }, { kind: 'crew', target: 'all', stat: 'stress', delta: 8 }],
+      weight: 3,
+    },
+  ],
+};
+
+export const EVENTS_4: EventDef[] = [
+  CREW_CRISIS,HARVEST_MOLD, HARVEST_FEAST, HARVEST_SEEDS, REINF_OFFER, PREP_CREW, REINF, SETUP, FINAL_EVA, PACK];

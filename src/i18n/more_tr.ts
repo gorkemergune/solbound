@@ -8,7 +8,7 @@ export const moreTr: Record<keyof typeof moreEn, string> = {
   'title.story2': 'Uzay aracı ancak belirli bir kilo kaldırabilir. Her insan, her giysi, her yedek parça ve her gıda paketi aynı fırlatma kütlesi için yarışır. Dünya’da bıraktığın her şeyi orada beceriyle, zamanla ve cesaretle çözmen gerekecek.',
   'title.story3': 'Orada üs tahmine göz yummaz. Su oksijene, güneş ışığı enerjiye, toz ise soruna dönüşür. Her karar bir ödünleşimdir: yaşam desteğini mi koruyacaksın, yiyecek mi yetiştireceksin? Ekibi dinlendirecek misin, contayı mı onaracaksın? Örnek toplamaya mı çıkacaksın, sığınakta mı kalacaksın?',
   'title.story4': 'Görev, herkes evde olduğunda biter. Oraya nasıl varacağınız sana bağlı.',
-  'title.how1': 'Hazırlan: astronotunu, hedefini, iniş yerini ya da mevsimini, üç ekip arkadaşını ve fırlatma kütlesi bütçesi içinde yükünü seç.',
+  'title.how1': 'Hazırlan: astronotunu, Ay’ı ya da Mars’ı, üç ekip arkadaşını ve fırlatma kütlesi bütçesi içinde yükünü seç. Nereye ineceğin sürprizdir: kolaydan çok zora sekiz yerden biri.',
   'title.how3': 'Karar ver: bildiklerini oku, şansa ve bedele bak, araştırma kartlarını aç. ⓘ işaretli kelimeler kendini açıklar.',
   'title.facts': 'Biliyor muydun?',
   'title.fact1': 'ISS’te oksijen, su elektrikle ayrıştırılarak üretilir.',

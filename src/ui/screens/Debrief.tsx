@@ -42,7 +42,7 @@ export function DebriefScreen() {
             <p className="science">
               {t('debrief.days', { d: Math.ceil(o.daysOnSurface - 1e-6) })} · {t('debrief.science', { v: o.science })}
             </p>
-            {o.rating !== 'success' && o.reasons.length > 0 && (
+            {o.rating !== 'excellent' && o.reasons.length > 0 && (
               <div className="reasons">
                 <strong>{t('debrief.why')}</strong>
                 <ul>

@@ -4,6 +4,7 @@ import { more2En } from './more2_en';
 import { more3En } from './more3_en';
 import { more4En } from './more4_en';
 import { more5En } from './more5_en';
+import { more6En } from './more6_en';
 
 const enBase = {
   // ---------- app ----------
@@ -811,7 +812,7 @@ const enBase = {
   'err.cargo.overCapacity': 'That would exceed the launch mass.',
 };
 
-export const en = { ...enBase, ...moreEn, ...more2En, ...more3En, ...more4En, ...more5En };
+export const en = { ...enBase, ...moreEn, ...more2En, ...more3En, ...more4En, ...more5En, ...more6En };
 export type BaseDict = Record<keyof typeof enBase, string>;
 export type Dict = Record<keyof typeof en, string>;
 export type TKey = keyof typeof en;

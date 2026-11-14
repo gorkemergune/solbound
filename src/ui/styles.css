@@ -1953,6 +1953,10 @@ input:focus {
 .rating-success .debrief-hero-text h2 {
   color: var(--good);
 }
+.rating-excellent .debrief-hero-text h2 {
+  color: var(--good);
+  text-shadow: 0 0 18px rgba(95, 211, 154, 0.45);
+}
 .rating-partial .debrief-hero-text h2,
 .rating-aborted .debrief-hero-text h2 {
   color: var(--accent-2);
@@ -2591,24 +2595,6 @@ input:focus {
 .fact-dots button.on {
   background: var(--accent);
 }
-.features {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  padding: 28px 6vw;
-  background: linear-gradient(180deg, #070b18, var(--bg));
-}
-.feature {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 16px;
-  color: var(--accent-2);
-}
-.feature p {
-  color: var(--text);
-  margin: 8px 0 0;
-}
 .title-page .title-footer {
   background: none;
   padding: 10px 6vw 30px;
@@ -2833,10 +2819,6 @@ div.option:focus-visible {
   .fact-card {
     align-self: auto;
   }
-  .features {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 20px 16px;
-  }
 }
 @media (max-width: 600px) {
   .title-nav {
@@ -2860,9 +2842,6 @@ div.option:focus-visible {
   .patch {
     width: 88px;
     height: 88px;
-  }
-  .features {
-    grid-template-columns: 1fr;
   }
   .speed button {
     padding: 0.4rem 0.4rem;
@@ -3639,5 +3618,165 @@ body {
 @media (max-width: 900px) {
   .surface-main {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- v0.8: random landing, DONKI explainer, credits, HUD fixes ---------- */
+.random-landing {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--theme);
+  background: var(--theme-soft);
+}
+.random-landing h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+.random-landing h4 {
+  margin: 8px 0 4px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.landing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 4px 12px;
+  font-size: 0.88rem;
+}
+.landing-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.diff-chip {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid currentColor;
+  vertical-align: 2px;
+}
+.diff-easy {
+  color: var(--good);
+}
+.diff-medium {
+  color: var(--accent-2);
+}
+.diff-hard {
+  color: #ff9b6b;
+}
+.diff-veryHard {
+  color: var(--low);
+}
+.landing-reveal {
+  margin: 10px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--theme);
+  background: var(--theme-soft);
+}
+.landing-reveal h2 {
+  margin: 2px 0 4px;
+  font-size: 1.3rem;
+}
+.lc-kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.lc-traits {
+  margin: 6px 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+}
+.sw-explain {
+  margin: 0 auto 14px;
+  max-width: 1100px;
+  padding: 14px 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+  background: linear-gradient(135deg, rgba(245, 176, 65, 0.14), rgba(245, 176, 65, 0.04));
+}
+.sw-explain h2 {
+  margin: 6px 0 4px;
+  font-size: 1.15rem;
+}
+.sw-explain p {
+  margin: 0;
+  line-height: 1.5;
+}
+.credits h3 {
+  margin: 12px 0 4px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.credits-team {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 10px;
+}
+.credits-team li {
+  padding: 4px 0;
+}
+.credits a {
+  color: var(--accent-2);
+}
+.go-home.booked {
+  cursor: default;
+  border-color: var(--accent);
+  color: var(--accent-2);
+  white-space: nowrap;
+}
+/* V4 6.8: one row of chips; overflow scrolls sideways instead of pushing the scene down */
+.countdowns {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  min-width: 0;
+  max-width: 100%;
+}
+.countdowns::-webkit-scrollbar {
+  display: none;
+}
+.cd-chip {
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+@media (min-width: 901px) {
+  .hud-sub {
+    flex-wrap: nowrap;
+  }
+  .time-aware {
+    flex-wrap: nowrap;
+    min-width: 0;
+    overflow: hidden;
+  }
+}
+/* V4 6.6: the speed buttons fit at 390 px */
+@media (max-width: 600px) {
+  .hud-controls {
+    flex-wrap: wrap;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .speed-label {
+    display: none;
+  }
+  .speed button {
+    padding: 0.38rem 0.4rem;
+    font-size: 0.8rem;
   }
 }

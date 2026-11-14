@@ -15,3 +15,4 @@ export * from './chatter';
 export * from './bigevents';
 export * from './time';
 export * from './spaceweather';
+export * from './landing';

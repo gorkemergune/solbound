@@ -57,7 +57,7 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
 
   // ---- power ----
   const solarNow = s.solarKW(hour, day);
-  const solarGen = solarNow * (env.darkHours > 0 ? env.darkFactor : 1) * (1 - env.dust) * (sys.solar / 100);
+  const solarGen = solarNow * (env.darkHours > 0 ? env.darkFactor : 1) * Math.max(0.05, 1 - env.dust * s.dustMul) * (sys.solar / 100);
   const baseGen = s.baseKW * (1 - env.fissionLoss);
   // the reinforcement module unfolds its own small array (gameplay)
   const moduleGen = m.flags.module === 'ready' && solarNow > 0.5 ? MODULE_SOLAR_KW * (env.darkHours > 0 ? env.darkFactor : 1) : 0;
@@ -184,7 +184,7 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
     sys.greenhouseGrowth = Math.min(
       100,
       sys.greenhouseGrowth +
-        CROPS[m.crop].growthPerH * modeFactor * served.greenhouse * lightFactor * (sys.greenhouseHealth / 100) * (m.flags.nutrientLoop ? 1.2 : 1) * (hasTrait(run, m, 'botanist') ? 1.15 : 1),
+        CROPS[m.crop].growthPerH * modeFactor * served.greenhouse * lightFactor * (sys.greenhouseHealth / 100) * (m.flags.nutrientLoop ? 1.2 : 1) * (hasTrait(run, m, 'botanist') ? 1.15 : 1) * s.ghMul,
     );
   }
   // Ripe crops wait for the crew's decision (HARVEST event); outside surface ops they are simply eaten.
@@ -219,8 +219,9 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
       if (c.sheltered) {
         c.radiation = clamp(c.radiation + 3 * (1 - sys.shelter / 100));
       } else {
-        c.radiation = clamp(c.radiation + 6);
-        c.health = clamp(c.health - 4);
+        const shield = (m.items.shield ?? 0) > 0 ? 0.5 : 1; // portable shielding blankets
+        c.radiation = clamp(c.radiation + 6 * shield);
+        c.health = clamp(c.health - 4 * shield);
       }
     }
     env.speHours -= 1;
@@ -230,6 +231,9 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
       log(m, run, 'journal.speOver', 'good');
     }
   }
+
+  // nobody stays in the shelter without a particle event (fixes people stuck there after a late task)
+  if (env.speHours <= 0) for (const c of crew) if (c.sheltered) c.sheltered = false;
 
   // ---- unmet needs (no negative stocks: shortage is recorded) ----
   let deficit = false;
@@ -292,7 +296,12 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
       c.fatigue = clamp(c.fatigue + 0.6);
       r.science += 0.25 * (ch.skills.science / 60) * ((m.items.spectro ?? 0) > 0 ? 1.4 : 1) * (ch.traitId === 'geologist' ? 1.25 : 1);
     }
-    if (!deficit && c.fatigue < 70) c.health = clamp(c.health + 0.08);
+    if (!deficit && c.fatigue < 70 && c.stress < 85) c.health = clamp(c.health + 0.08);
+    // very high stress wears people down (sleep, appetite, mistakes); see also the crew-crisis card
+    if (c.stress >= 85) {
+      c.health = clamp(c.health - 0.15);
+      c.fatigue = clamp(c.fatigue + 0.3);
+    }
     if (c.fatigue > 85) {
       c.health = clamp(c.health - 0.3);
       c.stress = clamp(c.stress + 0.3);
@@ -493,6 +502,12 @@ export function checkEmergencies(run: RunState, hooks: EffectHooks) {
     openEvent(run, 'EMG-WATER', `EMG-WATER@${day}`, hooks);
     return;
   }
+  // a crew member at the end of their rope: one card, at most once per person per 3 days
+  const breaking = activeCrew(m).find((c) => c.stress >= 98 && !c.taskId && m.minute - ((m.flags[`crisis@${c.id}`] as number) ?? -1e9) > 3 * 1440);
+  if (breaking) {
+    m.flags[`crisis@${breaking.id}`] = m.minute;
+    if (openEvent(run, 'CREW-CRISIS', `CREW-CRISIS@${breaking.id}@${Math.floor(m.minute)}`, hooks, breaking.id)) return;
+  }
   const lastMed = typeof m.flags.lastMed === 'number' ? (m.flags.lastMed as number) : -1e9;
   if (m.minute - lastMed >= 12 * 60) {
     const sick = activeCrew(m).filter((c) => c.health < 35 && !c.warned).sort((a, b) => a.health - b.health);
@@ -513,6 +528,14 @@ export function checkEmergencies(run: RunState, hooks: EffectHooks) {
   }
 }
 
+/** Next departure window: 13:00 local, after the midday charge (today if it is still ahead, else tomorrow). */
+export const DEPART_HOUR = 13;
+export function nextDeparture(minute: number): number {
+  const dayStart = Math.floor(minute / 1440) * 1440;
+  const today = dayStart + DEPART_HOUR * 60;
+  return minute < today - 30 ? today : today + 1440;
+}
+
 /** First harvest: the classic card; afterwards a seeded rotation, never the same card twice in a row. */
 export function harvestVariant(run: RunState): string {
   const m = run.mission!;
@@ -530,7 +553,7 @@ export function harvestVariant(run: RunState): string {
 export function maybeOfferReinforcement(run: RunState) {
   const m = run.mission!;
   // the crew lands on day 20 at the earliest; the offer is open until day 24 so they still have time to matter
-  if (run.destination !== 'moon' || m.flags.reinfOffered || (m.flags.earthCalls as number) < 2 || m.minute > 24 * 1440) return;
+  if (run.destination !== 'moon' || m.flags.reinfOffered || (m.flags.earthCalls as number) < 2 || m.minute > 24 * 1440 || m.goal.target < 20) return;
   m.flags.reinfOffered = true;
   m.queue.push({ eventId: 'REINF-OFFER', atMinute: m.minute + 90, instanceId: 'REINF-OFFER' });
   m.queue.sort((a, b) => a.atMinute - b.atMinute);
@@ -582,6 +605,11 @@ export function advanceTime(run: RunState, deltaMinutes: number) {
     const next = m.queue[0];
     if (next && next.atMinute <= m.minute + 1e-9) {
       m.queue.shift();
+      // the commander's "go home" departs in the next midday window
+      if (next.eventId === 'DEPART') {
+        endSurface(run);
+        return;
+      }
       // forecasts no longer stop the clock: they become a journal line and a banner with a link to the plan
       if (next.eventId.startsWith('FC-')) {
         const id = next.instanceId ?? next.eventId;

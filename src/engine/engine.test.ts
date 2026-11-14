@@ -6,10 +6,11 @@ import { CHATS } from './chatter';
 import { EVENTS, type Cond } from './events';
 import { generateCandidates } from './characters';
 import { computeOutcome } from './outcome';
-import { applyEffects, characterById, eventOf, optionState, returnStatus, successChance, suggestCrew } from './rules';
+import { applyEffects, availableCrewFor, characterById, eventOf, optionState, returnStatus, successChance, suggestCrew } from './rules';
 import { deserialize, serialize } from './save';
 import { SCENARIOS, SURFACE_START_MINUTE, scenarioFor } from './scenarios';
-import { WATER_PER_KG_O2, tickHour, makeHooks } from './sim';
+import { WATER_PER_KG_O2, tickHour, makeHooks, nextDeparture, openEvent, checkEmergencies } from './sim';
+import { LANDING_SITES, landingsFor, pickLanding } from './landing';
 import { launchAnyway, must, play, playLaunched, prepared, startPreps, type Policy } from './testkit';
 import { buildBigEvents, bigStatus, prepStatusKey } from './bigevents';
 import { NAMES, crewNames, nameVariety } from './characters';
@@ -193,7 +194,7 @@ describe('decisions', () => {
     const ev = r.mission!.activeEvent!;
     expect(ev.eventId).toBe('MOON-01');
     r = must(r, { type: 'resolve', instanceId: ev.instanceId, optionId: 'calibrate', crewIds: ['player'] });
-    expect(r.mission!.systems.solar).toBe(70);
+    expect(r.mission!.systems.solar).toBe(55); // v0.8: the dusty array opens at 55 %
     const success = r.mission!.decisions.at(-1)!.success;
     // the task now takes 5 h; resolve anything that opens meanwhile
     for (let i = 0; i < 40 && r.mission!.tasks.some((t) => t.eventId === 'MOON-01'); i++) {
@@ -454,8 +455,9 @@ describe('policies (deterministic fixtures)', () => {
       }
       expect(mars.mission!.echoes.length).toBeGreaterThanOrEqual(2); // preparation changed options
     }
-    expect(ratings.moon).toContain('success');
-    expect(ratings.mars).toContain('success');
+    const full = (x: string) => x === 'success' || x === 'excellent';
+    expect(ratings.moon.some(full)).toBe(true);
+    expect(ratings.mars.some(full)).toBe(true);
   });
 
   it('an empty cargo bay leads to a harder return on Mars (not a full success)', () => {
@@ -471,17 +473,21 @@ describe('policies (deterministic fixtures)', () => {
       r = structuredClone(r);
       r.mission!.resources.o2Kg = 4;
       r.mission!.env.leakKgH = 0.6;
+      r.mission!.flags.contingencyUsed = true; // this fixture ignores the problem: no reserve
       let guard = 0;
       while (r.phase === 'surface' && guard++ < 200) {
         const ev = r.mission!.activeEvent;
         if (ev) {
           const def = eventOf(ev.eventId);
-          const pref = ['cutLoads', 'rest', 'prioritize', 'call', 'skip', 'isolate', 'shelterNow', 'ignore', 'greens', 'vent', 'reprocess'];
+          const pref = ['cutLoads', 'rest', 'prioritize', 'call', 'skip', 'isolate', 'shelterNow', 'ignore', 'greens', 'vent', 'reprocess', 'treatCause', 'medic'];
           const avail = def.options.filter((o) => optionState(r, o, ev).available);
           const opt = avail.find((o) => pref.includes(o.id)) ?? avail.find((o) => !o.crew) ?? avail[0];
           r = must(r, { type: 'resolve', instanceId: ev.instanceId, optionId: opt.id, crewIds: suggestCrew(r, opt) });
           if (r.mission && r.mission.env.leakKgH < 0.6 && !r.mission.ended) r.mission.env.leakKgH = 0.6; // keep the leak in this fixture
-        } else r = must(r, { type: 'advance', minutes: 60 });
+        } else {
+          r = must(r, { type: 'advance', minutes: 60 });
+          if (r.mission && r.mission.env.leakKgH < 0.6 && !r.mission.ended) r.mission.env.leakKgH = 0.6;
+        }
       }
       const m = r.mission!;
       expect(m.journal.some((j) => j.key === 'journal.o2Warning')).toBe(true);
@@ -712,8 +718,20 @@ describe('v0.7: stay estimate, return home, V3 test fixes', () => {
     }
     if (r.phase !== 'surface') return; // an emergency ended it; nothing more to check
     r = must(r, { type: 'returnHome' });
-    expect(r.phase).toBe('returnPrep');
+    // v0.8: the ascent always leaves in the next 13:00 window, so the result no longer depends on the hour pressed
+    expect(r.phase).toBe('surface');
+    expect((r.mission!.flags.departAt as number) % 1440).toBe(13 * 60);
+    expect(applyCommand(r, { type: 'returnHome' }).error).toBe('err.alreadyResolved');
     expect(r.mission!.journal.some((j) => j.key === 'journal.returnEarly')).toBe(true);
+    for (let i = 0; i < 60 && r.phase === 'surface'; i++) {
+      const ev = r.mission!.activeEvent;
+      if (ev) {
+        const o = eventOf(ev.eventId).options.find((x) => optionState(r, x, ev).available)!;
+        r = must(r, { type: 'resolve', instanceId: ev.instanceId, optionId: o.id, crewIds: suggestCrew(r, o) });
+      } else r = must(r, { type: 'advance', minutes: 60 });
+    }
+    if (r.phase !== 'returnPrep') return; // an emergency ended it first
+    expect(r.mission!.minute % 1440).toBe(13 * 60);
     const done = playLaunched(r, { 'RETURN-01': ['safety', 'balanced', 'ration'], 'RETURN-02': ['reroute', 'repair'] });
     const o = computeOutcome(done);
     expect(o.daysOnSurface).toBeLessThan(o.goal.target);
@@ -738,5 +756,71 @@ describe('v0.7: stay estimate, return home, V3 test fixes', () => {
     expect(optionState(r, o2, null).available).toBe(true);
     r.mission!.flags.contingencyUsed = true;
     expect(optionState(r, water, null).available).toBe(false);
+  });
+});
+
+describe('v0.8: random landing, departure window, V4 fixes', () => {
+  it('each destination has eight landing sites with all four difficulties; the pick is seeded and sets the site', () => {
+    for (const d of ['moon', 'mars'] as const) {
+      const ls = landingsFor(d);
+      expect(ls).toHaveLength(8);
+      expect(new Set(ls.map((l) => l.difficulty))).toEqual(new Set(['easy', 'medium', 'hard', 'veryHard']));
+    }
+    expect(pickLanding(9, 'mars').id).toBe(pickLanding(9, 'mars').id);
+    const seen = new Set<string>();
+    for (let seed = 1; seed <= 60; seed++) seen.add(pickLanding(seed, 'moon').id);
+    expect(seen.size).toBeGreaterThanOrEqual(6);
+    let r = createRun(11, 'en');
+    r = must(r, { type: 'setDestination', destination: 'mars' });
+    expect(r.site).toBeNull();
+    const run = launchAnyway(r.candidates.length ? prepared({ dest: 'mars', seed: 11 }) : r);
+    const l = LANDING_SITES.find((x) => x.id === run.landing)!;
+    expect(l.dest).toBe('mars');
+    expect(run.site).toBe(l.base);
+  });
+
+  it('the departure window is always 13:00, whatever hour the player presses', () => {
+    for (const hour of [0, 6, 12.6, 13, 20]) {
+      const at = nextDeparture(3 * 1440 + hour * 60);
+      expect(at % 1440).toBe(13 * 60);
+      expect(at - (3 * 1440 + hour * 60)).toBeGreaterThan(29);
+    }
+  });
+
+  it('the patient cannot be assigned to treat themselves (V4 6.4)', () => {
+    const r = structuredClone(toSurface(prepared({ dest: 'moon', seed: 2 })));
+    const m = r.mission!;
+    m.queue = [];
+    const patient = m.crew[1].id;
+    openEvent(r, 'EMG-MED', 'EMG-MED@t', makeHooks(r), patient);
+    const opt = eventOf('EMG-MED').options.find((o) => o.id === 'treatCause')!;
+    expect(availableCrewFor(r, opt).map((c) => c.id)).not.toContain(patient);
+  });
+
+  it('shelter ends with the storm, and stress at the limit opens a crisis card (eksikler 3)', () => {
+    const r = structuredClone(toSurface(prepared({ dest: 'moon', seed: 6 })));
+    const m = r.mission!;
+    m.queue = [];
+    m.crew[0].sheltered = true;
+    m.env.speHours = 0;
+    m.crew[2].stress = 100;
+    const hooks = makeHooks(r);
+    tickHour(r, hooks);
+    expect(m.crew[0].sheltered).toBe(false);
+    m.activeEvent = null;
+    m.crew[2].stress = 100;
+    m.crew[2].taskId = null;
+    checkEmergencies(r, hooks);
+    const opened = m.activeEvent as ActiveEvent | null;
+    expect(opened?.eventId).toBe('CREW-CRISIS');
+    expect(opened?.subjectCrewId).toBe(m.crew[2].id);
+  });
+
+  it('the Moon reinforcement crew is offered only when the goal reaches day 20 (V4 6.5)', () => {
+    const r = toSurface(prepared({ dest: 'moon', seed: 8, cargo: { food: 2 } }));
+    const low = structuredClone(r);
+    low.mission!.goal.target = 12;
+    const done = playLaunched(low, {});
+    expect(done.mission!.decisions.some((d) => d.eventId === 'R-REINF')).toBe(false);
   });
 });

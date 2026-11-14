@@ -1,8 +1,8 @@
 # Solbound — güncel durum (tek kaynak)
 
-Son güncelleme: 14 Kasım 2026 · içerik sürümü `0.7.0-goal` · kayıt şeması 6
+Son güncelleme: 14 Kasım 2026 · içerik sürümü `0.8.0-landing` · kayıt şeması 7
 
-Bu belge oyunun **şu anki** kapsamını özetler. Diğer belgelerle çelişirse bu belge ve kod geçerlidir. `00_START_HERE.md` ve v0.2 belgeleri tasarım geçmişidir; `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md`, `CLAUDE_DISCOVERY_TASK.md` ise v0.1 önerisidir. Değişiklik günlüğü ve doğrulama sonuçları için [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), kullanıcının açık listesi için kökteki `eksikler.md`, son bağımsız test için [V3_TEST.md](V3_TEST.md), bir sonraki test görevi için [V4_PROMPT.md](V4_PROMPT.md) okunmalıdır.
+Bu belge oyunun **şu anki** kapsamını özetler. Diğer belgelerle çelişirse bu belge ve kod geçerlidir. `00_START_HERE.md` ve v0.2 belgeleri tasarım geçmişidir; `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md`, `CLAUDE_DISCOVERY_TASK.md` ise v0.1 önerisidir. Değişiklik günlüğü ve doğrulama sonuçları için [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), kullanıcının açık listesi için `bug/eksikler.md` (git’e girmez), son bağımsız test için [V4_TEST.md](V4_TEST.md) okunmalıdır. [V4_PROMPT.md](V4_PROMPT.md) bir önceki test görevidir.
 
 ## Ürün
 
@@ -15,8 +15,9 @@ NASA kayıtlarından beslenen, hikâye ağırlıklı bir **eğitim simülasyonu*
 | Aday havuzu | 16 aday, 15 uzmanlık; tek ızgara, sağdaki ekip profili kaydırırken sabit kalır. Görev atama alanı 4 kişide 2 × 2, 6 kişide 3 × 2. |
 | İsimler | Oyun diline göre (TR → Türk isimleri, EN → yaygın İngilizce isimler); cinsiyet portreyle eşleşir. |
 | Yük | 520 kg fırlatma kütlesi: vücut kütlesi + kişi başı 20 kg kit + ek yük. |
-| Görev süresi | En fazla 30 yüzey günü (son gün 14:00’te biter). “Eve dön” düğmesiyle istenen an dönülebilir. |
-| Hedef | Kalkıştan önce ekip ve yükle **tahmini kalış süresi** hesaplanır (olaysız ön simülasyon). Hedef bunun %85’idir. Hedefe ulaşmak tam başarı için gerekir. |
+| İniş yeri | Hedef (Ay/Mars) seçilir; iniş yeri kalkışta rastgele 8 yerden biri olur (kolay / orta / zor / çok zor). Yer adları gerçek, çarpanlar oyun varsayımı. |
+| Görev süresi | En fazla 30 yüzey günü (son gün 14:00’te biter). “Eve dön” her zaman bir sonraki 13:00 kalkış penceresini planlar. |
+| Hedef | Kalkıştan önce tahmin, olası iniş yerleri üzerinden aralık olarak gösterilir; inişte yere göre kesinleşir (olaysız ön simülasyon). Hedef bunun %85’idir ve başarı için gerekir. Tahmin kadar kalan ve herkesi getiren “Tahminin ötesinde” alır. |
 | Dönüş | Ay: 3 gün, Mars: 6 gün (transfer aracına yükselme). Kişi başına yiyecek, O₂ ve su ile batarya gerekir. |
 | Seçenekler | Her karar kartında kit, rol ya da araştırma gerektirmeyen en az 3 seçenek; kilitlilerle 4–6. |
 | Zorluk | Başarı tabanı yazılı değerin %85’i; görevler 1,5 kat uzun, yorgunluk 1,4 kat. Dışarıdaki kişi-saat başına 0,06 kg O₂, 0,3 L su ve 0,25 kWh. |
@@ -27,7 +28,8 @@ NASA kayıtlarından beslenen, hikâye ağırlıklı bir **eğitim simülasyonu*
 - **Saf, deterministik motor** (`src/engine`). Aynı seed ve aynı NASA verisi aynı görevi verir.
 - **Geri sayımlı büyük olaylar:** Mars toz fırtınası, Ay ekvator gecesi, meteor yağmuru, kutup karanlık dönemi, kargo modülü, gerçek CME varışları, takviye ekip (yalnız Ay). Tahminler saati **durdurmaz**: sahnenin üstünde bir bant ve günlük satırı olarak görünür. Hazırlık görevleri Plan sekmesindedir.
 - **Tempo:** 2. gün kurulum önceliği, son günlerde son dış yürüyüş ve paketleme kararları; hasat kartları dönüşümlüdür.
-- **Acil durumlar:** görev başına bir kez kullanılabilen ortak bir yedek vardır (O₂ tankları, su torbaları ya da tıbbi dengeleme). Aynı anda birkaç hasta olursa tek kart açılır.
+- **Acil durumlar:** görev başına bir kez kullanılabilen ortak bir yedek vardır (O₂ tankları, su torbaları ya da tıbbi dengeleme). Aynı anda birkaç hasta olursa tek kart açılır; nedeni onarma seçeneği vardır ve hasta kendine atanamaz.
+- **Stres:** 85 üstü sağlığı ve yorgunluğu bozar; 98’de ekip krizi kartı açılır. Fırtına bitince herkes sığınaktan çıkar.
 - **Ekip:** ekip uyumu stres artışını azaltır. Arabulucu, soğukkanlı, botanikçi, kimyager, uzay havası analisti ve haberleşme subayının somut etkileri vardır (bkz. V3 düzeltmeleri).
 - **Canlı NASA verisi (DONKI):** tarayıcıda **anahtar yoktur**. Kaynak sırası:
   1. önbellek (3 saatten yeni),
@@ -41,7 +43,7 @@ NASA kayıtlarından beslenen, hikâye ağırlıklı bir **eğitim simülasyonu*
 
 ## Çalıştırma
 
-`npm install` · `npm run dev` · `npm test` · `npm run build` · `npm run e2e` · `npm run donki:snapshot` (`.env` içinde `NASA_API_KEY`).
+`npm install` · `npm run dev` · `npm test` · `npm run build` · `npm run e2e` (uzun) · `npm run e2e:short` (yaklaşık 30 sn) · `npm run donki:snapshot` (`.env` içinde `NASA_API_KEY`).
 
 ## Bilinen eksikler
 
@@ -49,3 +51,5 @@ NASA kayıtlarından beslenen, hikâye ağırlıklı bir **eğitim simülasyonu*
 2. Video yalnız Chromium’da test edildi; Safari’de MP4 ve dosya paylaşımı denenmedi; GIF çıktısı yok.
 3. Safari/Firefox, gerçek cihaz ve ekran okuyucu testleri yapılmadı.
 4. GitHub Action, depo sırrı tanımlanıp gönderilmeden çalışmaz; yayın (deploy) kurulmadı.
+5. Yapanlar penceresindeki isimler ve portföy linki boş (`src/credits.ts`).
+6. v0.8 için uzun 30 günlük e2e ve büyük denge taraması yapılmadı; iniş yerlerinin zorluk etiketleri yalnız kısa bir bot taramasına dayanıyor. E2E’nin Windows düzeltmesi Windows’ta denenmedi.

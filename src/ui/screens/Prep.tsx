@@ -6,7 +6,6 @@ import {
   ITEM_BY_ID,
   PERSONAL_KIT_KG,
   PREP_PHASES,
-  SITES,
   canEnter,
   flyingCrew,
   incompatibleItems,
@@ -29,6 +28,7 @@ import { InfoTip, LangSwitch, StatBar } from '../components/common';
 import { RichText } from '../components/RichText';
 import { SpaceWeatherCard } from '../components/SpaceWeatherCard';
 import { StayGoal } from '../components/StayGoal';
+import { RandomLanding } from '../components/LandingInfo';
 import { useSpaceWeather } from '../../live/useSpaceWeather';
 import { newSeed, useLocale, useStore } from '../store';
 import { Brand } from './Title';
@@ -243,32 +243,7 @@ function DestinationScreen() {
                 <button type="button" className={`btn ${cur === d ? 'primary' : ''} big`} aria-pressed={cur === d} onClick={() => dispatch({ type: 'setDestination', destination: d })}>
                   {cur === d ? `✓ ${t('dest.selected')}` : t('dest.select', { dest: t(`dest.${d}`) })}
                 </button>
-                {cur === d && (
-                  <div className="sites" role="radiogroup" aria-label={t(d === 'moon' ? 'site.title' : 'site.titleMars')}>
-                    <h3>{t(d === 'moon' ? 'site.title' : 'site.titleMars')}</h3>
-                    {SITES[d].map((site) => (
-                      <div
-                        key={site}
-                        role="radio"
-                        tabIndex={0}
-                        aria-checked={run!.site === site}
-                        className={`site ${run!.site === site ? 'sel' : ''}`}
-                        onClick={() => dispatch({ type: 'setSite', site })}
-                        onKeyDown={(e) => {
-                          if ((e.key === 'Enter' || e.key === ' ') && e.target === e.currentTarget) {
-                            e.preventDefault();
-                            dispatch({ type: 'setSite', site });
-                          }
-                        }}
-                      >
-                        <strong>{t(`site.${site}`)}</strong>
-                        <span>
-                          <RichText text={t(`site.${site}.desc`)} />
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                {cur === d && <RandomLanding dest={d} />}
               </div>
             </article>
           );
@@ -598,7 +573,7 @@ function BriefingScreen() {
           <h1>{t('brief.heading')}</h1>
           <p>{t('brief.goal', { days: MISSION_DAYS })}</p>
           <p>
-            <strong>{t(`site.${r.site}`)}</strong> · {t('brief.payload', { used: pay.totalKg, cap: pay.capacityKg })}
+            <strong>🎲 {t('land.random')}</strong> · {t('brief.payload', { used: pay.totalKg, cap: pay.capacityKg })}
           </p>
           <p className="demo-badge">{t('app.missionBadge')}</p>
           {sw && (
@@ -608,6 +583,13 @@ function BriefingScreen() {
           )}
         </div>
       </div>
+      {sw && (
+        <section className="sw-explain" data-testid="sw-explain">
+          <span className="sw-badge">NASA DONKI</span>
+          <h2>☀ {t('sw.explainTitle')}</h2>
+          <p>{t('sw.explainText', { start: sw.rangeStart, end: sw.rangeEnd, dest: t(`dest.${dest}`) })}</p>
+        </section>
+      )}
       <div className="brief-sw">
         <StayGoal run={r} />
         <SpaceWeatherCard dest={dest} compact />
@@ -664,9 +646,7 @@ function BriefingScreen() {
           <p>
             <strong>{t(`dest.${dest}`)}</strong> — {t(`dest.${dest}.tag`)}
           </p>
-          <p>
-            <strong>{t(`site.${r.site}`)}</strong> — <RichText text={t(`site.${r.site}.desc`)} />
-          </p>
+          <RandomLanding dest={dest} />
         </section>
       </div>
       <p className="fine center">{t('brief.timeRule')}</p>

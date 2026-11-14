@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { MissionPatch, Panorama } from '../art/Panorama';
 import { LangSwitch, Modal } from '../components/common';
+import { CREDITS } from '../../credits';
 import { RichText } from '../components/RichText';
 import { SpaceWeatherCard } from '../components/SpaceWeatherCard';
-import { useStore } from '../store';
+import { useLocale, useStore } from '../store';
 
 function Logo() {
   return (
@@ -25,17 +26,11 @@ export function Brand({ small }: { small?: boolean }) {
   );
 }
 
-const FEATURES = [
-  { id: 'crew', icon: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-4 4-6 8-6s8 2 8 6' },
-  { id: 'mass', icon: 'M6 9h12l2 11H4zM9 9V7a3 3 0 0 1 6 0v2' },
-  { id: 'science', icon: 'M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3' },
-  { id: 'home', icon: 'M3 11l9-7 9 7M5 10v10h14V10' },
-] as const;
-
 export function TitleScreen() {
   const { t, savedRun, startNew, resume, saveNotice, storageOk } = useStore();
+  const locale = useLocale();
   const [confirm, setConfirm] = useState(false);
-  const [modal, setModal] = useState<null | 'story' | 'how'>(null);
+  const [modal, setModal] = useState<null | 'story' | 'how' | 'credits'>(null);
   const [fact, setFact] = useState(0);
   useEffect(() => {
     const id = window.setInterval(() => setFact((f) => (f + 1) % 6), 7000);
@@ -93,6 +88,9 @@ export function TitleScreen() {
             <button type="button" className="btn big ghost" onClick={() => setModal('story')}>
               <strong>{t('title.story')}</strong>
             </button>
+            <button type="button" className="btn big ghost" onClick={() => setModal('credits')} data-testid="credits-btn">
+              <strong>{t('credits.button')}</strong>
+            </button>
           </div>
           {saveNotice && <p className="notice">{t(saveNotice === 'corrupt' ? 'title.saveCorrupt' : 'title.saveVersion')}</p>}
           {!storageOk && <p className="notice">{t('title.noStorage')}</p>}
@@ -115,17 +113,6 @@ export function TitleScreen() {
       <div className="title-sw">
         <SpaceWeatherCard />
       </div>
-
-      <section className="features" aria-label={t('title.how')}>
-        {FEATURES.map((f, i) => (
-          <article key={f.id} className="feature">
-            <svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
-              <path d={f.icon} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            <p>{t(`title.how${i + 1}`)}</p>
-          </article>
-        ))}
-      </section>
 
       <footer className="title-footer fine">
         <p>{t('app.missionNote')}</p>
@@ -174,6 +161,44 @@ export function TitleScreen() {
           <button type="button" className="btn primary" onClick={() => setModal(null)}>
             {t('title.close')}
           </button>
+        </Modal>
+      )}
+      {modal === 'credits' && (
+        <Modal title={t('credits.title')} onClose={() => setModal(null)}>
+          <div className="credits">
+            <h2>{t('credits.title')}</h2>
+            {CREDITS.team.length > 0 && (
+              <>
+                <h3>{t('credits.team')}</h3>
+                <ul className="credits-team">
+                  {CREDITS.team.map((p) => (
+                    <li key={p.name}>
+                      {p.link ? (
+                        <a href={p.link} target="_blank" rel="noopener noreferrer">
+                          {p.name}
+                        </a>
+                      ) : (
+                        <strong>{p.name}</strong>
+                      )}
+                      {p.role && <span className="fine"> · {p.role[locale === 'tr' ? 'tr' : 'en']}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {CREDITS.portfolio && (
+              <p>
+                <a className="btn" href={CREDITS.portfolio} target="_blank" rel="noopener noreferrer">
+                  {t('credits.portfolio')} ↗
+                </a>
+              </p>
+            )}
+            <p className="fine">{t('credits.thanks')}</p>
+            <p className="fine">{t('credits.note')}</p>
+            <button type="button" className="btn primary" onClick={() => setModal(null)}>
+              {t('title.close')}
+            </button>
+          </div>
         </Modal>
       )}
       {confirm && (

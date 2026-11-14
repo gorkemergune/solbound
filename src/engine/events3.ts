@@ -251,7 +251,7 @@ const METEOR: EventDef = {
   onOpen: [
     {
       kind: 'if',
-      cond: { kind: 'flag', key: 'prep.meteor.berm', value: true },
+      cond: { kind: 'any', of: [{ kind: 'flag', key: 'prep.meteor.berm', value: true }, { kind: 'item', item: 'shield' }] },
       then: [{ kind: 'note', key: 'journal.meteorBerm', tone: 'good' }],
       else: [{ kind: 'env', key: 'heatHours', value: 30 }, { kind: 'sys', key: 'solar', delta: -10 }, { kind: 'note', key: 'journal.meteorHit', tone: 'bad' }],
     },

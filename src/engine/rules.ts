@@ -9,7 +9,7 @@ import type { ActiveEvent, Character, CrewState, Echo, JournalEntry, MissionStat
 
 export function scenarioOf(run: RunState): ScenarioDefinition {
   if (!run.destination) throw new Error('no destination');
-  return scenarioFor(run.destination, run.site);
+  return scenarioFor(run.destination, run.site, run.landing);
 }
 
 export function allCharacters(run: RunState): Character[] {
@@ -131,7 +131,8 @@ export type LockReason = { key: string; params?: Record<string, string | number>
 
 export function availableCrewFor(run: RunState, option: EventOption): CrewState[] {
   const m = run.mission!;
-  const away = m.activeEvent?.subjects ?? [];
+  // people the event is about (a stranded team, the patient) cannot be assigned to it
+  const away = [...(m.activeEvent?.subjects ?? []), ...(m.activeEvent?.subjectCrewId ? [m.activeEvent.subjectCrewId] : [])];
   return activeCrew(m).filter(
     (c) =>
       !c.taskId &&
@@ -421,6 +422,12 @@ export function applyEffects(ctx: Ctx, effects: Effect[], hooks: EffectHooks) {
       case 'wait':
         hooks.wait(e.hours);
         break;
+      case 'waitUntil': {
+        const now = (m.minute % 1440) / 60;
+        const h = (e.hour - now + 24) % 24 || 24;
+        hooks.wait(Math.ceil(h));
+        break;
+      }
       case 'abort':
         hooks.abort();
         break;

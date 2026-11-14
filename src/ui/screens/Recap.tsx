@@ -1,8 +1,11 @@
 // Mission film: a short canvas animation summarising the month, recordable as a video (MediaRecorder)
 // or saved as an image card, so players can share it. Everything is drawn from recorded run state.
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { landingName } from '../components/LandingInfo';
 import { characterById, computeOutcome, type DaySnapshot, type RunState } from '../../engine';
-import { lookFor } from '../art/Portrait';
+import { flushSync } from 'react-dom';
+import { createRoot } from 'react-dom/client';
+import { Portrait, lookFor } from '../art/Portrait';
 import { stripGloss } from '../components/RichText';
 import { useStore } from '../store';
 
@@ -93,7 +96,60 @@ function earth(ctx: CanvasRenderingContext2D, x: number, y: number, r: number) {
   ctx.fill();
 }
 
+// The film uses the same SVG portraits as the rest of the game (eksikler: faces did not match).
+// Each portrait is rendered once to SVG markup, loaded as an image and drawn into the canvas.
+const FACE_IMG = new Map<string, HTMLImageElement>();
+const faceKey = (p: Person) => `${p.seed}|${p.gender}|${p.age}`;
+
+function portraitSvg(p: Person): string {
+  const host = document.createElement('div');
+  const root = createRoot(host);
+  flushSync(() => root.render(<Portrait seed={p.seed} gender={p.gender} age={p.age} size={240} />));
+  const svg = host.innerHTML;
+  root.unmount();
+  return svg.includes('xmlns=') ? svg : svg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+}
+
+/** Resolves when every portrait image has loaded (or failed: the drawn fallback is used then). */
+export async function loadFaces(people: Person[]): Promise<void> {
+  await Promise.resolve(); // leave React's commit phase before rendering portraits
+  await Promise.all(
+    people.map((p) => {
+      const k = faceKey(p);
+      const have = FACE_IMG.get(k);
+      if (have?.complete && have.naturalWidth) return Promise.resolve();
+      return new Promise<void>((done) => {
+        const img = new Image();
+        img.onload = () => done();
+        img.onerror = () => {
+          FACE_IMG.delete(k);
+          done();
+        };
+        FACE_IMG.set(k, img);
+        img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(portraitSvg(p))}`;
+      });
+    }),
+  );
+}
+
 function face(ctx: CanvasRenderingContext2D, p: Person, x: number, y: number, r: number, dim = false) {
+  const img = FACE_IMG.get(faceKey(p));
+  if (img?.complete && img.naturalWidth) {
+    const s = (r * 2) / 0.96; // the portrait circle has radius 48 of 100
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(img, x - s / 2, y - s / 2, s, s);
+    ctx.restore();
+    if (dim) {
+      ctx.fillStyle = 'rgba(7,11,24,0.6)';
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    return;
+  }
   const l = lookFor(p.seed, p.gender, p.age);
   ctx.save();
   ctx.beginPath();
@@ -341,7 +397,7 @@ export function drawFrame(ctx: CanvasRenderingContext2D, t: number, d: RecapData
     }
     default: {
       planet(ctx, d.dest, W / 2, H + 300, 440);
-      const colour = d.ratingKey === 'success' ? '#5fd39a' : d.ratingKey === 'partial' ? '#f5b041' : '#ff8a8a';
+      const colour = d.ratingKey === 'success' || d.ratingKey === 'excellent' ? '#5fd39a' : d.ratingKey === 'partial' ? '#f5b041' : '#ff8a8a';
       text(ctx, 'SOLBOUND', W / 2, 84, 26, { weight: 800, color: '#f5b041', font: '"Space Grotesk Variable", system-ui, sans-serif' });
       text(ctx, `${d.mission} · ${d.site}`, W / 2, 120, 20, { color: '#c9d2dc' });
       text(ctx, d.rating, W / 2, 200, 46, { weight: 800, alpha: ease(p * 2), color: colour, font: '"Space Grotesk Variable", system-ui, sans-serif' });
@@ -392,7 +448,7 @@ function useRecapData(run: RunState): RecapData {
       dest,
       title: 'Solbound',
       mission: t('recap.s.mission', { days: Math.ceil(o.daysOnSurface - 1e-6), dest: destName }),
-      site: t(`site.${run.site}`),
+      site: landingName(t, run.landing, run.site),
       commander: run.player.name,
       crew,
       history: m.history,
@@ -431,7 +487,7 @@ export function shareText(run: RunState, t: (k: string, p?: Record<string, strin
   return t('recap.summary', {
     crew: run.mission!.crew.length,
     dest: t(`dest.${run.destination}`),
-    site: t(`site.${run.site}`),
+    site: landingName(t, run.landing, run.site),
     days: Math.ceil(o.daysOnSurface - 1e-6),
     harvests: o.harvests,
     big: o.bigEvents.length,
@@ -496,6 +552,16 @@ export function RecapReel({ run }: { run: RunState }) {
     raf.current = requestAnimationFrame(step);
   };
 
+  // the real portraits load asynchronously; redraw the first frame once they are in
+  const [faces, setFaces] = useState(0);
+  useEffect(() => {
+    let alive = true;
+    void loadFaces(data.crew).then(() => alive && setFaces((n) => n + 1));
+    return () => {
+      alive = false;
+    };
+  }, [data]);
+
   // first frame (and the final card when reduced motion is preferred)
   useEffect(() => {
     const ctx = ref.current?.getContext('2d');
@@ -503,7 +569,7 @@ export function RecapReel({ run }: { run: RunState }) {
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     drawFrame(ctx, reduced ? RECAP_SECONDS - 0.01 : 0.9, data);
     return () => cancelAnimationFrame(raf.current);
-  }, [data]);
+  }, [data, faces]);
 
   const record = () => {
     const c = ref.current;

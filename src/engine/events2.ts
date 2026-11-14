@@ -330,7 +330,7 @@ const MARS_SAR: EventDef = {
     },
     {
       id: 'wait',
-      success: [{ kind: 'crew', target: 'subject', stat: 'health', delta: -12 }, { kind: 'crew', target: 'subject', stat: 'stress', delta: 12 }],
+      success: [{ kind: 'crew', target: 'subject', stat: 'health', delta: -24 }, { kind: 'crew', target: 'subject', stat: 'stress', delta: 18 }, { kind: 'crew', target: 'all', stat: 'stress', delta: 6 }],
       weight: 3,
     },
   ],
@@ -539,7 +539,7 @@ const ISRU: EventDef = {
       hours: 9,
       cost: [{ kind: 'res', key: 'batteryKWh', delta: -12 }],
       check: { base: 0.7, skill: 'science', traits: ['geologist', 'chemist'] },
-      success: [{ kind: 'res', key: 'o2Kg', delta: 2.5 }, { kind: 'res', key: 'science', delta: 10 }],
+      success: [{ kind: 'res', key: 'o2Kg', delta: 6 }, { kind: 'res', key: 'science', delta: 10 }],
       failure: [{ kind: 'res', key: 'science', delta: 4 }],
       weight: 2,
     },

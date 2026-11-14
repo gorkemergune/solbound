@@ -52,6 +52,8 @@ export type Effect =
   | { kind: 'evacuate'; target: 'subject' }
   | { kind: 'harvestNow'; fraction: number }
   | { kind: 'wait'; hours: number }
+  /** simulate until the next given local hour (e.g. the midday departure window) */
+  | { kind: 'waitUntil'; hour: number }
   | { kind: 'abort' }
   | { kind: 'setCrop'; crop: Crop; growth: number }
   | { kind: 'harvest'; fraction: number; regrow: number }
@@ -150,7 +152,7 @@ const MOON_01: EventDef = {
   illustration: 'solar',
   speaker: 'technical',
   research: ['R-BATTERY', 'R-MOON-ENV'],
-  onOpen: [{ kind: 'sysSet', key: 'solar', value: 70 }],
+  onOpen: [{ kind: 'sysSet', key: 'solar', value: 55 }],
   options: [
     {
       id: 'prioritize',
@@ -695,7 +697,7 @@ const RETURN_01: EventDef = {
     {
       id: 'wait',
       requires: [{ kind: 'notFlag', key: 'waited', value: true }, { kind: 'envBelow', key: 'leakKgH', max: 0.001 }],
-      success: [{ kind: 'flag', key: 'waited', value: true }, { kind: 'gh', mode: 'off' }, { kind: 'wait', hours: 24 }],
+      success: [{ kind: 'flag', key: 'waited', value: true }, { kind: 'gh', mode: 'off' }, { kind: 'waitUntil', hour: 13 }],
       weight: 2,
     },
     {
@@ -839,11 +841,6 @@ const EMG_MED: EventDef = {
       weight: 3,
     },
     {
-      id: 'rest',
-      success: [{ kind: 'rest', target: 'subject' }, { kind: 'crew', target: 'subject', stat: 'health', delta: 8 }, { kind: 'crew', target: 'all', stat: 'stress', delta: 4 }],
-      weight: 3,
-    },
-    {
       id: 'evacuate',
       requires: [{ kind: 'notSubjectIsPlayer' }],
       success: [{ kind: 'evacuate', target: 'subject' }],
@@ -865,6 +862,24 @@ const EMG_MED: EventDef = {
         { kind: 'gh', mode: 'eco' },
         { kind: 'flag', key: 'contingencyUsed', value: true },
       ],
+      weight: 3,
+    },
+    {
+      id: 'treatCause',
+      crew: { count: 1, skill: 'technical', traits: ['mechanic', 'chemist'] },
+      hours: 3,
+      cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
+      check: { base: 0.75, skill: 'technical', traits: ['mechanic', 'chemist'], items: [{ item: 'parts', bonus: 0.15 }] },
+      success: [
+        { kind: 'sys', key: 'lifeSupport', delta: 20 },
+        { kind: 'sys', key: 'waterRecycler', delta: 20 },
+        { kind: 'env', key: 'leakKgH', value: 0 },
+        { kind: 'env', key: 'leakGrowth', value: 0 },
+        { kind: 'env', key: 'recyclerWear', value: 0 },
+        { kind: 'gh', mode: 'eco' },
+        { kind: 'crew', target: 'subject', stat: 'health', delta: 12 },
+      ],
+      failure: [{ kind: 'sys', key: 'lifeSupport', delta: 6 }, { kind: 'crew', target: 'subject', stat: 'health', delta: 6 }],
       weight: 3,
     },
   ],

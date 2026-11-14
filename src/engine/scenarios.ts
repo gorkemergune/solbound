@@ -1,4 +1,5 @@
 import type { DestinationId, Environment, GreenhouseMode, Resources, SiteId, Systems } from './types';
+import { LANDING_BY_ID } from './landing';
 
 export const MINUTES_PER_DAY = 1440;
 /** Surface clock starts on day 1 at 06:00. */
@@ -30,6 +31,12 @@ export type PoolEntry = {
 export type ScenarioDefinition = {
   id: DestinationId;
   site: SiteId;
+  /** landing site profile (null = the plain base type) */
+  landing: string | null;
+  /** greenhouse growth multiplier at this landing site */
+  ghMul: number;
+  /** how strongly dust storms dim the array here */
+  dustMul: number;
   missionDays: number;
   commDelay: 'seconds' | 'minutes';
   start: { resources: Resources; systems: Systems; env: Environment; greenhouseMode: GreenhouseMode };
@@ -86,6 +93,9 @@ const baseEnv: Environment = {
 const common = {
   missionDays: MISSION_DAYS,
   baseKW: 0,
+  landing: null as string | null,
+  ghMul: 1,
+  dustMul: 1,
   battery: { maxRateKW: 8, chargeEfficiency: 0.9 },
   o2ProductionKgH: 0.16,
   o2PerCrewKgH: 0.035,
@@ -217,12 +227,12 @@ function mars(site: 'spring' | 'summer'): ScenarioDefinition {
       thermal: (h) => (h < 5 || h >= 19 ? (summer ? 1.3 : 1.7) : summer ? 0.9 : 1.1),
       water: 0.5,
       greenhouse: { full: 1.3, eco: 0.5, off: 0 },
-      moxie: 0.2,
+      moxie: 0.1,
       sabatier: 0.35,
     },
     greenhouseWaterLH: { full: 0.08, eco: 0.04, off: 0 },
     // Gameplay: a scaled-up, MOXIE-inspired unit. The real MOXIE demo made grams per hour.
-    moxieKgH: 0.04,
+    moxieKgH: 0.05,
     returnNeeds: { foodPerCrew: 6, o2PerCrew: 4, waterPerCrew: 20, batteryKWh: 20 },
     returnDays: 6,
     mandatory: [
@@ -239,9 +249,32 @@ function mars(site: 'spring' | 'summer'): ScenarioDefinition {
 
 export const SITES: Record<DestinationId, SiteId[]> = { moon: ['polar', 'equator'], mars: ['spring', 'summer'] };
 
-export function scenarioFor(dest: DestinationId, site: SiteId | null): ScenarioDefinition {
+function baseScenario(dest: DestinationId, site: SiteId | null): ScenarioDefinition {
   if (dest === 'moon') return moon(site === 'equator' ? 'equator' : 'polar');
   return mars(site === 'summer' ? 'summer' : 'spring');
+}
+
+/** The scenario for a destination, base site type and (optionally) a landing-site profile. */
+export function scenarioFor(dest: DestinationId, site: SiteId | null, landing: string | null = null): ScenarioDefinition {
+  const l = landing ? LANDING_BY_ID[landing] : undefined;
+  const base = baseScenario(dest, l?.base ?? site);
+  if (!l) return base;
+  const solar = base.solarKW;
+  const thermal = base.loads.thermal;
+  return {
+    ...base,
+    landing: l.id,
+    ghMul: l.ghMul,
+    dustMul: l.dustMul,
+    solarKW: (h, d) => solar(h, d) * l.solarMul,
+    loads: { ...base.loads, thermal: (h, d) => Math.max(0.3, thermal(h, d) + l.thermalAdd) },
+    start: {
+      ...base.start,
+      resources: { ...base.start.resources, waterL: Math.max(80, base.start.resources.waterL + l.waterDelta) },
+      systems: { ...base.start.systems, shelter: Math.min(100, base.start.systems.shelter + l.shelterAdd) },
+    },
+    pool: base.pool.map((p) => ({ ...p, weight: p.weight * (l.pool?.[p.eventId] ?? 1) })),
+  };
 }
 
 /** Default (first) site per destination, used for previews before a site is picked. */

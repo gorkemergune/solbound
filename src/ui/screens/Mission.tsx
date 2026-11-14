@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { LandingCard, landingName } from '../components/LandingInfo';
 import {
   bigStatus,
   RESEARCH,
@@ -69,9 +70,6 @@ export function TransitScreen({ direction }: { direction: 'out' | 'back' }) {
             </span>
           </div>
           <CrewAboard run={r} />
-          <p className="transit-note fine">
-            {t('transit.compressed')} {t(r.destination === 'mars' ? 'transit.realMars' : 'transit.realMoon')}
-          </p>
           {!arrived && !pending && (
             <button type="button" className="btn ghost skip" onClick={() => setProgress(0.5)}>
               {t('app.skip')} »
@@ -156,6 +154,8 @@ export function LandingScreen() {
         <section className="card landing-card">
           <h2>{t('landing.heading', { dest: t(`dest.${dest}`) })}</h2>
           <p className="muted">{t('landing.sub')}</p>
+          <LandingCard id={r.landing} />
+          <p className="good-line">{t('land.goal', { e: m.goal.estimate, t: m.goal.target })}</p>
           <p className={pre === 'none' ? 'warn-line' : 'good-line'}>{t(`landing.preflight.${pre}`)}</p>
           <ul className="landing-stats">
             <li>
@@ -339,9 +339,15 @@ function Hud({ run, reason, onPlan, onReturn }: { run: RunState; reason: PauseRe
             <button type="button" className="btn" onClick={() => dispatch({ type: 'setPause', paused: !run.manualPause })} aria-pressed={run.manualPause}>
               {run.manualPause ? `▶ ${t('hud.resume')}` : `❚❚ ${t('hud.pause')}`}
             </button>
-            <button type="button" className="btn ghost go-home" onClick={onReturn} disabled={!!run.mission?.activeEvent}>
-              ⌂ {t('ret.button')}
-            </button>
+            {typeof m.flags.departAt === 'number' ? (
+              <span className="btn ghost go-home booked" role="status">
+                ⌂ {t('ret.booked')}
+              </span>
+            ) : (
+              <button type="button" className="btn ghost go-home" onClick={onReturn} disabled={!!run.mission?.activeEvent}>
+                ⌂ {t('ret.button')}
+              </button>
+            )}
             <div className="speed" role="group" aria-label={t('hud.speed', { x: run.speed })}>
               <span className="speed-label">{t('hud.speedLabel')}</span>
               {([1, 2, 4, 8, 16] as Speed[]).map((x) => (
@@ -737,7 +743,7 @@ export function SurfaceScreen() {
             </div>
           )}
           <div className="scene-caption fine">
-            {t(`phase.${r.phase}`)} · {crewActive}/{m.crew.length} · {t(`site.${r.site}`)}
+            {t(`phase.${r.phase}`)} · {crewActive}/{m.crew.length} · {landingName(t, r.landing, r.site)}
           </div>
           <section className="recent-log" aria-label={t('journal.title')}>
             <h3>{t('journal.title')}</h3>

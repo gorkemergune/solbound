@@ -4,6 +4,7 @@ import { more2Tr } from './more2_tr';
 import { more3Tr } from './more3_tr';
 import { more4Tr } from './more4_tr';
 import { more5Tr } from './more5_tr';
+import { more6Tr } from './more6_tr';
 
 // Türkçe metinler. Her anahtar en.ts ile aynı olmak zorundadır (tip denetimi zorlar).
 const trBase: BaseDict = {
@@ -794,4 +795,4 @@ const trBase: BaseDict = {
   'err.cargo.overCapacity': 'Bu, fırlatma kütlesini aşar.',
 };
 
-export const tr: Dict = { ...trBase, ...moreTr, ...more2Tr, ...more3Tr, ...more4Tr, ...more5Tr };
+export const tr: Dict = { ...trBase, ...moreTr, ...more2Tr, ...more3Tr, ...more4Tr, ...more5Tr, ...more6Tr };

@@ -2,14 +2,18 @@
 // Usage: npm run build && npm run e2e   (screenshots go to ./e2e-screens, which is git-ignored)
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 const PORT = 4179;
+// E2E_SHORT=1: stop each run after the first surface checks (quick smoke test instead of two full playthroughs)
+const SHORT = process.env.E2E_SHORT === '1';
 const BASE = `http://localhost:${PORT}/`;
-const OUT = new URL('../e2e-screens/', import.meta.url).pathname;
+// fileURLToPath: correct on Windows too (no "C:\\C:\\…%20…" paths); V4 6.7
+const OUT = fileURLToPath(new URL('../e2e-screens/', import.meta.url));
 mkdirSync(OUT, { recursive: true });
 
-const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { stdio: 'pipe' });
+const server = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], { stdio: 'pipe', shell: process.platform === 'win32' });
 await new Promise((resolve, reject) => {
   const to = setTimeout(() => reject(new Error('preview did not start')), 20000);
   server.stdout.on('data', (d) => {
@@ -108,6 +112,12 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
     const unknown = await page.locator('.sw-counts li.missing strong').first().textContent();
     check(`${prefix} a list that failed shows "—", not 0`, unknown === '—', unknown ?? '');
   }
+  // v0.8: no feature blurbs on the home page; a Credits button next to the story
+  check(`${prefix} home page has no feature blurbs`, (await page.locator('.features').count()) === 0);
+  await page.locator('[data-testid="credits-btn"]').click();
+  await page.locator('.credits').waitFor({ timeout: 3000 });
+  check(`${prefix} credits open`, true);
+  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: L.newMission }).click();
 
   // identity
@@ -125,13 +135,9 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
 
   // destination
   await page.getByRole('button', { name: L.choose }).click();
-  await page.getByRole('radio', { name: new RegExp(L.site) }).click();
-  const siteOn = await page.getByRole('radio', { name: new RegExp(L.site) }).getAttribute('aria-checked');
-  check(`${prefix} site can be chosen`, siteOn === 'true');
-  // glossary tooltip opens on hover
-  await page.locator('.site .term .infotip-btn').first().hover();
-  const pops = await page.locator('.infotip-pop').count();
-  check(`${prefix} glossary ⓘ shows an explanation on hover`, pops > 0);
+  // v0.8: no site choice any more; the landing is random and the possible sites are listed
+  const sites = await page.locator('.random-landing .landing-list li').count();
+  check(`${prefix} random landing lists the possible sites`, sites === 8, `${sites} sites`);
   await shot(page, `${prefix}-03-destination`);
   await page.getByRole('button', { name: new RegExp('^' + L.next + ' →$') }).click();
 
@@ -187,6 +193,7 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
 
   // briefing + launch
   await page.locator('.sw-brief').waitFor({ timeout: 5000 });
+  check(`${prefix} briefing explains that real NASA events happen in the game`, (await page.locator('[data-testid="sw-explain"]').count()) === 1);
   check(`${prefix} briefing shows the mission's real space-weather window`, /DONKI/.test((await page.locator('.sw-brief').textContent()) ?? ''));
   await shot(page, `${prefix}-06-briefing`);
   await page.getByRole('button', { name: new RegExp(L.launch) }).dblclick();
@@ -197,6 +204,7 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
 
   // landing
   await page.getByRole('button', { name: L.start }).waitFor();
+  check(`${prefix} landing reveals the site`, (await page.locator('[data-testid="landing-reveal"]').count()) === 1);
   await shot(page, `${prefix}-07b-landing`);
   await page.getByRole('button', { name: L.start }).click();
   await page.locator('.surface').waitFor();
@@ -214,6 +222,24 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
   const sceneH0 = (await page.locator('.base-scene').boundingBox())?.height ?? 0;
   const day = await page.locator('.clock-day').textContent();
   check(`${prefix} 30-day clock`, /\/ 30/.test(day ?? '') && (dest !== 'mars' || /Sol/.test(day ?? '')), day ?? '');
+  if (SHORT) {
+    const caption = await page.locator('.scene-caption, .surface-caption').first().textContent().catch(() => '');
+    if (caption) console.log(`  caption: ${caption}`);
+    if (!(await page.locator('.event-card:visible').count())) {
+      await page.locator('.go-home').click();
+      await page.locator('[data-testid="return-home"]').waitFor({ timeout: 4000 });
+      await page.locator('[data-testid="return-home"] .btn.primary').click();
+      await page.locator('.go-home.booked').waitFor({ timeout: 4000 });
+      const chip = (await page.locator('.cd-return').textContent()) ?? '';
+      const status = (await page.locator('.status').textContent()) ?? '';
+      check(`${prefix} the departure is booked (13:00 window) and the clock runs on`, /\d/.test(chip) && !/(by you|tarafından)/.test(status), `${chip} · ${status}`);
+      await shot(page, `${prefix}-08b-departure-booked`);
+      await noHorizontalOverflow(page, `${prefix} surface after booking`);
+    }
+    check(`${prefix} no console errors`, errors.length === 0, errors.slice(0, 3).join(' | '));
+    await ctx.close();
+    return;
+  }
 
   // hidden tab: the mission clock must not advance
   await page.waitForTimeout(800);
@@ -333,8 +359,9 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
         check(`${prefix} "go home" lists what the trip needs`, lines === 4, `${lines} lines`);
         await shot(page, `${prefix}-12c-go-home`);
         await page.locator('[data-testid="return-home"] .btn.primary').click();
-        await page.locator('.event-card .checklist').waitFor({ timeout: 8000 });
-        check(`${prefix} the early return starts`, true);
+        // v0.8: the ascent leaves in the next 13:00 window; the HUD shows the booked departure
+        await page.locator('.go-home.booked').waitFor({ timeout: 4000 });
+        check(`${prefix} the departure is booked`, true);
       }
       if (i === 4) {
         await page.getByRole('tab').nth(2).click();

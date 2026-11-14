@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { returnStatus, scenarioOf, type RunState } from '../../engine';
+import { DEPART_HOUR, returnStatus, scenarioOf, type RunState } from '../../engine';
 import { formatFixed } from '../../i18n';
 import { useLocale, useStore } from '../store';
 import { Modal } from './common';
@@ -49,6 +49,7 @@ export function ReturnHomeModal({ run, onClose }: { run: RunState; onClose: () =
         </ul>
         <p className={st.ready ? 'good-line' : 'warn-line'}>{st.ready ? t('ret.ready') : t('ret.notReady')}</p>
         <p className={reached ? 'good-line' : 'warn-line'}>{reached ? t('ret.goalOk', { d: m.goal.target }) : t('ret.goalLeft', { d: m.goal.target, now })}</p>
+        <p className="fine">{t('ret.window', { hh: String(DEPART_HOUR).padStart(2, '0') })}</p>
         {m.activeEvent && <p className="fine">{t('ret.busy')}</p>}
         <div className="row gap">
           <button type="button" className="btn" onClick={onClose}>
@@ -61,6 +62,7 @@ export function ReturnHomeModal({ run, onClose }: { run: RunState; onClose: () =
             onClick={() => {
               wasPaused.current = false;
               dispatch({ type: 'returnHome' });
+              dispatch({ type: 'setPause', paused: false }); // the clock runs on to the departure window
               onClose();
             }}
           >

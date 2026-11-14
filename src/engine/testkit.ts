@@ -15,7 +15,7 @@ export function prepared(opts: { seed?: number; dest: DestinationId; site?: Site
   let run = createRun(opts.seed ?? 42, 'en', opts.mode ?? 'standard');
   run = must(run, { type: 'goTo', phase: 'destination' });
   run = must(run, { type: 'setDestination', destination: opts.dest });
-  if (opts.site) run = must(run, { type: 'setSite', site: opts.site });
+  run = must(run, { type: 'setSite', site: opts.site ?? (opts.dest === 'moon' ? 'polar' : 'spring') });
   run = must(run, { type: 'goTo', phase: 'crew' });
   for (const id of opts.crew ?? ['c01', 'c02', 'c03']) run = must(run, { type: 'toggleCrew', id });
   run = must(run, { type: 'goTo', phase: 'cargo' });
@@ -88,7 +88,7 @@ export function realistic(opts: { seed: number; dest: DestinationId; site?: Site
   let run = createRun(opts.seed, 'en', 'standard');
   run = must(run, { type: 'goTo', phase: 'destination' });
   run = must(run, { type: 'setDestination', destination: opts.dest });
-  if (opts.site) run = must(run, { type: 'setSite', site: opts.site });
+  run = must(run, { type: 'setSite', site: opts.site ?? (opts.dest === 'moon' ? 'polar' : 'spring') });
   run = must(run, { type: 'goTo', phase: 'crew' });
   const ids = new Rng(deriveSeed(opts.seed, 'balance-crew')).shuffle(run.candidates.map((c) => c.id)).slice(0, 3);
   for (const id of ids) run = must(run, { type: 'toggleCrew', id });

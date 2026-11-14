@@ -31,7 +31,7 @@ test('balance report', () => {
 // V3 test follow-up: random crews, real mass budget, normal launch, 8 seeds per case; success rates per site
 test('balance report: realistic crews and cargo', () => {
   const P = ['radiator', 'insulate', 'clean', 'stow', 'mast', 'berm', 'spares', 'zone', 'beacon', 'wall'];
-  const base = { PREP: P, 'REINF-OFFER': ['decline'], 'OUT-01': ['full'], 'EMG-O2': ['reserve', 'repairLS', 'cutLoads'], 'EMG-WATER': ['reserve', 'repair', 'ration'], 'EMG-MED': ['stabilize', 'medkit', 'medic', 'rest'], 'RETURN-01': ['balanced', 'wait', 'ration'] };
+  const base = { PREP: P, 'REINF-OFFER': ['decline'], 'OUT-01': ['full'], 'EMG-O2': ['reserve', 'repairLS', 'cutLoads'], 'EMG-WATER': ['reserve', 'repair', 'ration'], 'EMG-MED': ['treatCause', 'stabilize', 'medkit', 'medic'], 'RETURN-01': ['balanced', 'wait', 'ration'] };
   const sites = [
     ['moon', 'polar', { food: 2, parts: 1, sealant: 1, potato: 1 }],
     ['moon', 'equator', { food: 3, parts: 1, sealant: 1, battery: 1 }],

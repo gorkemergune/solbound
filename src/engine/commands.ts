@@ -3,15 +3,16 @@ import { fallbackName, generateCandidates, generatePlayer, playerName, sanitizeN
 import { RESEARCH_BY_ID } from './research';
 import { availableCrewFor, characterById, echoesFor, eventOf, log, optionState, returnStatus, scaledCost, scenarioOf, successChance, applyEffects, type Ctx } from './rules';
 import { MISSION_DAYS, SITES, SURFACE_START_MINUTE, scenarioFor } from './scenarios';
+import { landingsFor, pickLanding, referenceLanding } from './landing';
 import { buildSchedule } from './schedule';
 import { PREP_EVENT, bigQueue, bigStatus, buildBigEvents, prepStatusKey } from './bigevents';
 import { bulletinPlan, firstSep, type SpaceWeatherSnapshot } from './spaceweather';
-import { advanceTime, endSurface, makeHooks, maybeOfferReinforcement, openEvent, rollFor, checkEmergencies, snapshot, tickHour } from './sim';
+import { DEPART_HOUR, advanceTime, makeHooks, maybeOfferReinforcement, nextDeparture, openEvent, rollFor, checkEmergencies, snapshot, tickHour } from './sim';
 import type { Character, CoverMode, CrewState, DestinationId, GreenhouseMode, ItemId, Locale, MissionState, Mode, Phase, Routine, RunState, SiteId, Speed } from './types';
 import { PREP_PHASES } from './types';
 
-export const SCHEMA_VERSION = 6;
-export const CONTENT_VERSION = '0.7.0-goal';
+export const SCHEMA_VERSION = 7;
+export const CONTENT_VERSION = '0.8.0-landing';
 export const REQUIRED_COMPANIONS = 3;
 
 export type Command =
@@ -57,6 +58,7 @@ export function createRun(seed: number, locale: Locale, mode: Mode = 'standard')
     crewIds: [],
     destination: null,
     site: null,
+    landing: null,
     cargo: {},
     mission: null,
     manualPause: false,
@@ -110,6 +112,11 @@ function newCrewState(run: RunState, id: string): CrewState {
  */
 export function estimateStay(run: RunState): MissionState['goal'] {
   const r: RunState = { ...structuredClone({ ...run, spaceWeather: null }), launched: true, phase: 'landing' };
+  if (!r.landing) {
+    const l = r.site ? referenceLanding(r.destination!, r.site) : pickLanding(r.seed, r.destination!);
+    r.landing = l.id;
+    r.site = l.base;
+  }
   r.mission = baseMission(r, true);
   r.mission.minute = SURFACE_START_MINUTE;
   const hooks = makeHooks(r);
@@ -131,6 +138,14 @@ export function estimateStay(run: RunState): MissionState['goal'] {
   return { estimate, target, limiting };
 }
 
+/** Before launch the site is unknown: the estimate over every possible landing site (min, max, per site). */
+export function estimateRange(run: RunState): { min: number; max: number; bySite: Record<string, number> } {
+  const bySite: Record<string, number> = {};
+  for (const l of landingsFor(run.destination!)) bySite[l.id] = estimateStay({ ...run, landing: l.id, site: l.base }).estimate;
+  const v = Object.values(bySite);
+  return { min: Math.min(...v), max: Math.max(...v), bySite };
+}
+
 /** The goal is this share of the estimate (room for events). */
 export const GOAL_SHARE = 0.85;
 
@@ -141,7 +156,7 @@ function createMission(run: RunState): MissionState {
 }
 
 function baseMission(run: RunState, quiet: boolean): MissionState {
-  const s = scenarioFor(run.destination!, run.site);
+  const s = scenarioFor(run.destination!, run.site, run.landing);
   const items: MissionState['items'] = {};
   for (const [k, v] of Object.entries(run.cargo)) if (v) items[k as ItemId] = v;
   const resources = { ...s.start.resources };
@@ -255,12 +270,15 @@ function reduce(run: RunState, cmd: Command): { error?: string } {
       if (!prep) return { error: 'err.launched' };
       if (!SITES[cmd.destination]) return { error: 'err.phase' };
       run.destination = cmd.destination; // crew & cargo are kept; incompatible items block launch with a reason
-      if (!run.site || !SITES[cmd.destination].includes(run.site)) run.site = SITES[cmd.destination][0];
+      // the landing site is a surprise now: it is picked at launch (setSite remains for tests and tools)
+      if (run.site && !SITES[cmd.destination].includes(run.site)) run.site = null;
+      run.landing = null;
       return {};
     case 'setSite':
       if (!prep) return { error: 'err.launched' };
       if (!run.destination || !SITES[run.destination].includes(cmd.site)) return { error: 'err.phase' };
       run.site = cmd.site;
+      run.landing = null;
       return {};
     case 'toggleCrew': {
       if (!prep) return { error: 'err.launched' };
@@ -285,6 +303,12 @@ function reduce(run: RunState, cmd: Command): { error?: string } {
       const blockers = launchBlockers(run);
       if (blockers.length) return { error: blockers[0] };
       run.launched = true;
+      // the lander sets down at a random site (seeded); an explicit base type maps to its reference site
+      if (!run.landing) {
+        const l = run.site ? referenceLanding(run.destination!, run.site) : pickLanding(run.seed, run.destination!);
+        run.landing = l.id;
+        run.site = l.base;
+      }
       run.phase = 'outbound';
       run.mission = createMission(run);
       log(run.mission, run, 'journal.launch', 'info', { dest: run.destination! });
@@ -338,8 +362,13 @@ function reduce(run: RunState, cmd: Command): { error?: string } {
     case 'returnHome': {
       const m = run.mission;
       if (!m || run.phase !== 'surface' || m.activeEvent || m.ended) return { error: 'err.phase' };
-      log(m, run, 'journal.returnEarly', 'info', { day: Math.floor((m.minute - SURFACE_START_MINUTE) / 1440) });
-      endSurface(run);
+      if (m.flags.departAt) return { error: 'err.alreadyResolved' };
+      // depart in the next midday window so the battery check never depends on the hour you pressed the button
+      const at = nextDeparture(m.minute);
+      m.flags.departAt = at;
+      m.queue.push({ eventId: 'DEPART', atMinute: at, instanceId: 'DEPART' });
+      m.queue.sort((a, b) => a.atMinute - b.atMinute);
+      log(m, run, 'journal.returnEarly', 'info', { day: Math.floor((m.minute - SURFACE_START_MINUTE) / 1440) + 1, hh: String(DEPART_HOUR).padStart(2, '0') });
       return {};
     }
     case 'localizeNames': {

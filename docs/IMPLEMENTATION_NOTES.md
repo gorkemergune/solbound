@@ -295,3 +295,47 @@ Ayrıntılı madde listesi `eksikler.md` dosyasında; güncel özet `docs/CURREN
 - **Görev atama:** bütün aktif ekip ızgara olarak gösteriliyor (4 kişide 2 sütun, 6 kişide 3 sütun); seçilemeyenler gri ve nedeni yazıyor. Plan sekmesindeki düğme sınıfı `prep-pick` olarak ayrıldı; adı `crew-pick` iken karar kartındaki alanı bozuyordu.
 - **Kompakt arayüz:** temel yazı 15 px (1700 px ve üstünde 16), sağ panel 340 px, sekmeler sığıyor ve gerekirse yana kayıyor.
 - Doğrulama (kısa, kullanıcı isteğiyle): typecheck hatasız, `npm test` 61/61, build başarılı. 1373 px’te ölçüm: sahne 1033 × 444, taşma 0, profil kaydırınca üstten 76 px’te sabit. E2E’nin ilk bölümü 38/38 geçti (tek ızgara, yapışkan profil, 2 × 2 görev atama); uzun 30 günlük oynatma ayrıntılı test oturumuna bırakıldı.
+
+## v0.8 — rastgele iniş, V4 test düzeltmeleri, `bug/eksikler.md` turu (14 Kasım 2026)
+
+Kayıt şeması 7, içerik `0.8.0-landing`. Kaynak: `docs/V4_TEST.md` bulguları ve `bug/eksikler.md`.
+
+- **Rastgele iniş (`src/engine/landing.ts`):**
+  - Hedef ekranındaki iki iniş yeri seçeneği kaldırıldı. Kalkışta seed’e bağlı olarak 8 yerden biri seçiliyor (`pickLanding`); her yer bir temel tip (Ay kutup/ekvator, Mars bahar/yaz) ve oyun çarpanları taşıyor: güneş, ısıtma, sera, başlangıç suyu, doğal sığınak, toz, olay ağırlıkları.
+  - **Gerçek olan:** yer adları (Shackleton, Mons Mouton, Malapert, Nobile, Haworth, Mare Tranquillitatis, Marius Tepeleri, Oceanus Procellarum, Jezero, Elysium, Arcadia, Utopia, Gale, Meridiani, Valles Marineris, Hellas) ve nitel özellikleri (kutup ışığı, buz, lav tüpü, toz fırtınası havzası). **Oyun varsayımı:** bütün sayılar.
+  - Zorluk etiketleri kısa bir bot taramasıyla ayarlandı (yer başına 12 oyun, “ilk açık seçenek” botu, hazırlık yok). Etiketler mutlak değil; aynı tipteki yerleri sıralar. Mars’ta olaysız tahmin yerler arasında az değişiyor (gıda sınırlı); fark daha çok toz fırtınalarında ve olaylarda çıkıyor.
+  - Hedef ekranı olası yerleri zorluk çipleriyle listeliyor. Brifing ve yük ekranında tahmin, bütün yerler üzerinden **aralık** olarak gösteriliyor (`estimateRange`, Ay için yaklaşık 50 ms). İniş ekranı yerin adını, zorluğunu, ne anlama geldiğini ve kesin hedefi açıyor. Sahne alt yazısı ve özet filmi yerin adını kullanıyor.
+  - `setSite` komutu testler ve araçlar için duruyor; elle seçilen tip, o tipin referans yerini veriyor.
+- **V4 bulguları:**
+  - 6.1 “Eve dön” saate bağlıydı: kalkış artık her zaman bir sonraki 13:00 penceresinde (`nextDeparture`, `DEPART` kuyruk öğesi). Düğme “Kalkış planlandı”ya dönüşüyor, çip kalan saati gösteriyor ve saat işlemeye devam ediyor. RETURN-01 “bekle” seçeneği 24 saat yerine bir sonraki 13:00’e kadar bekliyor (`waitUntil` efekti).
+  - 6.2 Hedefe ulaşınca hemen dönmek baskındı: üst kademe `excellent` (“Tahminin ötesinde”) eklendi; tahmin kadar (en fazla 29 gün) kalan ve herkesi getiren alıyor.
+  - 6.3 EMG-MED neredeyse kesin kayıptı: “Onu hasta eden şeyi düzelt” (`treatCause`) eklendi; yaşam desteği, su geri kazanımı ve sızıntıyı onarıyor. Seçenek sınırı 6 olduğu için `rest` kaldırıldı.
+  - 6.4 Hasta kendini tedavi edebiliyordu: `availableCrewFor` artık `subjectCrewId` kişisini dışarıda bırakıyor.
+  - 6.5 Takviye ekip çoğu zaman inmeden görev bitiyordu: teklif yalnız hedef 20. gün ya da sonrasıysa geliyor.
+  - 6.6 Mobilde hız düğmeleri 7 px taşıyordu: 600 px altında “Hız” etiketi gizli, düğmeler daraltıldı, satır sarabiliyor. Ölçüm: 390 px’te taşma 0.
+  - 6.7 E2E Windows’ta çalışmıyordu: `fileURLToPath` ve Windows’ta `shell: true`. Windows’ta denenmedi.
+  - 6.8 Çipler satır atlayınca sahne kayıyordu: çip satırı tek satır ve yana kayıyor; inmiş takviye ekip ve kargo çipleri gizleniyor.
+  - 6.9 MOXIE ve kalkan: kalkan korunmasız SPE dozunu yarıya indiriyor ve meteor çarpmasını önlüyor; MOXIE 0,1 kW, 0,05 kg/sa.
+  - Zayıf kararlar yeniden ayarlandı: MOON-01 güneş dizisi %55’ten başlıyor; MARS-02, MARS-SAR, ISRU ve HARVEST-FEAST seçenekleri dengelendi.
+- **Stres ve sığınak (eksikler 3):**
+  - Fırtına bitince herkes sığınaktan çıkıyor (bir karakterin 8. günden beri sığınakta kalması hatası).
+  - Stres 85 ve üstündeyse saatte −0,15 sağlık, +0,3 yorgunluk ve sağlık yenilenmesi yok.
+  - Stres 98’e ulaşınca, kişi başına 3 günde bir, `CREW-CRISIS` kartı açılıyor: konuşmak, izin günü, moral kiti ya da “devam”.
+- **Özet filmi (eksikler 2):** yüzler artık oyundaki SVG portrelerin kendisi. Portre bir kez SVG’ye çevrilip resim olarak yükleniyor ve tuvale çiziliyor; yüklenemezse eski çizim kullanılıyor. Chromium’da tuvalin kirlenmediği (`getImageData`) doğrulandı.
+- **Diğer arayüz:**
+  - Brifingte NASA DONKI açıklaması: gerçek olayların görevde aynı günde yaşandığı yazıyor.
+  - Uçuş ekranındaki “yolculuk sıkıştırıldı” notu kaldırıldı.
+  - Ana sayfanın alttaki dört tanıtım yazısı kaldırıldı. Aynı metinler “Nasıl oynanır” penceresinde duruyor; ilk madde rastgele inişe göre güncellendi.
+  - “Hikâyeyi oku”nun yanına **Yapanlar** düğmesi eklendi. İsimler ve portföy linki `src/credits.ts` içinde **boş**; kullanıcı dolduracak.
+- **E2E:** site seçimi adımı kaldırıldı; iniş yeri, DONKI açıklaması, Yapanlar penceresi ve kalkış planlama kontrolleri eklendi. `npm run e2e:short` (`E2E_SHORT=1`) her iki profili yüzeyin ilk kontrollerinden sonra bitiriyor; yaklaşık 30 sn.
+
+### v0.8 doğrulama (kısa, kullanıcı isteğiyle)
+
+| Kontrol | Sonuç |
+| --- | --- |
+| typecheck | Hatasız |
+| `npm test` | 66/66. Yeni testler: yerler (her hedefte 8 yer, 4 zorluk, seed’e bağlı seçim), kalkışın her zaman 13:00’te olması, hastanın kendine atanamaması, sığınaktan çıkış ve kriz kartı, hedef 20’den küçükse takviye teklifinin gelmemesi. Değişen beklentiler: MOON-01 %55, tam başarı `success` ya da `excellent`, erken dönüşün 13:00’te başlaması, O₂ senaryosunun yedeği kullanmaması |
+| `npm run build` | Başarılı |
+| `npm run e2e:short` | 62/62. Masaüstü Mars/TR ve mobil Ay/EN; 390 px’te yüzeyde taşma 0; kalkış planlanınca saat işliyor |
+| Özet filmi portreleri | Vite geliştirme sunucusunda ekip sahnesi çizildi; portreler oyundakilerle aynı, tuval kirlenmedi |
+| Uzun 30 günlük e2e ve büyük denge taraması | **Yapılmadı**; ayrıntılı test oturumuna bırakıldı |

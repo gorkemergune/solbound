@@ -2,7 +2,7 @@ import { activeCrew, characterById } from './rules';
 import { scenarioFor } from './scenarios';
 import type { DecisionRecord, Echo, RunState } from './types';
 
-export type Rating = 'success' | 'partial' | 'aborted' | 'lost';
+export type Rating = 'excellent' | 'success' | 'partial' | 'aborted' | 'lost';
 
 export type Outcome = {
   rating: Rating;
@@ -29,7 +29,7 @@ export type Outcome = {
 /** Debrief summary derived only from recorded state (no new randomness). */
 export function computeOutcome(run: RunState): Outcome {
   const m = run.mission!;
-  const s = scenarioFor(run.destination!, run.site);
+  const s = scenarioFor(run.destination!, run.site, run.landing);
   const home = m.ended?.reason === 'complete' || m.ended?.reason === 'aborted' ? activeCrew(m).map((c) => c.id) : [];
   const evacuated = m.crew.filter((c) => c.status === 'evacuated').map((c) => c.id);
   const lost = m.crew.filter((c) => c.status === 'deceased').map((c) => c.id);
@@ -43,6 +43,8 @@ export function computeOutcome(run: RunState): Outcome {
   else if (evacuated.length || m.flags.arrival === 'rough' || m.flags.margin === 'none') rating = 'partial';
   // the goal set before launch (85% of the estimated endurance) must be reached for a full success
   else if (daysOnSurface + 1e-9 < m.goal.target) rating = 'partial';
+  // staying at least as long as the pre-launch estimate (or to the end) is the top tier
+  else if (daysOnSurface + 1e-9 >= Math.min(m.goal.estimate, s.missionDays - 1)) rating = 'excellent';
   else rating = 'success';
 
   const reasons: string[] = [];
@@ -52,6 +54,8 @@ export function computeOutcome(run: RunState): Outcome {
   if (m.flags.margin === 'none') reasons.push('reason.ration');
   if (m.flags.arrival === 'rough') reasons.push('reason.rough');
   if (m.ended?.reason === 'complete' && daysOnSurface + 1e-9 < m.goal.target) reasons.push('reason.early');
+
+  if (rating === 'success') reasons.push('reason.excellent');
 
   const main = m.decisions.filter((d) => d.weight >= 3);
   const keyDecisions = (main.length >= 3 ? main : m.decisions)

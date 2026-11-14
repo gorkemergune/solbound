@@ -57,8 +57,14 @@ function span(t: ReturnType<typeof useStore>['t'], minutes: number, active: bool
 export function CountdownChips({ run, onOpen }: { run: RunState; onOpen: () => void }) {
   const { t } = useStore();
   const m = run.mission!;
-  const end = surfaceEndMinute(scenarioOf(run));
-  const live = m.big.filter((b) => ['countdown', 'active'].includes(bigStatus(b, m.minute)));
+  const depart = typeof m.flags.departAt === 'number' ? (m.flags.departAt as number) : null;
+  const end = depart ?? surfaceEndMinute(scenarioOf(run));
+  // arrivals (reinforcement crew, cargo) are news only until they land; storms and nights stay while active
+  const ARRIVAL = new Set(['crew', 'resupply']);
+  const live = m.big.filter((b) => {
+    const st = bigStatus(b, m.minute);
+    return st === 'countdown' || (st === 'active' && !ARRIVAL.has(b.kind));
+  });
   return (
     <div className="countdowns" role="list" aria-label={t('big.countdownLabel')}>
       {live.map((b) => {
@@ -81,7 +87,7 @@ export function CountdownChips({ run, onOpen }: { run: RunState; onOpen: () => v
       {run.phase === 'surface' && (
         <span role="listitem" className="cd-chip cd-return">
           <KindIcon kind="return" />
-          <span className="cd-name">{t('big.return')}</span>
+          <span className="cd-name">{depart ? t('ret.booked') : t('big.return')}</span>
           <span className="cd-time">{span(t, end - m.minute, false)}</span>
         </span>
       )}

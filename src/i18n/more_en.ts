@@ -7,7 +7,7 @@ export const moreEn = {
   'title.story2': 'The spacecraft can lift only so many kilograms. Every person, every suit, every spare part and every food pack competes for the same launch mass. Whatever you leave on Earth, you will have to solve with skill, time and courage.',
   'title.story3': 'Up there, the base will not forgive guesswork. Water becomes oxygen, sunlight becomes power, dust becomes a problem. Every decision is a trade: protect life support or grow food? Rest the crew or fix the seal? Go out for samples or stay in the shelter?',
   'title.story4': 'The mission ends when everyone is home. How you get there is up to you.',
-  'title.how1': 'Prepare: choose your astronaut, destination, landing site or season, three companions and your cargo within the launch mass budget.',
+  'title.how1': 'Prepare: choose your astronaut, the Moon or Mars, three companions and your cargo within the launch mass budget. Where you land is a surprise: one of eight sites, from easy to very hard.',
   'title.how3': 'Decide: read what you know, check the chance and the cost, open research cards. Words with ⓘ explain themselves.',
   'title.facts': 'Did you know?',
   'title.fact1': 'On the ISS, oxygen is made by splitting water with electricity.',
