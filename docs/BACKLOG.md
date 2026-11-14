@@ -1,3 +1,5 @@
+> Tarihsel v0.1 önerisi. Güncel kapsam için [v0.2 başlangıç belgesini](00_START_HERE.md) okuyun. Bu dosyadaki 12-sol, yalnız Mars, yalnız tur onayı veya araştırma-only kapsamı güncel gereksinim değildir. Bilimsel/teknik ayrıntılar güncel belgelerle birlikte değerlendirilir.
+
 # Hackathon yapılacaklar listesi
 
 Plan varsayımı: yaklaşık 24 saatlik geliştirme penceresi ve paralel ilerleyebilen ekip. Etkinlik takvimi doğrulanmadığı için bu bir teslim tarihi sözü değildir. Tahminler kişi-saat; toplam süreye QA ve entegrasyon payı eklenir. Takım küçükse P1 kesilir, P0 bitirilir.

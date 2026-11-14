@@ -1,3 +1,5 @@
+> Tarihsel v0.1 önerisi. Güncel kapsam için [v0.2 başlangıç belgesini](00_START_HERE.md) okuyun. Bu dosyadaki 12-sol, yalnız Mars, yalnız tur onayı veya araştırma-only kapsamı güncel gereksinim değildir. Bilimsel/teknik ayrıntılar güncel belgelerle birlikte değerlendirilir.
+
 # Claude deep discovery task — Solbound
 
 **Handoff status:** Prepared on 14 November 2026. Not dispatched: local Claude Code is installed but `claude auth status` reported no active login. This is a ready-to-send assignment, not a completed research report.
