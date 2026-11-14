@@ -1,0 +1,2955 @@
+{
+ "N": 40468,
+ "overall": {
+  "n": 40468,
+  "success": 29.9,
+  "partial": 38.1,
+  "aborted": 22.6,
+  "lost": 9.4
+ },
+ "bySite": {
+  "mars/spring": {
+   "n": 9954,
+   "success": 16.2,
+   "partial": 49.4,
+   "aborted": 19.7,
+   "lost": 14.7
+  },
+  "mars/summer": {
+   "n": 10279,
+   "success": 25.4,
+   "partial": 39.3,
+   "aborted": 21,
+   "lost": 14.3
+  },
+  "moon/equator": {
+   "n": 10281,
+   "success": 39.9,
+   "partial": 30.4,
+   "aborted": 25.2,
+   "lost": 4.5
+  },
+  "moon/polar": {
+   "n": 9954,
+   "success": 38.1,
+   "partial": 33.4,
+   "aborted": 24.5,
+   "lost": 4
+  }
+ },
+ "byArche": {
+  "careful": {
+   "n": 10151,
+   "success": 60.2,
+   "partial": 31.4,
+   "aborted": 2.1,
+   "lost": 6.2
+  },
+  "mixed": {
+   "n": 14230,
+   "success": 36.9,
+   "partial": 46.7,
+   "aborted": 8.2,
+   "lost": 8.2
+  },
+  "random": {
+   "n": 10112,
+   "success": 7.2,
+   "partial": 46.4,
+   "aborted": 35.9,
+   "lost": 10.5
+  },
+  "reckless": {
+   "n": 5975,
+   "success": 0.5,
+   "partial": 14.8,
+   "aborted": 69,
+   "lost": 15.7
+  }
+ },
+ "byMode": {
+  "explorer": {
+   "n": 10099,
+   "success": 29.7,
+   "partial": 38.2,
+   "aborted": 32.1,
+   "lost": 0
+  },
+  "standard": {
+   "n": 30369,
+   "success": 30,
+   "partial": 38.1,
+   "aborted": 19.4,
+   "lost": 12.5
+  }
+ },
+ "byCargo": {
+  "empty": {
+   "n": 4033,
+   "success": 12.8,
+   "partial": 49.8,
+   "aborted": 25.4,
+   "lost": 11.9
+  },
+  "full": {
+   "n": 12275,
+   "success": 33.8,
+   "partial": 35.4,
+   "aborted": 22.1,
+   "lost": 8.6
+  },
+  "light": {
+   "n": 9893,
+   "success": 22.9,
+   "partial": 42.3,
+   "aborted": 24,
+   "lost": 10.9
+  },
+  "random": {
+   "n": 14267,
+   "success": 36.3,
+   "partial": 34.2,
+   "aborted": 21.3,
+   "lost": 8.2
+  }
+ },
+ "bySW": {
+  "false": {
+   "n": 20371,
+   "success": 30.3,
+   "partial": 38.3,
+   "aborted": 22.2,
+   "lost": 9.2
+  },
+  "true": {
+   "n": 20097,
+   "success": 29.6,
+   "partial": 37.9,
+   "aborted": 23,
+   "lost": 9.6
+  }
+ },
+ "siteXarche": {
+  "mars/spring careful": {
+   "n": 2516,
+   "success": 37.6,
+   "partial": 47.1,
+   "aborted": 3.8,
+   "lost": 11.5
+  },
+  "mars/spring mixed": {
+   "n": 3468,
+   "success": 17,
+   "partial": 60.3,
+   "aborted": 8.9,
+   "lost": 13.8
+  },
+  "mars/spring random": {
+   "n": 2458,
+   "success": 2.8,
+   "partial": 55,
+   "aborted": 28.3,
+   "lost": 13.9
+  },
+  "mars/spring reckless": {
+   "n": 1512,
+   "success": 0.1,
+   "partial": 19.3,
+   "aborted": 57.1,
+   "lost": 23.4
+  },
+  "mars/summer careful": {
+   "n": 2581,
+   "success": 52,
+   "partial": 33,
+   "aborted": 3.8,
+   "lost": 11.2
+  },
+  "mars/summer mixed": {
+   "n": 3625,
+   "success": 30.2,
+   "partial": 46.7,
+   "aborted": 10,
+   "lost": 13.1
+  },
+  "mars/summer random": {
+   "n": 2570,
+   "success": 6.7,
+   "partial": 48.6,
+   "aborted": 28.2,
+   "lost": 16.4
+  },
+  "mars/summer reckless": {
+   "n": 1503,
+   "success": 0.1,
+   "partial": 16.5,
+   "aborted": 64.7,
+   "lost": 18.6
+  },
+  "moon/equator careful": {
+   "n": 2565,
+   "success": 77.5,
+   "partial": 21,
+   "aborted": 0.6,
+   "lost": 0.9
+  },
+  "moon/equator mixed": {
+   "n": 3632,
+   "success": 50.2,
+   "partial": 39.5,
+   "aborted": 7.5,
+   "lost": 2.8
+  },
+  "moon/equator random": {
+   "n": 2625,
+   "success": 11.1,
+   "partial": 38.8,
+   "aborted": 43.6,
+   "lost": 6.5
+  },
+  "moon/equator reckless": {
+   "n": 1459,
+   "success": 0.3,
+   "partial": 9.3,
+   "aborted": 79,
+   "lost": 11.4
+  },
+  "moon/polar careful": {
+   "n": 2489,
+   "success": 73.8,
+   "partial": 24.7,
+   "aborted": 0.4,
+   "lost": 1.1
+  },
+  "moon/polar mixed": {
+   "n": 3505,
+   "success": 49.6,
+   "partial": 40.9,
+   "aborted": 6.5,
+   "lost": 3
+  },
+  "moon/polar random": {
+   "n": 2459,
+   "success": 7.8,
+   "partial": 43.5,
+   "aborted": 43.5,
+   "lost": 5.2
+  },
+  "moon/polar reckless": {
+   "n": 1501,
+   "success": 1.5,
+   "partial": 14,
+   "aborted": 75.3,
+   "lost": 9.2
+  }
+ },
+ "siteXcargo": {
+  "mars/spring empty": {
+   "n": 968,
+   "success": 2.1,
+   "partial": 54.3,
+   "aborted": 23.8,
+   "lost": 19.8
+  },
+  "mars/spring full": {
+   "n": 3083,
+   "success": 20.2,
+   "partial": 48.4,
+   "aborted": 18.3,
+   "lost": 13.1
+  },
+  "mars/spring light": {
+   "n": 2468,
+   "success": 8.5,
+   "partial": 50.5,
+   "aborted": 23.2,
+   "lost": 17.8
+  },
+  "mars/spring random": {
+   "n": 3435,
+   "success": 22,
+   "partial": 48.2,
+   "aborted": 17.4,
+   "lost": 12.4
+  },
+  "mars/summer empty": {
+   "n": 1061,
+   "success": 7.4,
+   "partial": 48.3,
+   "aborted": 25,
+   "lost": 19.4
+  },
+  "mars/summer full": {
+   "n": 3046,
+   "success": 30.1,
+   "partial": 37,
+   "aborted": 20.3,
+   "lost": 12.7
+  },
+  "mars/summer light": {
+   "n": 2541,
+   "success": 15.5,
+   "partial": 44.1,
+   "aborted": 23.5,
+   "lost": 16.8
+  },
+  "mars/summer random": {
+   "n": 3631,
+   "success": 33.7,
+   "partial": 35.4,
+   "aborted": 18.6,
+   "lost": 12.3
+  },
+  "moon/equator empty": {
+   "n": 1021,
+   "success": 22.1,
+   "partial": 48.4,
+   "aborted": 25.8,
+   "lost": 3.7
+  },
+  "moon/equator full": {
+   "n": 3192,
+   "success": 43.1,
+   "partial": 26.3,
+   "aborted": 25.7,
+   "lost": 4.9
+  },
+  "moon/equator light": {
+   "n": 2437,
+   "success": 34.3,
+   "partial": 36.5,
+   "aborted": 24.7,
+   "lost": 4.4
+  },
+  "moon/equator random": {
+   "n": 3631,
+   "success": 45.9,
+   "partial": 24.8,
+   "aborted": 24.8,
+   "lost": 4.4
+  },
+  "moon/polar empty": {
+   "n": 983,
+   "success": 19.7,
+   "partial": 48.5,
+   "aborted": 27.2,
+   "lost": 4.6
+  },
+  "moon/polar full": {
+   "n": 2954,
+   "success": 42,
+   "partial": 30.1,
+   "aborted": 24,
+   "lost": 3.9
+  },
+  "moon/polar light": {
+   "n": 2447,
+   "success": 33.6,
+   "partial": 37.9,
+   "aborted": 24.5,
+   "lost": 4
+  },
+  "moon/polar random": {
+   "n": 3570,
+   "success": 43,
+   "partial": 29,
+   "aborted": 24.1,
+   "lost": 3.9
+  }
+ },
+ "traitLift_all": [
+  {
+   "label": "quartermaster",
+   "n": 10136,
+   "withPct": 35.6,
+   "withoutPct": 28,
+   "liftPts": 7.5
+  },
+  {
+   "label": "nutrition",
+   "n": 10166,
+   "withPct": 35,
+   "withoutPct": 28.2,
+   "liftPts": 6.9
+  },
+  {
+   "label": "mechanic",
+   "n": 10201,
+   "withPct": 34.3,
+   "withoutPct": 28.5,
+   "liftPts": 6
+  },
+  {
+   "label": "power",
+   "n": 10156,
+   "withPct": 32.4,
+   "withoutPct": 29.1,
+   "liftPts": 3.5
+  },
+  {
+   "label": "eva",
+   "n": 10229,
+   "withPct": 31.9,
+   "withoutPct": 29.3,
+   "liftPts": 2.7
+  },
+  {
+   "label": "pilot",
+   "n": 10223,
+   "withPct": 30.9,
+   "withoutPct": 29.6,
+   "liftPts": 1.3
+  },
+  {
+   "label": "rover",
+   "n": 10217,
+   "withPct": 30.5,
+   "withoutPct": 29.8,
+   "liftPts": 0.6
+  },
+  {
+   "label": "geologist",
+   "n": 10191,
+   "withPct": 28.5,
+   "withoutPct": 30.4,
+   "liftPts": -2
+  },
+  {
+   "label": "medic",
+   "n": 10163,
+   "withPct": 28.2,
+   "withoutPct": 30.5,
+   "liftPts": -2.2
+  },
+  {
+   "label": "steady",
+   "n": 10141,
+   "withPct": 27.6,
+   "withoutPct": 30.7,
+   "liftPts": -3.1
+  },
+  {
+   "label": "mediator",
+   "n": 10408,
+   "withPct": 27.5,
+   "withoutPct": 30.8,
+   "liftPts": -3.2
+  },
+  {
+   "label": "botanist",
+   "n": 10215,
+   "withPct": 27.5,
+   "withoutPct": 30.8,
+   "liftPts": -3.4
+  },
+  {
+   "label": "spaceWeather",
+   "n": 10227,
+   "withPct": 27.5,
+   "withoutPct": 30.8,
+   "liftPts": -3.4
+  },
+  {
+   "label": "chemist",
+   "n": 10097,
+   "withPct": 27,
+   "withoutPct": 30.9,
+   "liftPts": -4.1
+  },
+  {
+   "label": "comms",
+   "n": 10077,
+   "withPct": 26.7,
+   "withoutPct": 31,
+   "liftPts": -4.3
+  }
+ ],
+ "itemLift_all": [
+  {
+   "label": "food",
+   "n": 16488,
+   "withPct": 42.5,
+   "withoutPct": 21.3,
+   "liftPts": 20.3
+  },
+  {
+   "label": "potato",
+   "n": 12680,
+   "withPct": 39.6,
+   "withoutPct": 25.5,
+   "liftPts": 13.6
+  },
+  {
+   "label": "filter",
+   "n": 16554,
+   "withPct": 35.1,
+   "withoutPct": 26.4,
+   "liftPts": 8
+  },
+  {
+   "label": "seeds",
+   "n": 16630,
+   "withPct": 34.3,
+   "withoutPct": 26.9,
+   "liftPts": 6.8
+  },
+  {
+   "label": "comfort",
+   "n": 17951,
+   "withPct": 33.9,
+   "withoutPct": 26.8,
+   "liftPts": 6.7
+  },
+  {
+   "label": "soy",
+   "n": 13827,
+   "withPct": 34.6,
+   "withoutPct": 27.5,
+   "liftPts": 6.5
+  },
+  {
+   "label": "sealant",
+   "n": 16223,
+   "withPct": 33.3,
+   "withoutPct": 27.7,
+   "liftPts": 5
+  },
+  {
+   "label": "medkit",
+   "n": 15663,
+   "withPct": 33.4,
+   "withoutPct": 27.8,
+   "liftPts": 4.9
+  },
+  {
+   "label": "cleaner",
+   "n": 13411,
+   "withPct": 33.5,
+   "withoutPct": 28.2,
+   "liftPts": 4.5
+  },
+  {
+   "label": "o2candle",
+   "n": 15067,
+   "withPct": 32.7,
+   "withoutPct": 28.3,
+   "liftPts": 3.8
+  },
+  {
+   "label": "spectro",
+   "n": 12265,
+   "withPct": 32.5,
+   "withoutPct": 28.8,
+   "liftPts": 3.1
+  },
+  {
+   "label": "purifier",
+   "n": 5372,
+   "withPct": 22.9,
+   "withoutPct": 20.1,
+   "liftPts": 2.8
+  },
+  {
+   "label": "parts",
+   "n": 15066,
+   "withPct": 32.1,
+   "withoutPct": 28.7,
+   "liftPts": 2.4
+  },
+  {
+   "label": "battery",
+   "n": 13235,
+   "withPct": 31.8,
+   "withoutPct": 29.1,
+   "liftPts": 1.8
+  },
+  {
+   "label": "shield",
+   "n": 10380,
+   "withPct": 31.4,
+   "withoutPct": 29.5,
+   "liftPts": 1.2
+  },
+  {
+   "label": "moxie",
+   "n": 5262,
+   "withPct": 17.7,
+   "withoutPct": 22,
+   "liftPts": -4.5
+  }
+ ],
+ "traitLift_moon": [
+  {
+   "label": "mechanic",
+   "n": 5060,
+   "withPct": 46.1,
+   "withoutPct": 36.7,
+   "liftPts": 9.5
+  },
+  {
+   "label": "nutrition",
+   "n": 5054,
+   "withPct": 45.9,
+   "withoutPct": 36.7,
+   "liftPts": 9.2
+  },
+  {
+   "label": "quartermaster",
+   "n": 5057,
+   "withPct": 44.7,
+   "withoutPct": 37.1,
+   "liftPts": 7.6
+  },
+  {
+   "label": "power",
+   "n": 5015,
+   "withPct": 42.3,
+   "withoutPct": 37.9,
+   "liftPts": 4.4
+  },
+  {
+   "label": "eva",
+   "n": 5112,
+   "withPct": 40.2,
+   "withoutPct": 38.6,
+   "liftPts": 1.5
+  },
+  {
+   "label": "pilot",
+   "n": 5131,
+   "withPct": 39.3,
+   "withoutPct": 38.9,
+   "liftPts": 0.4
+  },
+  {
+   "label": "rover",
+   "n": 5119,
+   "withPct": 38.9,
+   "withoutPct": 39.1,
+   "liftPts": -0.2
+  },
+  {
+   "label": "geologist",
+   "n": 5122,
+   "withPct": 38.1,
+   "withoutPct": 39.3,
+   "liftPts": -1.3
+  },
+  {
+   "label": "medic",
+   "n": 5052,
+   "withPct": 37.6,
+   "withoutPct": 39.5,
+   "liftPts": -1.8
+  },
+  {
+   "label": "chemist",
+   "n": 5134,
+   "withPct": 36.6,
+   "withoutPct": 39.9,
+   "liftPts": -3.3
+  },
+  {
+   "label": "mediator",
+   "n": 5160,
+   "withPct": 36.1,
+   "withoutPct": 40,
+   "liftPts": -3.9
+  },
+  {
+   "label": "spaceWeather",
+   "n": 5130,
+   "withPct": 36,
+   "withoutPct": 40.1,
+   "liftPts": -4.1
+  },
+  {
+   "label": "steady",
+   "n": 5067,
+   "withPct": 35.6,
+   "withoutPct": 40.2,
+   "liftPts": -4.5
+  },
+  {
+   "label": "botanist",
+   "n": 5107,
+   "withPct": 35.6,
+   "withoutPct": 40.2,
+   "liftPts": -4.6
+  },
+  {
+   "label": "comms",
+   "n": 5032,
+   "withPct": 35,
+   "withoutPct": 40.3,
+   "liftPts": -5.3
+  }
+ ],
+ "itemLift_moon": [
+  {
+   "label": "food",
+   "n": 8743,
+   "withPct": 49.3,
+   "withoutPct": 31.2,
+   "liftPts": 18
+  },
+  {
+   "label": "potato",
+   "n": 6631,
+   "withPct": 46.9,
+   "withoutPct": 35.2,
+   "liftPts": 11.7
+  },
+  {
+   "label": "soy",
+   "n": 7221,
+   "withPct": 43.7,
+   "withoutPct": 36.4,
+   "liftPts": 7.3
+  },
+  {
+   "label": "comfort",
+   "n": 9229,
+   "withPct": 41.9,
+   "withoutPct": 36.6,
+   "liftPts": 5.4
+  },
+  {
+   "label": "cleaner",
+   "n": 7086,
+   "withPct": 42.1,
+   "withoutPct": 37.4,
+   "liftPts": 4.7
+  },
+  {
+   "label": "filter",
+   "n": 8727,
+   "withPct": 41.6,
+   "withoutPct": 37.1,
+   "liftPts": 4.5
+  },
+  {
+   "label": "sealant",
+   "n": 8430,
+   "withPct": 41.6,
+   "withoutPct": 37.2,
+   "liftPts": 4.5
+  },
+  {
+   "label": "medkit",
+   "n": 8160,
+   "withPct": 41.3,
+   "withoutPct": 37.5,
+   "liftPts": 3.9
+  },
+  {
+   "label": "seeds",
+   "n": 8672,
+   "withPct": 41.2,
+   "withoutPct": 37.4,
+   "liftPts": 3.9
+  },
+  {
+   "label": "parts",
+   "n": 8039,
+   "withPct": 40.8,
+   "withoutPct": 37.8,
+   "liftPts": 3
+  },
+  {
+   "label": "spectro",
+   "n": 6429,
+   "withPct": 41.1,
+   "withoutPct": 38.1,
+   "liftPts": 3
+  },
+  {
+   "label": "o2candle",
+   "n": 7879,
+   "withPct": 40.7,
+   "withoutPct": 38,
+   "liftPts": 2.7
+  },
+  {
+   "label": "battery",
+   "n": 7034,
+   "withPct": 40.7,
+   "withoutPct": 38.1,
+   "liftPts": 2.5
+  },
+  {
+   "label": "shield",
+   "n": 5522,
+   "withPct": 40.3,
+   "withoutPct": 38.5,
+   "liftPts": 1.8
+  }
+ ],
+ "traitLift_mars": [
+  {
+   "label": "quartermaster",
+   "n": 5079,
+   "withPct": 26.6,
+   "withoutPct": 19,
+   "liftPts": 7.4
+  },
+  {
+   "label": "nutrition",
+   "n": 5112,
+   "withPct": 24.3,
+   "withoutPct": 19.7,
+   "liftPts": 4.5
+  },
+  {
+   "label": "eva",
+   "n": 5117,
+   "withPct": 23.7,
+   "withoutPct": 19.9,
+   "liftPts": 3.8
+  },
+  {
+   "label": "mechanic",
+   "n": 5141,
+   "withPct": 22.7,
+   "withoutPct": 20.2,
+   "liftPts": 2.6
+  },
+  {
+   "label": "power",
+   "n": 5141,
+   "withPct": 22.7,
+   "withoutPct": 20.2,
+   "liftPts": 2.6
+  },
+  {
+   "label": "pilot",
+   "n": 5092,
+   "withPct": 22.4,
+   "withoutPct": 20.3,
+   "liftPts": 2.2
+  },
+  {
+   "label": "rover",
+   "n": 5098,
+   "withPct": 22.1,
+   "withoutPct": 20.5,
+   "liftPts": 1.5
+  },
+  {
+   "label": "steady",
+   "n": 5074,
+   "withPct": 19.6,
+   "withoutPct": 21.3,
+   "liftPts": -1.6
+  },
+  {
+   "label": "botanist",
+   "n": 5108,
+   "withPct": 19.3,
+   "withoutPct": 21.4,
+   "liftPts": -2.2
+  },
+  {
+   "label": "mediator",
+   "n": 5248,
+   "withPct": 19.1,
+   "withoutPct": 21.5,
+   "liftPts": -2.5
+  },
+  {
+   "label": "medic",
+   "n": 5111,
+   "withPct": 18.9,
+   "withoutPct": 21.5,
+   "liftPts": -2.5
+  },
+  {
+   "label": "spaceWeather",
+   "n": 5097,
+   "withPct": 19,
+   "withoutPct": 21.5,
+   "liftPts": -2.6
+  },
+  {
+   "label": "geologist",
+   "n": 5069,
+   "withPct": 18.8,
+   "withoutPct": 21.6,
+   "liftPts": -2.8
+  },
+  {
+   "label": "comms",
+   "n": 5045,
+   "withPct": 18.4,
+   "withoutPct": 21.7,
+   "liftPts": -3.2
+  },
+  {
+   "label": "chemist",
+   "n": 4963,
+   "withPct": 17,
+   "withoutPct": 22.1,
+   "liftPts": -4.9
+  }
+ ],
+ "itemLift_mars": [
+  {
+   "label": "food",
+   "n": 7745,
+   "withPct": 34.8,
+   "withoutPct": 12.2,
+   "liftPts": 22.6
+  },
+  {
+   "label": "potato",
+   "n": 6049,
+   "withPct": 31.6,
+   "withoutPct": 16.3,
+   "liftPts": 15.5
+  },
+  {
+   "label": "filter",
+   "n": 7827,
+   "withPct": 27.9,
+   "withoutPct": 16.5,
+   "liftPts": 11.5
+  },
+  {
+   "label": "seeds",
+   "n": 7958,
+   "withPct": 26.8,
+   "withoutPct": 17,
+   "liftPts": 9.7
+  },
+  {
+   "label": "comfort",
+   "n": 8722,
+   "withPct": 25.4,
+   "withoutPct": 17.5,
+   "liftPts": 8
+  },
+  {
+   "label": "medkit",
+   "n": 7503,
+   "withPct": 24.7,
+   "withoutPct": 18.6,
+   "liftPts": 6
+  },
+  {
+   "label": "soy",
+   "n": 6606,
+   "withPct": 24.7,
+   "withoutPct": 19,
+   "liftPts": 5.7
+  },
+  {
+   "label": "sealant",
+   "n": 7793,
+   "withPct": 24.2,
+   "withoutPct": 18.8,
+   "liftPts": 5.4
+  },
+  {
+   "label": "o2candle",
+   "n": 7188,
+   "withPct": 23.9,
+   "withoutPct": 19.2,
+   "liftPts": 4.8
+  },
+  {
+   "label": "cleaner",
+   "n": 6325,
+   "withPct": 23.8,
+   "withoutPct": 19.5,
+   "liftPts": 4.4
+  },
+  {
+   "label": "spectro",
+   "n": 5836,
+   "withPct": 23.1,
+   "withoutPct": 19.9,
+   "liftPts": 3.2
+  },
+  {
+   "label": "purifier",
+   "n": 5372,
+   "withPct": 22.9,
+   "withoutPct": 20.1,
+   "liftPts": 2.8
+  },
+  {
+   "label": "parts",
+   "n": 7027,
+   "withPct": 22,
+   "withoutPct": 20.3,
+   "liftPts": 1.7
+  },
+  {
+   "label": "battery",
+   "n": 6201,
+   "withPct": 21.7,
+   "withoutPct": 20.5,
+   "liftPts": 1.1
+  },
+  {
+   "label": "shield",
+   "n": 4858,
+   "withPct": 21.2,
+   "withoutPct": 20.8,
+   "liftPts": 0.5
+  },
+  {
+   "label": "moxie",
+   "n": 5262,
+   "withPct": 17.7,
+   "withoutPct": 22,
+   "liftPts": -4.5
+  }
+ ],
+ "playerTrait": [
+  {
+   "label": "quartermaster",
+   "n": 2698,
+   "withPct": 37.3,
+   "withoutPct": 29.4,
+   "liftPts": 7.8
+  },
+  {
+   "label": "mechanic",
+   "n": 2683,
+   "withPct": 34,
+   "withoutPct": 29.7,
+   "liftPts": 4.7
+  },
+  {
+   "label": "nutrition",
+   "n": 2679,
+   "withPct": 33.9,
+   "withoutPct": 29.7,
+   "liftPts": 4.7
+  },
+  {
+   "label": "power",
+   "n": 2627,
+   "withPct": 32.9,
+   "withoutPct": 29.7,
+   "liftPts": 3.4
+  },
+  {
+   "label": "rover",
+   "n": 2686,
+   "withPct": 30.7,
+   "withoutPct": 29.9,
+   "liftPts": 0.7
+  },
+  {
+   "label": "pilot",
+   "n": 2778,
+   "withPct": 30.4,
+   "withoutPct": 29.9,
+   "liftPts": 0.3
+  },
+  {
+   "label": "eva",
+   "n": 2694,
+   "withPct": 30,
+   "withoutPct": 29.9,
+   "liftPts": -0.3
+  },
+  {
+   "label": "medic",
+   "n": 2720,
+   "withPct": 28.6,
+   "withoutPct": 30,
+   "liftPts": -1.2
+  },
+  {
+   "label": "mediator",
+   "n": 2648,
+   "withPct": 28.5,
+   "withoutPct": 30,
+   "liftPts": -1.6
+  },
+  {
+   "label": "geologist",
+   "n": 2780,
+   "withPct": 28.3,
+   "withoutPct": 30.1,
+   "liftPts": -1.7
+  },
+  {
+   "label": "botanist",
+   "n": 2734,
+   "withPct": 27.9,
+   "withoutPct": 30.1,
+   "liftPts": -2.3
+  },
+  {
+   "label": "steady",
+   "n": 2790,
+   "withPct": 27.2,
+   "withoutPct": 30.2,
+   "liftPts": -3.1
+  },
+  {
+   "label": "spaceWeather",
+   "n": 2665,
+   "withPct": 27,
+   "withoutPct": 30.2,
+   "liftPts": -3.3
+  },
+  {
+   "label": "comms",
+   "n": 2638,
+   "withPct": 26.6,
+   "withoutPct": 30.2,
+   "liftPts": -3.6
+  },
+  {
+   "label": "chemist",
+   "n": 2648,
+   "withPct": 26.1,
+   "withoutPct": 30.2,
+   "liftPts": -4.1
+  }
+ ],
+ "skill_technical": {
+  "<180": {
+   "n": 11613,
+   "success": 25.5,
+   "partial": 33.6,
+   "aborted": 27.3,
+   "lost": 13.6
+  },
+  "240+": {
+   "n": 6461,
+   "success": 32,
+   "partial": 49.6,
+   "aborted": 15,
+   "lost": 3.4
+  },
+  "210-239": {
+   "n": 10235,
+   "success": 32.7,
+   "partial": 39.4,
+   "aborted": 20.8,
+   "lost": 7
+  },
+  "180-209": {
+   "n": 12159,
+   "success": 30.8,
+   "partial": 35.1,
+   "aborted": 23.7,
+   "lost": 10.4
+  }
+ },
+ "skill_science": {
+  "240+": {
+   "n": 9371,
+   "success": 26.1,
+   "partial": 34.7,
+   "aborted": 26.2,
+   "lost": 13.1
+  },
+  "210-239": {
+   "n": 11306,
+   "success": 30.9,
+   "partial": 34.8,
+   "aborted": 23.6,
+   "lost": 10.7
+  },
+  "<180": {
+   "n": 8643,
+   "success": 31.5,
+   "partial": 44.6,
+   "aborted": 18.6,
+   "lost": 5.3
+  },
+  "180-209": {
+   "n": 11148,
+   "success": 31,
+   "partial": 39.3,
+   "aborted": 21.7,
+   "lost": 8
+  }
+ },
+ "skill_teamwork": {
+  "180-209": {
+   "n": 12469,
+   "success": 30.1,
+   "partial": 37.6,
+   "aborted": 23.1,
+   "lost": 9.2
+  },
+  "210-239": {
+   "n": 8479,
+   "success": 29.1,
+   "partial": 38.1,
+   "aborted": 23.2,
+   "lost": 9.6
+  },
+  "<180": {
+   "n": 15506,
+   "success": 30.8,
+   "partial": 39.3,
+   "aborted": 21,
+   "lost": 8.8
+  },
+  "240+": {
+   "n": 4014,
+   "success": 27.7,
+   "partial": 35,
+   "aborted": 25.8,
+   "lost": 11.5
+  }
+ },
+ "cargoKg": {
+  "mars 0": {
+   "n": 2029,
+   "success": 4.8,
+   "partial": 51.2,
+   "aborted": 24.4,
+   "lost": 19.6
+  },
+  "mars 1-59": {
+   "n": 2527,
+   "success": 10.8,
+   "partial": 48.9,
+   "aborted": 22.8,
+   "lost": 17.6
+  },
+  "mars 120-179": {
+   "n": 10995,
+   "success": 26.6,
+   "partial": 42.2,
+   "aborted": 18.8,
+   "lost": 12.4
+  },
+  "mars 180+": {
+   "n": 935,
+   "success": 30.1,
+   "partial": 40,
+   "aborted": 17.3,
+   "lost": 12.6
+  },
+  "mars 60-119": {
+   "n": 3747,
+   "success": 17.3,
+   "partial": 44.8,
+   "aborted": 21.9,
+   "lost": 16
+  },
+  "moon 0": {
+   "n": 2004,
+   "success": 21,
+   "partial": 48.5,
+   "aborted": 26.4,
+   "lost": 4.1
+  },
+  "moon 1-59": {
+   "n": 2494,
+   "success": 32.2,
+   "partial": 38.1,
+   "aborted": 25.3,
+   "lost": 4.4
+  },
+  "moon 120-179": {
+   "n": 10835,
+   "success": 43.7,
+   "partial": 27.1,
+   "aborted": 24.9,
+   "lost": 4.3
+  },
+  "moon 180+": {
+   "n": 910,
+   "success": 46.6,
+   "partial": 24.8,
+   "aborted": 23.1,
+   "lost": 5.5
+  },
+  "moon 60-119": {
+   "n": 3992,
+   "success": 37.9,
+   "partial": 34.4,
+   "aborted": 23.8,
+   "lost": 4
+  }
+ },
+ "freeKg": {
+  "mean": 41,
+  "negative": 0
+ },
+ "reasons": {
+  "reason.ration": 14401,
+  "reason.aborted": 9201,
+  "reason.rough": 6280,
+  "reason.evacuated": 4675,
+  "reason.lost": 3951
+ },
+ "endReasons": {
+  "complete": 27477,
+  "aborted": 9201,
+  "playerLost": 3790
+ },
+ "unmetInLoss": {
+  "n": 3790,
+  "o2": 29.6,
+  "water": 73,
+  "food": 20.5,
+  "power": 85.3
+ },
+ "unmetInPartial": {
+  "n": 15416,
+  "o2": 4.1,
+  "water": 5.5,
+  "food": 32.9,
+  "power": 77.1
+ },
+ "lossDay": {
+  "5-9": 226,
+  "20-30": 3227,
+  "10-19": 337
+ },
+ "events": [
+  {
+   "id": "RETURN-02",
+   "seenInRuns": 68.3,
+   "perRun": 0.68,
+   "lockedPct": 67.2,
+   "avgAvail": 3.1,
+   "avgTotal": 4,
+   "rollPct": 26.9,
+   "rollSuccess": 60.4,
+   "impactPts": 99.7,
+   "opts": [
+    {
+     "k": "reroute",
+     "n": 3329,
+     "succ": 99.7,
+     "lost": 0
+    },
+    {
+     "k": "spare",
+     "n": 13525,
+     "succ": 59.3,
+     "lost": 0
+    },
+    {
+     "k": "repair",
+     "n": 7423,
+     "succ": 10.5,
+     "lost": 0.6
+    },
+    {
+     "k": "powerDown",
+     "n": 3343,
+     "succ": 0,
+     "lost": 1.7
+    }
+   ]
+  },
+  {
+   "id": "RETURN-01",
+   "seenInRuns": 68.7,
+   "perRun": 0.98,
+   "lockedPct": 100,
+   "avgAvail": 2.4,
+   "avgTotal": 5,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 94.1,
+   "opts": [
+    {
+     "k": "balanced",
+     "n": 11497,
+     "succ": 94.1,
+     "lost": 0
+    },
+    {
+     "k": "safety",
+     "n": 950,
+     "succ": 76.6,
+     "lost": 0
+    },
+    {
+     "k": "allSamples",
+     "n": 947,
+     "succ": 60.9,
+     "lost": 0
+    },
+    {
+     "k": "wait",
+     "n": 11709,
+     "succ": 6.7,
+     "lost": 1.6
+    },
+    {
+     "k": "ration",
+     "n": 14401,
+     "succ": 0,
+     "lost": 1.7
+    }
+   ]
+  },
+  {
+   "id": "NIGHT",
+   "seenInRuns": 22.1,
+   "perRun": 0.22,
+   "lockedPct": 57.5,
+   "avgAvail": 3.4,
+   "avgTotal": 4,
+   "rollPct": 30.3,
+   "rollSuccess": 93.7,
+   "impactPts": 56.4,
+   "opts": [
+    {
+     "k": "wasteHeat",
+     "n": 2702,
+     "succ": 68,
+     "lost": 1
+    },
+    {
+     "k": "eco",
+     "n": 3776,
+     "succ": 49.8,
+     "lost": 2
+    },
+    {
+     "k": "asIs",
+     "n": 1254,
+     "succ": 19.8,
+     "lost": 6.2
+    },
+    {
+     "k": "hibernate",
+     "n": 1194,
+     "succ": 11.6,
+     "lost": 6.3
+    }
+   ]
+  },
+  {
+   "id": "HARVEST",
+   "seenInRuns": 93.1,
+   "perRun": 3.54,
+   "lockedPct": 100,
+   "avgAvail": 1.4,
+   "avgTotal": 4,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 54.6,
+   "opts": [
+    {
+     "k": "eyes",
+     "n": 29216,
+     "succ": 71,
+     "lost": 3.2
+    },
+    {
+     "k": "eat",
+     "n": 109366,
+     "succ": 36.4,
+     "lost": 5.7
+    },
+    {
+     "k": "switchSoy",
+     "n": 2646,
+     "succ": 20.9,
+     "lost": 8.3
+    },
+    {
+     "k": "switchPotato",
+     "n": 2116,
+     "succ": 16.4,
+     "lost": 8.5
+    }
+   ]
+  },
+  {
+   "id": "QUAKE",
+   "seenInRuns": 48.8,
+   "perRun": 0.9,
+   "lockedPct": 0.6,
+   "avgAvail": 3,
+   "avgTotal": 3,
+   "rollPct": 77.5,
+   "rollSuccess": 88.7,
+   "impactPts": 52.2,
+   "opts": [
+    {
+     "k": "inspect",
+     "n": 23682,
+     "succ": 59.4,
+     "lost": 0.8
+    },
+    {
+     "k": "quick",
+     "n": 4452,
+     "succ": 25.6,
+     "lost": 4.2
+    },
+    {
+     "k": "ignore",
+     "n": 8170,
+     "succ": 7.2,
+     "lost": 8.8
+    }
+   ]
+  },
+  {
+   "id": "MOON-01",
+   "seenInRuns": 50,
+   "perRun": 0.5,
+   "lockedPct": 0,
+   "avgAvail": 3,
+   "avgTotal": 3,
+   "rollPct": 61.7,
+   "rollSuccess": 76.6,
+   "impactPts": 44.7,
+   "opts": [
+    {
+     "k": "calibrate",
+     "n": 12493,
+     "succ": 56.1,
+     "lost": 2.4
+    },
+    {
+     "k": "allOn",
+     "n": 5346,
+     "succ": 11.5,
+     "lost": 8
+    },
+    {
+     "k": "prioritize",
+     "n": 2396,
+     "succ": 11.4,
+     "lost": 5.6
+    }
+   ]
+  },
+  {
+   "id": "SHADOW",
+   "seenInRuns": 23.6,
+   "perRun": 0.24,
+   "lockedPct": 2.9,
+   "avgAvail": 3,
+   "avgTotal": 3,
+   "rollPct": 10.9,
+   "rollSuccess": 86.7,
+   "impactPts": 43.9,
+   "opts": [
+    {
+     "k": "essentials",
+     "n": 6073,
+     "succ": 54.7,
+     "lost": 2.3
+    },
+    {
+     "k": "relocate",
+     "n": 1042,
+     "succ": 20,
+     "lost": 4.6
+    },
+    {
+     "k": "normal",
+     "n": 2432,
+     "succ": 10.8,
+     "lost": 6.6
+    }
+   ]
+  },
+  {
+   "id": "MARS-01",
+   "seenInRuns": 50,
+   "perRun": 0.5,
+   "lockedPct": 61.5,
+   "avgAvail": 2.4,
+   "avgTotal": 3,
+   "rollPct": 45.4,
+   "rollSuccess": 69.8,
+   "impactPts": 42.1,
+   "opts": [
+    {
+     "k": "swapFilter",
+     "n": 4794,
+     "succ": 42.5,
+     "lost": 0.1
+    },
+    {
+     "k": "maintain",
+     "n": 9184,
+     "succ": 23.5,
+     "lost": 13.9
+    },
+    {
+     "k": "ration",
+     "n": 6255,
+     "succ": 0.4,
+     "lost": 26.3
+    }
+   ]
+  },
+  {
+   "id": "ICE",
+   "seenInRuns": 23.6,
+   "perRun": 0.64,
+   "lockedPct": 2.3,
+   "avgAvail": 3,
+   "avgTotal": 3,
+   "rollPct": 68.6,
+   "rollSuccess": 83.6,
+   "impactPts": 39.8,
+   "opts": [
+    {
+     "k": "traverse",
+     "n": 17841,
+     "succ": 55.9,
+     "lost": 1.7
+    },
+    {
+     "k": "rim",
+     "n": 4300,
+     "succ": 18,
+     "lost": 4.2
+    },
+    {
+     "k": "skip",
+     "n": 3864,
+     "succ": 16.1,
+     "lost": 4.6
+    }
+   ]
+  },
+  {
+   "id": "HAYFEVER",
+   "seenInRuns": 45.6,
+   "perRun": 0.46,
+   "lockedPct": 100,
+   "avgAvail": 2.4,
+   "avgTotal": 4,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 39.6,
+   "opts": [
+    {
+     "k": "cleanHab",
+     "n": 12631,
+     "succ": 54.7,
+     "lost": 1.8
+    },
+    {
+     "k": "medkit",
+     "n": 899,
+     "succ": 26.9,
+     "lost": 5.1
+    },
+    {
+     "k": "ignore",
+     "n": 4927,
+     "succ": 15.1,
+     "lost": 6.9
+    }
+   ]
+  },
+  {
+   "id": "HEAT",
+   "seenInRuns": 24.5,
+   "perRun": 0.24,
+   "lockedPct": 2.7,
+   "avgAvail": 3,
+   "avgTotal": 3,
+   "rollPct": 65,
+   "rollSuccess": 89.7,
+   "impactPts": 39,
+   "opts": [
+    {
+     "k": "shade",
+     "n": 6435,
+     "succ": 54.7,
+     "lost": 2.8
+    },
+    {
+     "k": "ride",
+     "n": 1629,
+     "succ": 18.2,
+     "lost": 7.7
+    },
+    {
+     "k": "cutLoads",
+     "n": 1837,
+     "succ": 15.7,
+     "lost": 6.3
+    }
+   ]
+  },
+  {
+   "id": "MOON-03",
+   "seenInRuns": 42.2,
+   "perRun": 0.42,
+   "lockedPct": 78.9,
+   "avgAvail": 2.3,
+   "avgTotal": 4,
+   "rollPct": 18.9,
+   "rollSuccess": 75.8,
+   "impactPts": 38.7,
+   "opts": [
+    {
+     "k": "waterWall",
+     "n": 2872,
+     "succ": 55.8,
+     "lost": 1
+    },
+    {
+     "k": "shelterNow",
+     "n": 10550,
+     "succ": 53.6,
+     "lost": 1.4
+    },
+    {
+     "k": "forecast",
+     "n": 425,
+     "succ": 20.7,
+     "lost": 3.8
+    },
+    {
+     "k": "finishSamples",
+     "n": 3229,
+     "succ": 17.1,
+     "lost": 6.6
+    }
+   ]
+  },
+  {
+   "id": "MARS-03",
+   "seenInRuns": 49.8,
+   "perRun": 0.5,
+   "lockedPct": 97.4,
+   "avgAvail": 3.5,
+   "avgTotal": 5,
+   "rollPct": 40.8,
+   "rollSuccess": 69.1,
+   "impactPts": 36.9,
+   "opts": [
+    {
+     "k": "replant",
+     "n": 4565,
+     "succ": 41.4,
+     "lost": 11
+    },
+    {
+     "k": "diagnose",
+     "n": 8213,
+     "succ": 23.4,
+     "lost": 14.3
+    },
+    {
+     "k": "redirect",
+     "n": 2088,
+     "succ": 8.3,
+     "lost": 13.4
+    },
+    {
+     "k": "salvage",
+     "n": 5140,
+     "succ": 4.5,
+     "lost": 18.4
+    }
+   ]
+  },
+  {
+   "id": "MOON-S2",
+   "seenInRuns": 46.7,
+   "perRun": 0.87,
+   "lockedPct": 60.8,
+   "avgAvail": 2.4,
+   "avgTotal": 3,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 36.5,
+   "opts": [
+    {
+     "k": "comfort",
+     "n": 9546,
+     "succ": 57.3,
+     "lost": 2.2
+    },
+    {
+     "k": "cleanSuits",
+     "n": 18821,
+     "succ": 47.2,
+     "lost": 2.6
+    },
+    {
+     "k": "skip",
+     "n": 6893,
+     "succ": 20.8,
+     "lost": 4.7
+    }
+   ]
+  },
+  {
+   "id": "ISRU",
+   "seenInRuns": 46.5,
+   "perRun": 0.87,
+   "lockedPct": 0,
+   "avgAvail": 3,
+   "avgTotal": 3,
+   "rollPct": 70.1,
+   "rollSuccess": 88.4,
+   "impactPts": 35.6,
+   "opts": [
+    {
+     "k": "run",
+     "n": 24679,
+     "succ": 55.4,
+     "lost": 1.7
+    },
+    {
+     "k": "skip",
+     "n": 5290,
+     "succ": 20.3,
+     "lost": 5.5
+    },
+    {
+     "k": "sample",
+     "n": 5253,
+     "succ": 19.8,
+     "lost": 5.1
+    }
+   ]
+  },
+  {
+   "id": "OUT-01",
+   "seenInRuns": 100,
+   "perRun": 1,
+   "lockedPct": 74.7,
+   "avgAvail": 3.3,
+   "avgTotal": 4,
+   "rollPct": 11.2,
+   "rollSuccess": 76.8,
+   "impactPts": 35.5,
+   "opts": [
+    {
+     "k": "full",
+     "n": 24583,
+     "succ": 42.6,
+     "lost": 7.7
+    },
+    {
+     "k": "specialist",
+     "n": 4526,
+     "succ": 16.9,
+     "lost": 10.5
+    },
+    {
+     "k": "trim",
+     "n": 905,
+     "succ": 16.2,
+     "lost": 6.1
+    },
+    {
+     "k": "rest",
+     "n": 10454,
+     "succ": 7.1,
+     "lost": 13
+    }
+   ]
+  },
+  {
+   "id": "RESUPPLY",
+   "seenInRuns": 94.8,
+   "perRun": 0.95,
+   "lockedPct": 15.6,
+   "avgAvail": 2.8,
+   "avgTotal": 3,
+   "rollPct": 18.1,
+   "rollSuccess": 82.9,
+   "impactPts": 35.2,
+   "opts": [
+    {
+     "k": "near",
+     "n": 24214,
+     "succ": 44,
+     "lost": 7.1
+    },
+    {
+     "k": "retrieve",
+     "n": 6952,
+     "succ": 11.8,
+     "lost": 12.5
+    },
+    {
+     "k": "later",
+     "n": 7189,
+     "succ": 8.8,
+     "lost": 12.4
+    }
+   ]
+  },
+  {
+   "id": "DARK",
+   "seenInRuns": 20.3,
+   "perRun": 0.2,
+   "lockedPct": 0,
+   "avgAvail": 3,
+   "avgTotal": 3,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 34.9,
+   "opts": [
+    {
+     "k": "essentials",
+     "n": 5912,
+     "succ": 55.9,
+     "lost": 1.1
+    },
+    {
+     "k": "normal",
+     "n": 1185,
+     "succ": 21,
+     "lost": 3.6
+    },
+    {
+     "k": "eco",
+     "n": 1136,
+     "succ": 21,
+     "lost": 4.8
+    }
+   ]
+  },
+  {
+   "id": "MOON-02",
+   "seenInRuns": 49.4,
+   "perRun": 0.49,
+   "lockedPct": 81.9,
+   "avgAvail": 2.8,
+   "avgTotal": 4,
+   "rollPct": 86,
+   "rollSuccess": 85.7,
+   "impactPts": 34.8,
+   "opts": [
+    {
+     "k": "patch",
+     "n": 4744,
+     "succ": 58.7,
+     "lost": 1.9
+    },
+    {
+     "k": "replace",
+     "n": 2997,
+     "succ": 55,
+     "lost": 2
+    },
+    {
+     "k": "clean",
+     "n": 9435,
+     "succ": 29.6,
+     "lost": 6
+    },
+    {
+     "k": "isolate",
+     "n": 2806,
+     "succ": 23.9,
+     "lost": 4.5
+    }
+   ]
+  },
+  {
+   "id": "MOON-SAR",
+   "seenInRuns": 42.4,
+   "perRun": 0.42,
+   "lockedPct": 5.1,
+   "avgAvail": 2.9,
+   "avgTotal": 3,
+   "rollPct": 85,
+   "rollSuccess": 70.9,
+   "impactPts": 34.8,
+   "opts": [
+    {
+     "k": "rescue",
+     "n": 11437,
+     "succ": 55.5,
+     "lost": 1.6
+    },
+    {
+     "k": "earth",
+     "n": 3142,
+     "succ": 27.8,
+     "lost": 4.3
+    },
+    {
+     "k": "wait",
+     "n": 2570,
+     "succ": 20.7,
+     "lost": 5
+    }
+   ]
+  },
+  {
+   "id": "METEOR",
+   "seenInRuns": 41.4,
+   "perRun": 0.41,
+   "lockedPct": 82.9,
+   "avgAvail": 3.2,
+   "avgTotal": 4,
+   "rollPct": 22.8,
+   "rollSuccess": 82,
+   "impactPts": 34.5,
+   "opts": [
+    {
+     "k": "observe",
+     "n": 10712,
+     "succ": 56.9,
+     "lost": 1.6
+    },
+    {
+     "k": "repair",
+     "n": 1683,
+     "succ": 47.7,
+     "lost": 2.4
+    },
+    {
+     "k": "inside",
+     "n": 2232,
+     "succ": 23.2,
+     "lost": 3.8
+    },
+    {
+     "k": "eva",
+     "n": 2143,
+     "succ": 22.4,
+     "lost": 4.1
+    }
+   ]
+  },
+  {
+   "id": "MOON-S1",
+   "seenInRuns": 48.2,
+   "perRun": 1.31,
+   "lockedPct": 52,
+   "avgAvail": 2.5,
+   "avgTotal": 3,
+   "rollPct": 7.3,
+   "rollSuccess": 89.4,
+   "impactPts": 33.2,
+   "opts": [
+    {
+     "k": "call",
+     "n": 39241,
+     "succ": 53.3,
+     "lost": 2
+    },
+    {
+     "k": "rest",
+     "n": 9816,
+     "succ": 20.2,
+     "lost": 5.1
+    },
+    {
+     "k": "science",
+     "n": 3838,
+     "succ": 20.1,
+     "lost": 5.1
+    }
+   ]
+  },
+  {
+   "id": "WQ",
+   "seenInRuns": 96.3,
+   "perRun": 1.85,
+   "lockedPct": 49.2,
+   "avgAvail": 2.5,
+   "avgTotal": 3,
+   "rollPct": 27.2,
+   "rollSuccess": 49.6,
+   "impactPts": 32.7,
+   "opts": [
+    {
+     "k": "reprocess",
+     "n": 50272,
+     "succ": 42.6,
+     "lost": 7.1
+    },
+    {
+     "k": "filter",
+     "n": 4166,
+     "succ": 18.9,
+     "lost": 9.2
+    },
+    {
+     "k": "drink",
+     "n": 20322,
+     "succ": 9.9,
+     "lost": 13
+    }
+   ]
+  },
+  {
+   "id": "MARS-02",
+   "seenInRuns": 49.9,
+   "perRun": 0.74,
+   "lockedPct": 100,
+   "avgAvail": 2.7,
+   "avgTotal": 5,
+   "rollPct": 3.7,
+   "rollSuccess": 83.5,
+   "impactPts": 31.9,
+   "opts": [
+    {
+     "k": "hunker",
+     "n": 14147,
+     "succ": 33.4,
+     "lost": 12.6
+    },
+    {
+     "k": "eco",
+     "n": 11725,
+     "succ": 16.3,
+     "lost": 15.5
+    },
+    {
+     "k": "fullPower",
+     "n": 3103,
+     "succ": 5.6,
+     "lost": 18.2
+    },
+    {
+     "k": "clean",
+     "n": 1118,
+     "succ": 1.5,
+     "lost": 12.5
+    }
+   ]
+  },
+  {
+   "id": "MICRO",
+   "seenInRuns": 46.3,
+   "perRun": 0.86,
+   "lockedPct": 53.3,
+   "avgAvail": 2.2,
+   "avgTotal": 3,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 31.8,
+   "opts": [
+    {
+     "k": "patch",
+     "n": 13820,
+     "succ": 59.4,
+     "lost": 1.2
+    },
+    {
+     "k": "isolate",
+     "n": 18456,
+     "succ": 37,
+     "lost": 3.8
+    },
+    {
+     "k": "parts",
+     "n": 2721,
+     "succ": 27.6,
+     "lost": 3.1
+    }
+   ]
+  },
+  {
+   "id": "CROP",
+   "seenInRuns": 100,
+   "perRun": 1,
+   "lockedPct": 100,
+   "avgAvail": 1.7,
+   "avgTotal": 4,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 29.5,
+   "opts": [
+    {
+     "k": "potato",
+     "n": 9067,
+     "succ": 50.3,
+     "lost": 7.7
+    },
+    {
+     "k": "soy",
+     "n": 7229,
+     "succ": 35.1,
+     "lost": 8.5
+    },
+    {
+     "k": "greens",
+     "n": 24172,
+     "succ": 20.8,
+     "lost": 10.3
+    }
+   ]
+  },
+  {
+   "id": "CME",
+   "seenInRuns": 49.2,
+   "perRun": 0.91,
+   "lockedPct": 27.6,
+   "avgAvail": 3.7,
+   "avgTotal": 4,
+   "rollPct": 14,
+   "rollSuccess": 86.9,
+   "impactPts": 29,
+   "opts": [
+    {
+     "k": "shelter",
+     "n": 23982,
+     "succ": 39,
+     "lost": 8.5
+    },
+    {
+     "k": "planned",
+     "n": 2670,
+     "succ": 16.7,
+     "lost": 9.9
+    },
+    {
+     "k": "measure",
+     "n": 5155,
+     "succ": 10.5,
+     "lost": 13
+    },
+    {
+     "k": "carryOn",
+     "n": 5138,
+     "succ": 10,
+     "lost": 13.6
+    }
+   ]
+  },
+  {
+   "id": "BRINE",
+   "seenInRuns": 50,
+   "perRun": 1.46,
+   "lockedPct": 73.6,
+   "avgAvail": 3.3,
+   "avgTotal": 4,
+   "rollPct": 60.7,
+   "rollSuccess": 83.9,
+   "impactPts": 26.9,
+   "opts": [
+    {
+     "k": "distill",
+     "n": 35856,
+     "succ": 31.1,
+     "lost": 11.9
+    },
+    {
+     "k": "purify",
+     "n": 1424,
+     "succ": 13.3,
+     "lost": 9.7
+    },
+    {
+     "k": "leave",
+     "n": 6453,
+     "succ": 10.8,
+     "lost": 15.1
+    },
+    {
+     "k": "raw",
+     "n": 15308,
+     "succ": 4.2,
+     "lost": 18.8
+    }
+   ]
+  },
+  {
+   "id": "GEAR",
+   "seenInRuns": 49.9,
+   "perRun": 0.97,
+   "lockedPct": 44.1,
+   "avgAvail": 2.5,
+   "avgTotal": 3,
+   "rollPct": 32.9,
+   "rollSuccess": 82.9,
+   "impactPts": 25.6,
+   "opts": [
+    {
+     "k": "parts",
+     "n": 14245,
+     "succ": 32,
+     "lost": 11.3
+    },
+    {
+     "k": "clean",
+     "n": 12920,
+     "succ": 24.1,
+     "lost": 13
+    },
+    {
+     "k": "fixed",
+     "n": 12094,
+     "succ": 6.4,
+     "lost": 17.8
+    }
+   ]
+  },
+  {
+   "id": "WIND",
+   "seenInRuns": 49.9,
+   "perRun": 0.98,
+   "lockedPct": 100,
+   "avgAvail": 3,
+   "avgTotal": 4,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 25.3,
+   "opts": [
+    {
+     "k": "covers",
+     "n": 24011,
+     "succ": 30.3,
+     "lost": 12.6
+    },
+    {
+     "k": "ignore",
+     "n": 5546,
+     "succ": 11.8,
+     "lost": 14.6
+    },
+    {
+     "k": "tieDown",
+     "n": 10291,
+     "succ": 5,
+     "lost": 18.1
+    }
+   ]
+  },
+  {
+   "id": "MARS-S2",
+   "seenInRuns": 50,
+   "perRun": 1.45,
+   "lockedPct": 70.1,
+   "avgAvail": 2.3,
+   "avgTotal": 3,
+   "rollPct": 59.2,
+   "rollSuccess": 72.9,
+   "impactPts": 22.8,
+   "opts": [
+    {
+     "k": "comfort",
+     "n": 10993,
+     "succ": 30.5,
+     "lost": 12
+    },
+    {
+     "k": "mediate",
+     "n": 34807,
+     "succ": 23.9,
+     "lost": 13.6
+    },
+    {
+     "k": "shifts",
+     "n": 12987,
+     "succ": 7.7,
+     "lost": 16.7
+    }
+   ]
+  },
+  {
+   "id": "MARS-S1",
+   "seenInRuns": 50,
+   "perRun": 1.45,
+   "lockedPct": 53.7,
+   "avgAvail": 2.5,
+   "avgTotal": 3,
+   "rollPct": 78.6,
+   "rollSuccess": 75,
+   "impactPts": 20.4,
+   "opts": [
+    {
+     "k": "analyze",
+     "n": 18239,
+     "succ": 28.7,
+     "lost": 13.3
+    },
+    {
+     "k": "basic",
+     "n": 27989,
+     "succ": 22.8,
+     "lost": 13.3
+    },
+    {
+     "k": "rest",
+     "n": 12587,
+     "succ": 8.3,
+     "lost": 15.9
+    }
+   ]
+  },
+  {
+   "id": "MARS-SAR",
+   "seenInRuns": 48.3,
+   "perRun": 0.48,
+   "lockedPct": 3.6,
+   "avgAvail": 3,
+   "avgTotal": 3,
+   "rollPct": 82,
+   "rollSuccess": 71.5,
+   "impactPts": 19.7,
+   "opts": [
+    {
+     "k": "rescue",
+     "n": 12499,
+     "succ": 28.2,
+     "lost": 12.8
+    },
+    {
+     "k": "mast",
+     "n": 3534,
+     "succ": 8.8,
+     "lost": 16.7
+    },
+    {
+     "k": "wait",
+     "n": 3524,
+     "succ": 8.5,
+     "lost": 16.3
+    }
+   ]
+  },
+  {
+   "id": "DEVIL",
+   "seenInRuns": 24.6,
+   "perRun": 0.48,
+   "lockedPct": 2.4,
+   "avgAvail": 2,
+   "avgTotal": 2,
+   "rollPct": 73.4,
+   "rollSuccess": 88.2,
+   "impactPts": 14.6,
+   "opts": [
+    {
+     "k": "clean",
+     "n": 14208,
+     "succ": 20.5,
+     "lost": 13.4
+    },
+    {
+     "k": "later",
+     "n": 5155,
+     "succ": 5.9,
+     "lost": 16.3
+    }
+   ]
+  },
+  {
+   "id": "EMG-O2",
+   "seenInRuns": 26.8,
+   "perRun": 0.47,
+   "lockedPct": 64.5,
+   "avgAvail": 3.4,
+   "avgTotal": 4,
+   "rollPct": 38,
+   "rollSuccess": 84.7,
+   "impactPts": 14.1,
+   "opts": [
+    {
+     "k": "repairLS",
+     "n": 7298,
+     "succ": 14.1,
+     "lost": 11.9
+    },
+    {
+     "k": "candle",
+     "n": 2527,
+     "succ": 9.4,
+     "lost": 21.1
+    },
+    {
+     "k": "cutLoads",
+     "n": 4702,
+     "succ": 0.7,
+     "lost": 27.9
+    },
+    {
+     "k": "abort",
+     "n": 4673,
+     "succ": 0,
+     "lost": 0
+    }
+   ]
+  },
+  {
+   "id": "SAB",
+   "seenInRuns": 99.4,
+   "perRun": 0.99,
+   "lockedPct": 55.4,
+   "avgAvail": 1.4,
+   "avgTotal": 2,
+   "rollPct": 33.3,
+   "rollSuccess": 92.9,
+   "impactPts": 10.2,
+   "opts": [
+    {
+     "k": "sabatier",
+     "n": 13410,
+     "succ": 36.9,
+     "lost": 6.3
+    },
+    {
+     "k": "vent",
+     "n": 26805,
+     "succ": 26.7,
+     "lost": 10.9
+    }
+   ]
+  },
+  {
+   "id": "EMG-MED",
+   "seenInRuns": 22.3,
+   "perRun": 0.79,
+   "lockedPct": 100,
+   "avgAvail": 2.4,
+   "avgTotal": 5,
+   "rollPct": 0,
+   "rollSuccess": null,
+   "impactPts": 0.7,
+   "opts": [
+    {
+     "k": "medkit",
+     "n": 3460,
+     "succ": 0.7,
+     "lost": 47.9
+    },
+    {
+     "k": "rest",
+     "n": 17112,
+     "succ": 0.3,
+     "lost": 60.5
+    },
+    {
+     "k": "medic",
+     "n": 2172,
+     "succ": 0.2,
+     "lost": 63.9
+    },
+    {
+     "k": "abort",
+     "n": 2916,
+     "succ": 0,
+     "lost": 0
+    },
+    {
+     "k": "evacuate",
+     "n": 6136,
+     "succ": 0,
+     "lost": 53.2
+    }
+   ]
+  },
+  {
+   "id": "EMG-WATER",
+   "seenInRuns": 6.9,
+   "perRun": 0.08,
+   "lockedPct": 0.3,
+   "avgAvail": 4,
+   "avgTotal": 4,
+   "rollPct": 12,
+   "rollSuccess": 80.9,
+   "impactPts": 0,
+   "opts": [
+    {
+     "k": "ration",
+     "n": 2039,
+     "succ": 0,
+     "lost": 56.8
+    },
+    {
+     "k": "abort",
+     "n": 391,
+     "succ": 0,
+     "lost": 0
+    },
+    {
+     "k": "repair",
+     "n": 382,
+     "succ": 0,
+     "lost": 27.5
+    },
+    {
+     "k": "ghOff",
+     "n": 364,
+     "succ": 0,
+     "lost": 38.7
+    }
+   ]
+  }
+ ],
+ "pacing": {
+  "decisionsPerRunMedian": 31,
+  "p10": 24,
+  "p90": 36,
+  "emptyDayPct": 33.1,
+  "perDay": {
+   "1": 1.67,
+   "2": 0.61,
+   "3": 1.47,
+   "4": 0.89,
+   "5": 1,
+   "6": 1.51,
+   "7": 1.33,
+   "8": 1.12,
+   "9": 0.97,
+   "10": 0.99,
+   "11": 1.16,
+   "12": 1.07,
+   "13": 1.05,
+   "14": 0.99,
+   "15": 1.19,
+   "16": 0.93,
+   "17": 1.01,
+   "18": 0.86,
+   "19": 0.86,
+   "20": 0.88,
+   "21": 1.02,
+   "22": 0.95,
+   "23": 0.83,
+   "24": 0.97,
+   "25": 0.86,
+   "26": 0.8,
+   "27": 0.7,
+   "28": 0.55,
+   "29": 0.22,
+   "30": 0.2,
+   "31": 1.16,
+   "32": 0.51
+  }
+ },
+ "tension": {
+  "successWithCloseCall": 62.5,
+  "successWithHealthDip": 0.6,
+  "echoesPerRun": 8.4,
+  "runsWithEcho": 98.8,
+  "echoSources": {
+   "mechanic": 43775,
+   "parts": 37367,
+   "eva": 31980,
+   "cleaner": 27075,
+   "geologist": 23316,
+   "comfort": 20539,
+   "spectro": 20504,
+   "sealant": 19180,
+   "pilot": 14868,
+   "chemist": 13967,
+   "potato": 11183,
+   "power": 10155,
+   "soy": 9875,
+   "filter": 9176,
+   "rover": 7988,
+   "steady": 7854,
+   "mediator": 7771,
+   "seeds": 4565,
+   "spaceWeather": 4539,
+   "medkit": 4359,
+   "o2candle": 2527,
+   "medic": 2172,
+   "botanist": 2094,
+   "comms": 1488,
+   "purifier": 1424
+  },
+  "harvestRuns": 97,
+  "chatsMedian": 128,
+  "bigEvents": {
+   "resupply": 38355,
+   "cme": 36945,
+   "storm": 30093,
+   "meteor": 16770,
+   "night": 8926,
+   "dark": 8233
+  },
+  "bigPrepVsSuccess": {
+   "cme preps=0": {
+    "n": 5071,
+    "success": 0.5,
+    "partial": 17.4,
+    "aborted": 64.3,
+    "lost": 17.7
+   },
+   "cme preps=1": {
+    "n": 1,
+    "success": 0,
+    "partial": 100,
+    "aborted": 0,
+    "lost": 0
+   },
+   "cme preps=2": {
+    "n": 31873,
+    "success": 34,
+    "partial": 44.8,
+    "aborted": 12.6,
+    "lost": 8.7
+   },
+   "dark preps=0": {
+    "n": 675,
+    "success": 3.3,
+    "partial": 31.4,
+    "aborted": 56.7,
+    "lost": 8.6
+   },
+   "dark preps=1": {
+    "n": 189,
+    "success": 8.5,
+    "partial": 66.1,
+    "aborted": 19.6,
+    "lost": 5.8
+   },
+   "dark preps=2": {
+    "n": 7369,
+    "success": 50.9,
+    "partial": 40.4,
+    "aborted": 7.4,
+    "lost": 1.2
+   },
+   "meteor preps=0": {
+    "n": 1323,
+    "success": 2,
+    "partial": 25.9,
+    "aborted": 62.6,
+    "lost": 9.6
+   },
+   "meteor preps=1": {
+    "n": 181,
+    "success": 22.7,
+    "partial": 55.8,
+    "aborted": 14.9,
+    "lost": 6.6
+   },
+   "meteor preps=2": {
+    "n": 15266,
+    "success": 51.3,
+    "partial": 39.3,
+    "aborted": 7.8,
+    "lost": 1.6
+   },
+   "night preps=0": {
+    "n": 819,
+    "success": 0.5,
+    "partial": 16.4,
+    "aborted": 71.3,
+    "lost": 11.8
+   },
+   "night preps=2": {
+    "n": 8107,
+    "success": 50.6,
+    "partial": 36.9,
+    "aborted": 10.6,
+    "lost": 2
+   },
+   "resupply preps=0": {
+    "n": 4948,
+    "success": 0.6,
+    "partial": 17.8,
+    "aborted": 64.6,
+    "lost": 17
+   },
+   "resupply preps=1": {
+    "n": 7635,
+    "success": 33.8,
+    "partial": 42.4,
+    "aborted": 13.8,
+    "lost": 10
+   },
+   "resupply preps=2": {
+    "n": 25772,
+    "success": 36.9,
+    "partial": 43.8,
+    "aborted": 12,
+    "lost": 7.3
+   },
+   "storm preps=0": {
+    "n": 4416,
+    "success": 0.1,
+    "partial": 17.8,
+    "aborted": 61.5,
+    "lost": 20.6
+   },
+   "storm preps=1": {
+    "n": 62,
+    "success": 0,
+    "partial": 41.9,
+    "aborted": 35.5,
+    "lost": 22.6
+   },
+   "storm preps=2": {
+    "n": 25615,
+    "success": 26.7,
+    "partial": 47.6,
+    "aborted": 12.6,
+    "lost": 13.2
+   }
+  }
+ },
+ "science": {
+  "mars/spring": {
+   "median": 298,
+   "p90": 502
+  },
+  "mars/summer": {
+   "median": 288,
+   "p90": 498
+  },
+  "moon/equator": {
+   "median": 259,
+   "p90": 486
+  },
+  "moon/polar": {
+   "median": 291,
+   "p90": 518
+  }
+ },
+ "pairs_moon": {
+  "basePct": 26.8,
+  "top": [
+   {
+    "k": "food+shield",
+    "n": 1630,
+    "succ": 35.8
+   },
+   {
+    "k": "food+parts",
+    "n": 2716,
+    "succ": 35.5
+   },
+   {
+    "k": "cleaner+food",
+    "n": 2632,
+    "succ": 35.4
+   },
+   {
+    "k": "food+soy",
+    "n": 2626,
+    "succ": 35.4
+   },
+   {
+    "k": "filter+food",
+    "n": 3250,
+    "succ": 35.2
+   },
+   {
+    "k": "comfort+food",
+    "n": 3478,
+    "succ": 35.1
+   },
+   {
+    "k": "food+spectro",
+    "n": 2278,
+    "succ": 35.1
+   },
+   {
+    "k": "food+seeds",
+    "n": 3317,
+    "succ": 34.8
+   }
+  ]
+ },
+ "pairs_mars": {
+  "basePct": 12.8,
+  "top": [
+   {
+    "k": "food+potato",
+    "n": 1963,
+    "succ": 26.1
+   },
+   {
+    "k": "filter+food",
+    "n": 2646,
+    "succ": 25.7
+   },
+   {
+    "k": "food+seeds",
+    "n": 2738,
+    "succ": 24.9
+   },
+   {
+    "k": "comfort+food",
+    "n": 2943,
+    "succ": 24.7
+   },
+   {
+    "k": "food+spectro",
+    "n": 1818,
+    "succ": 24
+   },
+   {
+    "k": "cleaner+food",
+    "n": 2056,
+    "succ": 23.8
+   },
+   {
+    "k": "food+purifier",
+    "n": 1605,
+    "succ": 23.7
+   },
+   {
+    "k": "food+medkit",
+    "n": 2579,
+    "succ": 23.7
+   }
+  ]
+ },
+ "carefulFull": {
+  "mars/spring": {
+   "n": 778,
+   "success": 46.7,
+   "partial": 40.9,
+   "aborted": 2.7,
+   "lost": 9.8
+  },
+  "mars/summer": {
+   "n": 744,
+   "success": 60.2,
+   "partial": 25.9,
+   "aborted": 3.9,
+   "lost": 9.9
+  },
+  "moon/equator": {
+   "n": 766,
+   "success": 83.2,
+   "partial": 15.4,
+   "aborted": 0.8,
+   "lost": 0.7
+  },
+  "moon/polar": {
+   "n": 713,
+   "success": 82.2,
+   "partial": 17.3,
+   "aborted": 0.1,
+   "lost": 0.4
+  }
+ },
+ "recklessEmpty": {
+  "mars/spring": {
+   "n": 130,
+   "success": 0,
+   "partial": 16.9,
+   "aborted": 60,
+   "lost": 23.1
+  },
+  "mars/summer": {
+   "n": 146,
+   "success": 0,
+   "partial": 10.3,
+   "aborted": 71.2,
+   "lost": 18.5
+  },
+  "moon/equator": {
+   "n": 145,
+   "success": 0,
+   "partial": 13.1,
+   "aborted": 75.9,
+   "lost": 11
+  },
+  "moon/polar": {
+   "n": 161,
+   "success": 1.2,
+   "partial": 9.3,
+   "aborted": 77.6,
+   "lost": 11.8
+  }
+ }
+}
