@@ -15,7 +15,7 @@ import { formatFixed, listFormat } from '../../i18n';
 import { EventArt } from '../art/Scenes';
 import { Portrait } from '../art/Portrait';
 import { useLocale, useStore, type PendingResult } from '../store';
-import { computeDeltas, destName, echoText, lockText, speakerFor } from '../text';
+import { computeDeltas, destName, echoText, forecastDays, lockText, speakerFor, swParams } from '../text';
 import { InfoTip } from './common';
 import { RichText } from './RichText';
 
@@ -130,7 +130,8 @@ export function EventCard({ run }: { run: RunState }) {
   const subjectNames = (active.subjects ?? []).map((id) => characterById(run, id).name).join(' & ');
   const speaker = speakerFor(run, ev.speaker, active.subjectCrewId);
   const speakerChar = [run.player, ...run.candidates].find((c) => c.name === speaker);
-  const kindKey = ev.kind === 'emergency' ? 'event.emergency' : ev.kind === 'small' ? 'event.small' : ev.kind === 'transit' ? 'event.transit' : 'event.decision';
+  const kindKey =
+    ev.kind === 'emergency' ? 'event.emergency' : ev.kind === 'small' ? 'event.small' : ev.kind === 'transit' ? 'event.transit' : ev.kind === 'forecast' ? 'event.forecast' : 'event.decision';
 
   const choose = (o: EventOption) => {
     setSelected(o.id);
@@ -164,7 +165,14 @@ export function EventCard({ run }: { run: RunState }) {
     setPending(pending);
   };
 
-  const titleParams = { name: subjectName ?? '', names: subjectNames, dest: destName(t, run) };
+  const sw = ev.id === 'CME' || ev.id === 'FC-CME' ? swParams(run, active.instanceId) : null;
+  const titleParams = {
+    name: subjectName ?? '',
+    names: subjectNames,
+    dest: destName(t, run),
+    days: ev.kind === 'forecast' ? forecastDays(run, m.minute, ev.id, active.instanceId) : 0,
+    ...(sw ?? {}),
+  };
   return (
     <section className={`event-card kind-${ev.kind}`} aria-labelledby="event-title">
       <header className="event-head">
@@ -184,6 +192,14 @@ export function EventCard({ run }: { run: RunState }) {
         <p>
           <RichText text={t(`ev.${ev.id}.body`, titleParams)} />
         </p>
+        {sw?.link && (
+          <p className="sw-source">
+            <span className="sw-badge">NASA DONKI</span>{' '}
+            <a href={sw.link} target="_blank" rel="noopener noreferrer">
+              {t('sw.open')} ↗
+            </a>
+          </p>
+        )}
         {ev.id === 'RETURN-01' ? <ReturnChecklist run={run} /> : <KnownFacts run={run} eventId={ev.id} />}
         {ev.research.length > 0 && (
           <div className="research-links">

@@ -10,11 +10,15 @@ import { eventOf, optionState, returnStatus, successChance, suggestCrew } from '
 import { deserialize, serialize } from './save';
 import { SCENARIOS, SURFACE_START_MINUTE, scenarioFor } from './scenarios';
 import { WATER_PER_KG_O2, tickHour, makeHooks } from './sim';
-import { launchAnyway, must, play, prepared, type Policy } from './testkit';
+import { launchAnyway, must, play, prepared, startPreps, type Policy } from './testkit';
+import { buildBigEvents, bigStatus, prepStatusKey } from './bigevents';
+import { crewNames, nameVariety } from './characters';
+import { SOL_TO_EARTH, clockDrift, earthMinutesElapsed, lunarSun } from './time';
 import type { RunState } from './types';
 
-const carefulMoon: Policy = { 'OUT-01': ['full'], 'MOON-01': ['calibrate'], 'MOON-02': ['patch', 'replace'], 'MOON-03': ['waterWall', 'shelterNow'], 'RETURN-01': ['balanced'], 'RETURN-02': ['spare'] };
-const carefulMars: Policy = { 'OUT-01': ['full'], 'MARS-01': ['swapFilter'], 'MARS-02': ['eco'], 'MARS-03': ['replant'], 'RETURN-01': ['balanced'], 'RETURN-02': ['spare'] };
+const PREPS = ['radiator', 'insulate', 'clean', 'stow', 'mast', 'berm', 'spares', 'zone', 'beacon'];
+const carefulMoon: Policy = { PREP: PREPS, 'OUT-01': ['full'], 'MOON-01': ['calibrate'], 'MOON-02': ['patch', 'replace'], 'MOON-03': ['waterWall', 'shelterNow'], 'RETURN-01': ['balanced'], 'RETURN-02': ['spare'] };
+const carefulMars: Policy = { PREP: PREPS, 'OUT-01': ['full'], 'MARS-01': ['swapFilter'], 'MARS-02': ['eco'], 'MARS-03': ['replant'], 'RETURN-01': ['balanced'], 'RETURN-02': ['spare'] };
 
 function toSurface(run: RunState): RunState {
   let r = launchAnyway(run);
@@ -32,11 +36,22 @@ describe('characters', () => {
     expect(createRun(124, 'en').candidates).not.toEqual(a.candidates);
   });
 
-  it('generates 12 candidates with unique ids and every trait at least once', () => {
-    const c = generateCandidates(9);
-    expect(c).toHaveLength(12);
-    expect(new Set(c.map((x) => x.id)).size).toBe(12);
-    expect(new Set(c.map((x) => x.traitId)).size).toBe(10);
+  it('generates 16 candidates with unique ids, unique names and every one of the 15 traits', () => {
+    for (const seed of [9, 10, 11]) {
+      const c = generateCandidates(seed);
+      expect(c).toHaveLength(16);
+      expect(new Set(c.map((x) => x.id)).size).toBe(16);
+      expect(new Set(c.map((x) => x.name)).size).toBe(16);
+      expect(new Set(c.map((x) => x.traitId)).size).toBe(15);
+    }
+  });
+
+  it('name generator: no shared first or family names in a crew, large variety', () => {
+    const n = crewNames(3, 16);
+    expect(new Set(n.map((x) => x.split(' ')[0])).size).toBe(16);
+    expect(new Set(n.map((x) => x.split(' ')[1])).size).toBe(16);
+    expect(nameVariety()).toBeGreaterThan(1500);
+    expect(createRun(1, 'tr').player.name).not.toBe(createRun(2, 'tr').player.name);
   });
 
   it('keeps a shared skill budget so no candidate tops every skill', () => {
@@ -273,15 +288,19 @@ describe('resource accounting', () => {
 });
 
 describe('schedule & variety', () => {
-  it('is deterministic per seed, varies across seeds, keeps 2–3 events a day for the 7-day demo', () => {
+  it('is deterministic per seed, varies across seeds and spreads events over the 30 days', () => {
     const a = buildSchedule(7, SCENARIOS.mars);
     expect(buildSchedule(7, SCENARIOS.mars)).toEqual(a);
     const sigs = new Set([1, 2, 3, 4, 5, 6].map((seed) => buildSchedule(seed, SCENARIOS.mars).map((e) => e.eventId).join(',')));
     expect(sigs.size).toBeGreaterThan(3);
-    expect(a.length).toBeGreaterThanOrEqual(12);
-    for (const id of ['MARS-01', 'MARS-02', 'MARS-03', 'CROP']) expect(a.map((e) => e.eventId)).toContain(id);
+    expect(a.length).toBeGreaterThanOrEqual(18);
+    for (const id of ['MARS-01', 'MARS-03', 'CROP']) expect(a.map((e) => e.eventId)).toContain(id);
     const days = new Set(a.map((e) => Math.floor(e.atMinute / 1440)));
-    expect(days.size).toBe(7);
+    expect(days.size).toBeGreaterThanOrEqual(15);
+    expect(Math.max(...a.map((e) => e.atMinute)) / 1440).toBeGreaterThan(22); // the last week is not empty
+    // repeats get their own instance id (decision rolls are bound to it)
+    const ids = a.map((e) => e.instanceId ?? e.eventId);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('site-specific events only appear at their site', () => {
@@ -401,11 +420,11 @@ describe('policies (deterministic fixtures)', () => {
     }
   });
 
-  it('an empty cargo bay leads to a harder, partial return on Mars', () => {
-    const r = play(prepared({ dest: 'mars', seed: 42 }), { 'OUT-01': ['rest'], 'MARS-01': ['ration'], 'MARS-02': ['eco'], 'MARS-03': ['salvage'], 'RETURN-01': ['balanced', 'wait', 'ration'] });
-    const before = r.mission!.decisions.find((d) => d.eventId === 'RETURN-01' && d.optionId === 'ration');
-    expect(before).toBeDefined();
-    expect(computeOutcome(r).rating).toBe('partial');
+  it('an empty cargo bay leads to a harder return on Mars (not a full success)', () => {
+    for (const seed of [1, 42, 777]) {
+      const r = play(prepared({ dest: 'mars', seed }), { 'OUT-01': ['rest'], 'MARS-01': ['ration'], 'MARS-02': ['eco'], 'MARS-03': ['salvage'], 'EMG-O2': ['cutLoads'], 'RETURN-01': ['balanced', 'wait', 'ration'] });
+      expect(computeOutcome(r).rating).not.toBe('success');
+    }
   });
 
   it('ignoring an oxygen shortage follows a warned, explained chain to loss (standard) or evacuation (explorer)', () => {
@@ -444,5 +463,120 @@ describe('policies (deterministic fixtures)', () => {
   it('return checklist reflects reserves', () => {
     const r = play(prepared({ dest: 'moon', seed: 42, cargo: { food: 2 } }), carefulMoon);
     expect(returnStatus(r, r.mission!).lines.find((l) => l.key === 'crew')!.ok).toBe(true);
+  });
+});
+
+describe('30-day mission: countdowns, preparation, time', () => {
+  const crewOf = (run: RunState) => [run.player, ...run.crewIds.map((id) => run.candidates.find((c) => c.id === id)!)];
+
+  it('places the predictable big events per site, deterministically, with forecasts before hits', () => {
+    for (const seed of [1, 2, 3]) {
+      const eq = prepared({ seed, dest: 'moon', site: 'equator' });
+      const a = buildBigEvents(seed, scenarioFor('moon', 'equator'), crewOf(eq));
+      expect(buildBigEvents(seed, scenarioFor('moon', 'equator'), crewOf(eq))).toEqual(a);
+      const night = a.find((b) => b.kind === 'night')!;
+      expect(night.startAt / 1440).toBeGreaterThan(14);
+      expect(night.startAt / 1440).toBeLessThan(15.5);
+      expect((night.endAt - night.startAt) / 1440).toBeGreaterThan(14);
+      expect(a.some((b) => b.kind === 'meteor') && a.some((b) => b.kind === 'resupply')).toBe(true);
+      const pol = buildBigEvents(seed, scenarioFor('moon', 'polar'), crewOf(eq));
+      expect(pol.some((b) => b.kind === 'dark')).toBe(true);
+      expect(pol.some((b) => b.kind === 'night')).toBe(false);
+      expect(buildBigEvents(seed, scenarioFor('mars', 'summer'), crewOf(eq)).filter((b) => b.kind === 'storm')).toHaveLength(2);
+      expect(buildBigEvents(seed, scenarioFor('mars', 'spring'), crewOf(eq)).filter((b) => b.kind === 'storm')).toHaveLength(1);
+      for (const b of [...a, ...pol]) expect(b.announceAt).toBeLessThan(b.startAt);
+    }
+  });
+
+  it('a communications officer gets every warning one day earlier', () => {
+    const run = prepared({ seed: 4, dest: 'mars', site: 'summer' });
+    const crew = crewOf(run);
+    const s = scenarioFor('mars', 'summer');
+    const base = buildBigEvents(4, s, crew.map((c) => ({ ...c, traitId: 'mechanic' as const })));
+    const comms = buildBigEvents(4, s, crew.map((c, i) => ({ ...c, traitId: i === 1 ? ('comms' as const) : ('mechanic' as const) })));
+    for (let i = 0; i < base.length; i++) {
+      expect(comms[i].startAt).toBe(base[i].startAt);
+      expect(comms[i].announceAt).toBeLessThanOrEqual(base[i].announceAt - 1440 + 1e-9);
+    }
+  });
+
+  it('preparation tasks: only during the countdown, once, with crew time, and they change the hit', () => {
+    let r = toSurface(prepared({ seed: 3, dest: 'mars', site: 'summer' }));
+    const storm = r.mission!.big.find((b) => b.kind === 'storm')!;
+    expect(applyCommand(r, { type: 'prep', bigId: storm.id, actionId: 'stow', crewIds: ['player', 'c01'] }).error).toBe('err.prepClosed');
+    // run to the forecast
+    while (r.mission!.activeEvent?.eventId !== 'FC-STORM') {
+      const ev = r.mission!.activeEvent;
+      if (ev) {
+        const def = eventOf(ev.eventId);
+        const o = def.options.find((x) => optionState(r, x, ev).available)!;
+        r = must(r, { type: 'resolve', instanceId: ev.instanceId, optionId: o.id, crewIds: suggestCrew(r, o) });
+      } else r = must(r, { type: 'advance', minutes: 60 });
+    }
+    expect(r.mission!.activeEvent?.eventId).toBe('FC-STORM');
+    r = must(r, { type: 'resolve', instanceId: r.mission!.activeEvent!.instanceId, optionId: 'plan', crewIds: [] });
+    expect(bigStatus(storm, r.mission!.minute)).toBe('countdown');
+    const o = eventOf('PREP-storm').options.find((x) => x.id === 'stow')!;
+    const crew = suggestCrew(r, o);
+    r = must(r, { type: 'prep', bigId: storm.id, actionId: 'stow', crewIds: crew });
+    expect(r.mission!.flags[prepStatusKey(storm.id, 'stow')]).toBe('doing');
+    expect(r.mission!.crew.filter((c) => c.taskId).length).toBe(2);
+    expect(applyCommand(r, { type: 'prep', bigId: storm.id, actionId: 'stow', crewIds: crew }).error).toBe('err.alreadyResolved');
+    for (let i = 0; i < 3 && !r.mission!.activeEvent; i++) r = must(r, { type: 'advance', minutes: 60 });
+    expect(r.mission!.flags['prep.storm.stow']).toBe(true);
+    expect(r.mission!.flags[prepStatusKey(storm.id, 'stow')]).toBe('done');
+  });
+
+  it('lunar night: no sunlight, fission keeps the base alive; a clean radiator keeps full power', () => {
+    const eq = scenarioFor('moon', 'equator');
+    expect(eq.solarKW(12, 20)).toBe(0);
+    expect(eq.solarKW(12, 3)).toBeGreaterThan(3);
+    expect(eq.baseKW).toBeGreaterThan(0);
+    expect(scenarioFor('moon', 'polar').baseKW).toBe(0);
+    const set = lunarSun(14 * 1440);
+    expect(set.up).toBe(true);
+    expect(lunarSun(20 * 1440).up).toBe(false);
+    for (const radiator of [true, false]) {
+      const run = play(prepared({ seed: 5, dest: 'moon', site: 'equator', cargo: { food: 2, parts: 1 } }), { PREP: radiator ? ['radiator', 'insulate'] : [], NIGHT: ['hibernate'] });
+      const night = run.mission!.decisions.find((d) => d.eventId === 'NIGHT');
+      expect(night).toBeDefined();
+      const prepped = run.mission!.decisions.some((d) => d.eventId === 'PREP-night' && d.optionId === 'radiator' && d.success);
+      const hit = run.mission!.journal.find((j) => j.key === 'journal.radiatorOk' || j.key === 'journal.radiatorDusty')!;
+      expect(hit.key).toBe(prepped ? 'journal.radiatorOk' : 'journal.radiatorDusty');
+      expect(run.mission!.journal.some((j) => j.key === 'journal.dawn')).toBe(true);
+    }
+  });
+
+  it('records one history row per day for the debrief chart and recap', () => {
+    const run = play(prepared({ seed: 8, dest: 'moon', cargo: { food: 2, parts: 1, sealant: 1 } }), carefulMoon);
+    const h = run.mission!.history;
+    expect(h[0].day).toBe(0);
+    expect(h.at(-1)!.day).toBe(30);
+    expect(new Set(h.map((x) => x.day)).size).toBe(h.length);
+  });
+
+  it('time awareness: a Mars hour is 1.0275 Earth hours; Moon clocks gain 58.7 µs a day', () => {
+    expect(SOL_TO_EARTH).toBeCloseTo(1.0275, 4);
+    const mars = { ...prepared({ dest: 'mars' }) };
+    const moon = { ...prepared({ dest: 'moon' }) };
+    const tenDays = SURFACE_START_MINUTE + 10 * 1440;
+    expect(earthMinutesElapsed(mars, tenDays) - 10 * 1440).toBeCloseTo(10 * 1440 * 0.0275, -1);
+    expect(earthMinutesElapsed(moon, tenDays)).toBe(10 * 1440);
+    expect(clockDrift(moon, tenDays)).toEqual({ unit: 'us', value: 587 });
+  });
+
+  it('the water emergency offers a decision before the tanks run dry', () => {
+    const r = structuredClone(toSurface(prepared({ dest: 'mars', seed: 2 })));
+    const m = r.mission!;
+    m.queue = [];
+    m.resources.waterL = 6;
+    m.systems.waterRecycler = 30;
+    const out = must(r, { type: 'advance', minutes: 180 });
+    expect(out.mission!.activeEvent?.eventId).toBe('EMG-WATER');
+  });
+
+  it('prep helper used by the balance policies never errors', () => {
+    const r = toSurface(prepared({ dest: 'moon', site: 'equator' }));
+    expect(() => startPreps(r, PREPS)).not.toThrow();
   });
 });

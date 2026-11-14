@@ -2,7 +2,8 @@
 // never changes resources. Lines live in i18n under `chat.<id>` with {a} and {b} speaker names.
 import { Rng, deriveSeed } from './rng';
 import { activeCrew, characterById, log } from './rules';
-import type { MissionState, RunState, TraitId } from './types';
+import { bigStatus } from './bigevents';
+import type { BigKind, MissionState, RunState, TraitId } from './types';
 
 type ChatDef = {
   id: string;
@@ -20,6 +21,8 @@ const moon = (r: RunState) => r.destination === 'moon';
 const mars = (r: RunState) => r.destination === 'mars';
 const bat = (m: MissionState) => m.resources.batteryKWh / m.resources.batteryCapKWh;
 const always = () => true;
+const coming = (m: MissionState, kind: BigKind) => m.big.some((b) => b.kind === kind && bigStatus(b, m.minute) === 'countdown');
+const day = (m: MissionState) => Math.floor(m.minute / 1440) + 1;
 
 export const CHATS: ChatDef[] = [
   { id: 'coffee', when: (_r, _m, h) => h >= 7 && h <= 9 },
@@ -72,6 +75,22 @@ export const CHATS: ChatDef[] = [
   { id: 'marsMagnet', when: mars },
   { id: 'coverTalk', when: mars },
   { id: 'seasonTalk', when: (r) => r.site === 'summer', weight: 2 },
+  // 30-day mission: countdowns, time, new specialists
+  { id: 'stormComing', when: (_r, m) => coming(m, 'storm'), weight: 5 },
+  { id: 'nightComing', when: (_r, m) => coming(m, 'night'), weight: 5 },
+  { id: 'meteorComing', when: (_r, m) => coming(m, 'meteor'), weight: 5 },
+  { id: 'resupplyComing', when: (_r, m) => coming(m, 'resupply'), weight: 4 },
+  { id: 'darkComing', when: (_r, m) => coming(m, 'dark'), weight: 5 },
+  { id: 'lunarNightTalk', when: (_r, m) => m.big.some((b) => b.kind === 'night' && bigStatus(b, m.minute) === 'active'), weight: 4 },
+  { id: 'commsLink', trait: 'comms', when: always, weight: 2 },
+  { id: 'powerGrid', trait: 'power', when: always, weight: 2 },
+  { id: 'chemLoop', trait: 'chemist', when: always, weight: 2 },
+  { id: 'nutriMeal', trait: 'nutrition', when: always, weight: 2 },
+  { id: 'roverDrive', trait: 'rover', when: always, weight: 2 },
+  { id: 'solClock', when: mars, weight: 2 },
+  { id: 'moonClock', when: moon, weight: 2 },
+  { id: 'halfway', when: (_r, m) => day(m) >= 15 && day(m) <= 16, weight: 6 },
+  { id: 'lastWeek', when: (_r, m) => day(m) >= 23 && day(m) <= 25, weight: 6 },
 ];
 
 /** Every few daytime hours, two crew members talk about what is happening. */

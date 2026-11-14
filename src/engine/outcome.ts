@@ -1,5 +1,5 @@
 import { activeCrew, characterById } from './rules';
-import { SCENARIOS } from './scenarios';
+import { scenarioFor } from './scenarios';
 import type { DecisionRecord, Echo, RunState } from './types';
 
 export type Rating = 'success' | 'partial' | 'aborted' | 'lost';
@@ -15,14 +15,20 @@ export type Outcome = {
   lessons: string[];
   /** why the rating is not a full success (i18n keys) */
   reasons: string[];
-  demoDays: number;
-  targetDays: number;
+  missionDays: number;
+  /** days actually spent on the surface */
+  daysOnSurface: number;
+  harvests: number;
+  /** big events that hit, and how many of their preparation tasks were completed */
+  bigEvents: { id: string; kind: string; preps: number }[];
+  decisions: number;
+  chats: number;
 };
 
 /** Debrief summary derived only from recorded state (no new randomness). */
 export function computeOutcome(run: RunState): Outcome {
   const m = run.mission!;
-  const s = SCENARIOS[run.destination!];
+  const s = scenarioFor(run.destination!, run.site);
   const home = m.ended?.reason === 'complete' || m.ended?.reason === 'aborted' ? activeCrew(m).map((c) => c.id) : [];
   const evacuated = m.crew.filter((c) => c.status === 'evacuated').map((c) => c.id);
   const lost = m.crew.filter((c) => c.status === 'deceased').map((c) => c.id);
@@ -54,6 +60,8 @@ export function computeOutcome(run: RunState): Outcome {
   if (m.flags.waterRation || m.decisions.some((d) => d.eventId === 'MARS-01')) lessons.push('lesson.water');
   if (m.decisions.some((d) => d.eventId === 'MOON-03')) lessons.push('lesson.radiation');
   if (m.decisions.some((d) => d.eventId === 'MARS-02')) lessons.push('lesson.dust');
+  if (m.decisions.some((d) => d.eventId.startsWith('PREP-'))) lessons.push('lesson.countdown');
+  if (m.decisions.some((d) => d.eventId === 'NIGHT')) lessons.push('lesson.night');
   if (m.harvests > 0 || m.decisions.some((d) => d.eventId === 'MARS-03')) lessons.push('lesson.food');
   lessons.unshift(m.echoes.length ? 'lesson.prep' : 'lesson.prepNone');
 
@@ -65,10 +73,16 @@ export function computeOutcome(run: RunState): Outcome {
     science: Math.round(m.resources.science),
     keyDecisions,
     echoes: m.echoes,
-    lessons: lessons.slice(0, 4),
+    lessons: lessons.slice(0, 5),
     reasons,
-    demoDays: s.demoDays,
-    targetDays: s.campaignTargetDays,
+    missionDays: s.missionDays,
+    daysOnSurface: Math.min(s.missionDays, Math.max(0, Math.round(((m.ended?.minute ?? m.minute) - 360) / 1440 * 10) / 10)),
+    harvests: m.harvests,
+    bigEvents: m.big
+      .filter((b) => m.resolved.includes(`${b.hitEventId}@${b.id}`))
+      .map((b) => ({ id: b.id, kind: b.kind, preps: m.decisions.filter((d) => d.instanceId.startsWith(`PREP-${b.kind}@${b.id}:`) && d.success).length })),
+    decisions: m.decisions.filter((d) => !d.eventId.startsWith('FC-')).length,
+    chats: m.journal.filter((j) => j.tone === 'chat').length,
   };
 }
 

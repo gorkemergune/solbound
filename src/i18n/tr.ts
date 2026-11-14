@@ -1,12 +1,12 @@
 import type { BaseDict, Dict } from './en';
 import { moreTr } from './more_tr';
+import { more2Tr } from './more2_tr';
+import { more3Tr } from './more3_tr';
 
 // Türkçe metinler. Her anahtar en.ts ile aynı olmak zorundadır (tip denetimi zorlar).
 const trBase: BaseDict = {
   'app.name': 'Solbound',
   'app.tagline': 'Kiminle gittiğin, yanına ne aldığın ve birbirinizi nasıl koruduğun; eve nasıl döneceğinizi belirler.',
-  'app.demoBadge': 'Demo: planlanan {target} yüzey gününün {days} günü',
-  'app.demoNote': 'Bu sürüm kısaltılmış 7 günlük bir görev oynatır. 30 günlük tam kampanya proje hedefidir ve henüz tamamlanmadı.',
   'app.footer': 'METU NASA Space Apps Challenge 2026 için bağımsız öğrenci projesi. Resmî bir NASA ürünü değildir.',
   'app.language': 'Dil',
   'app.skip': 'İçeriğe geç',
@@ -125,7 +125,6 @@ const trBase: BaseDict = {
   'dest.mars': 'Mars',
   'dest.moon.tag': 'Eve yakın, hiç havası yok',
   'dest.mars.tag': 'Eve uzak, ince ve tozlu hava',
-  'dest.moon.p1': 'Uzun süre güneş alan kutup bölgesi: demo boyunca güneş enerjisi kararlı.',
   'dest.moon.p2': 'Atmosfer yok: radyasyon ve sıcak, toz hâlindeki regolit başlıca tehlikeler.',
   'dest.moon.p3': 'Dünya’ya telsiz sinyali yaklaşık bir saniyede gider; Görev Kontrol canlı yardım edebilir.',
   'dest.mars.p1': 'Güneşli gündüzler ve karanlık geceler: her geceyi batarya taşır.',
@@ -133,11 +132,9 @@ const trBase: BaseDict = {
   'dest.mars.p3': 'Dünya’ya mesajlar her yönde dakikalar sürer; ekip kendi başına karar verir.',
   'dest.select': '{dest} hedefini seç',
   'dest.selected': 'Seçildi',
-  'dest.events': 'Demo olayları: {list}',
 
   'crew.heading': 'Üç ekip arkadaşı seç',
   'crew.sub': 'Seninle birlikte dört kişi olursunuz. Bir alandaki güç, her zaman başka bir alandan bir şey götürür.',
-  'crew.count': '{n} / 3 seçildi',
   'crew.add': 'Ekibe ekle',
   'crew.remove': 'Çıkar',
   'crew.full': 'Ekip dolu',
@@ -210,7 +207,6 @@ const trBase: BaseDict = {
   'item.moxie.incompatible': 'Ay’da işlenecek karbondioksit atmosferi yok',
 
   'brief.heading': 'Görev brifingi',
-  'brief.goal': 'Hedef: üssü {days} demo günü boyunca yönet, dönüşü hazırla ve ekibi eve getir.',
   'brief.crew': 'Dört kişilik ekip',
   'brief.cargo': 'Yük ({used} kg)',
   'brief.cargoNone': 'Ek yük yok',
@@ -290,7 +286,6 @@ const trBase: BaseDict = {
   'gh.full.desc': '1,3 kW · en hızlı büyüme',
   'gh.eco.desc': '0,5 kW · daha yavaş büyüme',
   'gh.off.desc': '0 kW · büyüme yok',
-  'gh.compressed': 'Bitki büyümesi demo için zamanda sıkıştırılmıştır.',
 
   'crewPanel.title': 'Ekip',
   'crewPanel.health': 'Sağlık',
@@ -651,7 +646,6 @@ const trBase: BaseDict = {
   'debrief.rating.partial': 'Evdeyiz, ama bedeli oldu',
   'debrief.rating.aborted': 'Görev erken bitti, ekip güvende',
   'debrief.rating.lost': 'Görev kaybedildi',
-  'debrief.rating.success.desc': 'Ekibin demo görevini tamamladı ve güvenle döndü.',
   'debrief.rating.partial.desc': 'Ekip geri döndü ama her şey yolunda gitmedi.',
   'debrief.rating.aborted.desc': 'Görev yerine güvenliği seçtin. Bu gerçek bir komutan kararıdır.',
   'debrief.rating.lost.desc': 'Görev devam edemedi. Aşağıdaki günlük nedenler zincirini gösteriyor.',
@@ -670,12 +664,10 @@ const trBase: BaseDict = {
   'reason.aborted': 'Yüzey görevi erken bitirildi.',
   'reason.ration': 'Kontrol listesinin istediği rezervler olmadan kalktınız ve eve dönüşte kısıtlamaya gittiniz.',
   'reason.rough': 'Dönüş yolundaki güç arızası giderilmedi; yolculuk soğuk ve herkes için zor geçti.',
-  'cargo.unused': 'Bu hedefin demo olaylarında kullanılmıyor',
   'debrief.lessons': 'Sistemlerin öğrettikleri',
   'debrief.timeline': 'Görev günlüğü',
   'debrief.retrySame': 'Aynı seed ile tekrar dene',
   'debrief.retryNew': 'Yeni görev',
-  'debrief.demo': 'Bu {days} günlük demoydu. {target} günlük tam kampanya hâlâ geliştiriliyor.',
   'debrief.chanceWas': 'şans %{pct}',
   'debrief.success': 'başarılı oldu',
   'debrief.failed': 'istendiği gibi gitmedi',
@@ -763,7 +755,6 @@ const trBase: BaseDict = {
   'R-COMMS.inGame': 'Ay’da bazı görevler “Dünya’dan canlı yardım” bonusu alır. Mars’ta bu bonus yoktur.',
   'R-CROPS.title': 'Dünya’dan uzakta yiyecek yetiştirmek',
   'R-CROPS.claim': 'NASA bitki araştırmacıları, ürünlerin su, ışık, besin ve yetişme ortamına ihtiyaç duyduğunu belirtir; Mars toz fırtınaları güneş ışığının çoğunu engelleyebilir ve yerel su tuzlu olur. Patates, tatlı patates, buğday ve soya aday ürünlerdir.',
-  'R-CROPS.inGame': 'Seranın ışıklar için enerjiye ve biraz suya ihtiyacı var. Bir hasat demoya sığsın diye büyüme sıkıştırılmıştır.',
   'R-MOXIE.title': 'Mars havasından oksijen',
   'R-MOXIE.claim': 'NASA’nın Perseverance üzerindeki MOXIE deneyi, karbondioksitçe zengin Mars atmosferinden oksijen elde etti: toplam 122 g; en verimli anında saatte yaklaşık 12 g.',
   'R-MOXIE.inGame': 'Yükündeki CO₂→O₂ ünitesi büyütülmüş, hayalî bir sürümdür (saatte 40 g). Yalnız Mars’ta çalışır; çünkü Ay’da CO₂ atmosferi yoktur.',
@@ -771,15 +762,12 @@ const trBase: BaseDict = {
   'rule.o2Production': 'Yaşam desteği saatte en fazla 0,16 kg O₂ üretir; her kişi saatte 0,035 kg kullanır.',
   'rule.electrolysisWater': 'Her kg O₂ için yaklaşık 1,125 kg su (H₂O ve O₂’nin mol kütlelerinden).',
   'rule.recycler85': 'Geri kazanım, tam durum ve tam enerjide ekip suyunun %85’ini geri kazanır.',
-  'rule.dustLight': 'Demo fırtınası yaklaşık 34 saat boyunca güneş ışığının %50’sini engeller.',
   'rule.dustSettle': 'Çöken toz, fırtına boyunca panel durumunu saatte %0,5 düşürür.',
   'rule.batteryLoss': '%90 şarj verimi, en fazla 8 kW şarj/deşarj.',
   'rule.priority': 'Öncelik: yaşam desteği, ısıl kontrol, su, CO₂ ünitesi, sera.',
-  'rule.moonPolar': 'Kutup demo bölgesi kararlı ve alçak güneş alır; 7 demo günü Ay gündüzünde geçer, Ay gecesi demoda yok.',
   'rule.moonThermal': 'Isıl kontrol güneşte 1,8 kW çeker.',
   'rule.radIndex': 'Olay sırasında dışarıda: saatte +6 endeks ve −4 sağlık. Sığınak maruziyeti azaltır.',
   'rule.earthBonus': 'Ay’da “canlı yardım” işaretli görevler +%8 başarı alır.',
-  'rule.growthCompressed': 'Tam güçte yeşillik yaklaşık 3, soya 4, patates 4,5 demo gününde olgunlaşır.',
   'rule.moxieScaled': 'Hayalî ünite: 0,3 kW karşılığında saatte 0,04 kg O₂.',
 
   'err.launched': 'Kalkıştan sonra hazırlık kilitlenir.',
@@ -804,4 +792,4 @@ const trBase: BaseDict = {
   'err.cargo.overCapacity': 'Bu, fırlatma kütlesini aşar.',
 };
 
-export const tr: Dict = { ...trBase, ...moreTr };
+export const tr: Dict = { ...trBase, ...moreTr, ...more2Tr, ...more3Tr };

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { CAMPAIGN_TARGET_DAYS, DEMO_DAYS } from '../../engine';
 import { MissionPatch, Panorama } from '../art/Panorama';
 import { LangSwitch, Modal } from '../components/common';
 import { RichText } from '../components/RichText';
+import { SpaceWeatherCard } from '../components/SpaceWeatherCard';
 import { useStore } from '../store';
 
 function Logo() {
@@ -95,7 +95,7 @@ export function TitleScreen() {
           </div>
           {saveNotice && <p className="notice">{t(saveNotice === 'corrupt' ? 'title.saveCorrupt' : 'title.saveVersion')}</p>}
           {!storageOk && <p className="notice">{t('title.noStorage')}</p>}
-          <p className="demo-badge">{t('app.demoBadge', { days: DEMO_DAYS, target: CAMPAIGN_TARGET_DAYS })}</p>
+          <p className="demo-badge">{t('app.missionBadge')}</p>
         </div>
         <aside className="fact-card" aria-live="polite">
           <span className="fact-kicker">{t('title.facts')}</span>
@@ -111,6 +111,10 @@ export function TitleScreen() {
         </aside>
       </main>
 
+      <div className="title-sw">
+        <SpaceWeatherCard />
+      </div>
+
       <section className="features" aria-label={t('title.how')}>
         {FEATURES.map((f, i) => (
           <article key={f.id} className="feature">
@@ -123,7 +127,7 @@ export function TitleScreen() {
       </section>
 
       <footer className="title-footer fine">
-        <p>{t('app.demoNote')}</p>
+        <p>{t('app.missionNote')}</p>
         <p>
           {t('app.footer')} {t('title.dataNote')}
         </p>

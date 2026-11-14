@@ -1,6 +1,7 @@
 // Helpers shared by engine tests and the balance report. Pure; no test framework imports.
 import { applyCommand, createRun, type Command } from './commands';
 import { eventOf, optionState, suggestCrew } from './rules';
+import { PREP_EVENT, bigStatus, prepStatusKey } from './bigevents';
 import type { DestinationId, ItemId, Mode, RunState, SiteId } from './types';
 
 export function must(run: RunState, cmd: Command): RunState {
@@ -22,7 +23,7 @@ export function prepared(opts: { seed?: number; dest: DestinationId; site?: Site
   return { ...run, phase: 'briefing' };
 }
 
-/** Policy: ordered preferences per event id; first available option wins. */
+/** Policy: ordered preferences per event id; first available option wins. `PREP` lists prep tasks to start during countdowns. */
 export type Policy = Record<string, string[]>;
 
 /** Launch ignoring the mass budget (fixtures choose cargo explicitly). */
@@ -50,10 +51,30 @@ export function play(run: RunState, policy: Policy, stepMinutes = 60): RunState 
       continue;
     }
     if (r.phase === 'surface') {
+      r = startPreps(r, policy.PREP ?? []);
       r = must(r, { type: 'advance', minutes: stepMinutes });
       continue;
     }
     throw new Error(`stuck in ${r.phase}`);
+  }
+  return r;
+}
+
+/** Start every listed preparation task that is possible right now (used by policies). */
+export function startPreps(run: RunState, actions: string[]): RunState {
+  let r = run;
+  const m = r.mission!;
+  if (m.activeEvent || !actions.length) return r;
+  for (const b of m.big) {
+    if (bigStatus(b, m.minute) !== 'countdown') continue;
+    const ev = eventOf(PREP_EVENT[b.kind]);
+    for (const id of actions) {
+      const o = ev.options.find((x) => x.id === id);
+      if (!o || r.mission!.flags[prepStatusKey(b.id, id)]) continue;
+      if (!optionState(r, o, null).available) continue;
+      const res = applyCommand(r, { type: 'prep', bigId: b.id, actionId: id, crewIds: suggestCrew(r, o) });
+      if (!res.error) r = res.state;
+    }
   }
   return r;
 }

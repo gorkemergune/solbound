@@ -3,8 +3,12 @@ import type { DestinationId, Environment, GreenhouseMode, Resources, SiteId, Sys
 export const MINUTES_PER_DAY = 1440;
 /** Surface clock starts on day 1 at 06:00. */
 export const SURFACE_START_MINUTE = 6 * 60;
-export const DEMO_DAYS = 7;
-export const CAMPAIGN_TARGET_DAYS = 30;
+/** The full surface mission. */
+export const MISSION_DAYS = 30;
+/** Hours in one lunar day-night cycle (synodic month, about 29.5 Earth days; R-MOON-NIGHT). */
+export const LUNAR_CYCLE_H = 29.53 * 24;
+/** Equator landing just after local sunrise: fraction of the lunar cycle already passed at day 1 00:00. */
+export const EQUATOR_PHASE0 = 0.02;
 
 /** An event that may be drawn into a run's schedule. */
 export type PoolEntry = {
@@ -13,10 +17,12 @@ export type PoolEntry = {
   days: [number, number];
   weight: number;
   sites?: SiteId[];
+  /** how many times it can appear in one run (default 1) */
+  max?: number;
 };
 
 /**
- * Everything numeric here is a GAMEPLAY PARAMETER chosen for a readable 7-day demo, not a NASA value.
+ * Everything numeric here is a GAMEPLAY PARAMETER chosen for a readable 30-day mission, not a NASA value.
  * The qualitative relationships (Mars dust dims sunlight, Mars nights need a battery, the lunar
  * south pole has long low sunlight, lunar noon is very hot, southern summer brings Mars' big storms)
  * are sourced on the research cards.
@@ -24,12 +30,13 @@ export type PoolEntry = {
 export type ScenarioDefinition = {
   id: DestinationId;
   site: SiteId;
-  demoDays: number;
-  campaignTargetDays: number;
+  missionDays: number;
   commDelay: 'seconds' | 'minutes';
   start: { resources: Resources; systems: Systems; env: Environment; greenhouseMode: GreenhouseMode };
   /** kW from a clean, healthy array at a given hour of a given surface day (before dust / panel condition). */
   solarKW: (hourOfDay: number, day: number) => number;
+  /** constant generation independent of sunlight (gameplay fission unit at the lunar equator) */
+  baseKW: number;
   loads: {
     lifeSupport: number;
     thermal: (hourOfDay: number, day: number) => number;
@@ -70,44 +77,61 @@ const baseEnv: Environment = {
   wilt: 0,
   darkHours: 0,
   heatHours: 0,
+  darkFactor: 0,
+  fissionLoss: 0,
 };
 
 const common = {
-  demoDays: DEMO_DAYS,
-  campaignTargetDays: CAMPAIGN_TARGET_DAYS,
+  missionDays: MISSION_DAYS,
+  baseKW: 0,
   battery: { maxRateKW: 8, chargeEfficiency: 0.9 },
   o2ProductionKgH: 0.16,
   o2PerCrewKgH: 0.035,
   waterPerCrewLH: 0.17,
-  recyclerRecovery: 0.85,
+  recyclerRecovery: 0.93,
 };
 
+// Day windows span the whole month; `max` lets routine events come back (with a new instance id).
 const MOON_COMMON_POOL: PoolEntry[] = [
-  { eventId: 'MOON-S1', days: [1, 4], weight: 3 },
-  { eventId: 'MOON-S2', days: [2, 7], weight: 3 },
-  { eventId: 'WQ', days: [2, 6], weight: 3 },
-  { eventId: 'SAB', days: [2, 5], weight: 3 },
-  { eventId: 'QUAKE', days: [2, 7], weight: 3 },
-  { eventId: 'MICRO', days: [2, 7], weight: 3 },
-  { eventId: 'HAYFEVER', days: [2, 7], weight: 3 },
-  { eventId: 'MOON-SAR', days: [3, 6], weight: 2 },
-  { eventId: 'ISRU', days: [2, 6], weight: 2 },
-  { eventId: 'ICE', days: [2, 6], weight: 4, sites: ['polar'] },
-  { eventId: 'SHADOW', days: [2, 6], weight: 4, sites: ['polar'] },
-  { eventId: 'HEAT', days: [4, 7], weight: 5, sites: ['equator'] },
+  { eventId: 'MOON-S1', days: [2, 28], weight: 3, max: 3 },
+  { eventId: 'MOON-S2', days: [2, 28], weight: 3, max: 2 },
+  { eventId: 'WQ', days: [3, 27], weight: 3, max: 2 },
+  { eventId: 'SAB', days: [2, 8], weight: 4 },
+  { eventId: 'QUAKE', days: [3, 28], weight: 3, max: 2 },
+  { eventId: 'MICRO', days: [3, 28], weight: 3, max: 2 },
+  { eventId: 'HAYFEVER', days: [3, 20], weight: 3 },
+  { eventId: 'MOON-SAR', days: [5, 26], weight: 2 },
+  { eventId: 'ISRU', days: [3, 27], weight: 3, max: 2 },
+  { eventId: 'ICE', days: [3, 27], weight: 4, sites: ['polar'], max: 3 },
+  { eventId: 'SHADOW', days: [3, 12], weight: 3, sites: ['polar'] },
+  { eventId: 'HEAT', days: [6, 9], weight: 9, sites: ['equator'] },
 ];
 
 const MARS_COMMON_POOL: PoolEntry[] = [
-  { eventId: 'MARS-S1', days: [1, 4], weight: 3 },
-  { eventId: 'MARS-S2', days: [2, 7], weight: 3 },
-  { eventId: 'WQ', days: [2, 7], weight: 3 },
-  { eventId: 'SAB', days: [2, 5], weight: 3 },
-  { eventId: 'WIND', days: [1, 4], weight: 3 },
-  { eventId: 'GEAR', days: [3, 7], weight: 3 },
-  { eventId: 'BRINE', days: [2, 7], weight: 3 },
-  { eventId: 'MARS-SAR', days: [3, 6], weight: 2 },
-  { eventId: 'DEVIL', days: [2, 7], weight: 3, sites: ['spring'] },
+  { eventId: 'MARS-S1', days: [2, 28], weight: 3, max: 3 },
+  { eventId: 'MARS-S2', days: [2, 28], weight: 3, max: 3 },
+  { eventId: 'WQ', days: [3, 27], weight: 3, max: 2 },
+  { eventId: 'SAB', days: [2, 8], weight: 4 },
+  { eventId: 'WIND', days: [2, 26], weight: 3, max: 2 },
+  { eventId: 'GEAR', days: [4, 28], weight: 3, max: 2 },
+  { eventId: 'BRINE', days: [3, 27], weight: 3, max: 3 },
+  { eventId: 'MARS-SAR', days: [5, 26], weight: 2 },
+  { eventId: 'DEVIL', days: [2, 28], weight: 3, sites: ['spring'], max: 2 },
 ];
+
+/** Equator: sun elevation (as sin) from the lunar cycle; negative = night. */
+export function equatorSun(hourOfDay: number, day: number): number {
+  const t = (day - 1) * 24 + hourOfDay + 0.5;
+  return Math.sin(2 * Math.PI * (t / LUNAR_CYCLE_H + EQUATOR_PHASE0));
+}
+
+/** Surface minute of the equator sunset / next sunrise (derived from the cycle above). */
+export function equatorSunset(): number {
+  return Math.round((0.5 - EQUATOR_PHASE0) * LUNAR_CYCLE_H * 60);
+}
+export function equatorSunrise(): number {
+  return Math.round((1 - EQUATOR_PHASE0) * LUNAR_CYCLE_H * 60);
+}
 
 function moon(site: 'polar' | 'equator'): ScenarioDefinition {
   const polar = site === 'polar';
@@ -117,17 +141,28 @@ function moon(site: 'polar' | 'equator'): ScenarioDefinition {
     site,
     commDelay: 'seconds',
     start: {
-      resources: { batteryKWh: 26, batteryCapKWh: 40, o2Kg: 20, waterL: 130, foodCrewDays: 26, science: 0 },
+      // a pre-landed pantry and water tanks (gameplay) — 30 days for four people does not fit in one lander
+      resources: { batteryKWh: 26, batteryCapKWh: 40, o2Kg: 20, waterL: polar ? 240 : 300, foodCrewDays: 64, science: 0 },
       systems: { lifeSupport: 100, waterRecycler: 100, solar: 100, seal: 100, greenhouseHealth: 90, greenhouseGrowth: 40, shelter: 45 },
       env: { ...baseEnv },
       greenhouseMode: 'full',
     },
-    // Polar ridge: the Sun skims the horizon, steady output. Equator: landing at lunar dawn, the Sun
-    // climbs toward noon over the demo (a lunar day lasts about two Earth weeks, R-MOON-NIGHT).
-    solarKW: polar ? () => 5.6 : (_h, day) => Math.min(7.4, 4.6 + 0.45 * day),
+    // Polar ridge: the Sun skims the horizon, steady output (known dark periods come as a countdown).
+    // Equator: landing at lunar dawn; noon around day 8, sunset around day 15, then a ~14.5-day night
+    // that ends just before departure (R-MOON-NIGHT). Tracking panels give most power once the Sun is up.
+    solarKW: polar ? () => 5.6 : (h, day) => {
+      const e = equatorSun(h, day);
+      return e > 0 ? 7.6 * Math.min(1, 0.35 + e) : 0;
+    },
+    // Gameplay assumption inspired by NASA's Fission Surface Power project: a small pre-placed unit at the equator.
+    baseKW: polar ? 0 : 5,
     loads: {
       lifeSupport: 1.6,
-      thermal: polar ? () => 1.5 : (_h, day) => 1.0 + 0.28 * day,
+      // equator: heat rejection peaks at lunar noon; at night the base must heat itself
+      thermal: polar ? () => 1.5 : (h, day) => {
+        const e = equatorSun(h, day);
+        return e > 0 ? 1.0 + 2.2 * e * e : 2.6;
+      },
       water: 0.5,
       greenhouse: { full: 1.3, eco: 0.5, off: 0 },
       moxie: 0,
@@ -139,14 +174,15 @@ function moon(site: 'polar' | 'equator'): ScenarioDefinition {
     mandatory: [
       { eventId: 'MOON-01', days: [1, 1], weight: 1 },
       { eventId: 'CROP', days: [1, 1], weight: 1 },
-      { eventId: 'MOON-02', days: [2, 4], weight: 1 },
-      { eventId: 'MOON-03', days: [4, 6], weight: 1 },
+      { eventId: 'MOON-02', days: [3, 8], weight: 1 },
+      // a solar particle event cannot be forecast days ahead, so it stays a surprise
+      { eventId: 'MOON-03', days: [9, 26], weight: 1 },
     ],
     pool: MOON_COMMON_POOL.filter((p) => !p.sites || p.sites.includes(site)),
   };
 }
 
-/** Simple daylight curve: sunrise 05:00, sunset 19:00 (demo simplification of a 24.6 h sol). */
+/** Daylight curve over one sol: sunrise 05:00, sunset 19:00 local time (the clock runs in Mars hours). */
 function marsCurve(peak: number) {
   return (hour: number) => {
     const mid = hour + 0.5;
@@ -163,7 +199,7 @@ function mars(site: 'spring' | 'summer'): ScenarioDefinition {
     site,
     commDelay: 'minutes',
     start: {
-      resources: { batteryKWh: 45, batteryCapKWh: 60, o2Kg: 22, waterL: 150, foodCrewDays: 36, science: 0 },
+      resources: { batteryKWh: 45, batteryCapKWh: 60, o2Kg: 22, waterL: 320, foodCrewDays: 72, science: 0 },
       systems: { lifeSupport: 100, waterRecycler: 100, solar: 100, seal: 100, greenhouseHealth: 90, greenhouseGrowth: 40, shelter: 55 },
       env: { ...baseEnv },
       greenhouseMode: 'full',
@@ -183,10 +219,9 @@ function mars(site: 'spring' | 'summer'): ScenarioDefinition {
     moxieKgH: 0.04,
     returnNeeds: { foodPerCrew: 6, o2PerCrew: 4, waterPerCrew: 20, batteryKWh: 20 },
     mandatory: [
-      { eventId: 'MARS-01', days: [1, 2], weight: 1 },
+      { eventId: 'MARS-01', days: [1, 3], weight: 1 },
       { eventId: 'CROP', days: [1, 1], weight: 1 },
-      { eventId: 'MARS-02', days: [2, 4], weight: 1 },
-      { eventId: 'MARS-03', days: [5, 6], weight: 1 },
+      { eventId: 'MARS-03', days: [8, 22], weight: 1 },
     ],
     pool: MARS_COMMON_POOL.filter((p) => !p.sites || p.sites.includes(site)),
   };
@@ -203,5 +238,5 @@ export function scenarioFor(dest: DestinationId, site: SiteId | null): ScenarioD
 export const SCENARIOS: Record<DestinationId, ScenarioDefinition> = { moon: moon('polar'), mars: mars('spring') };
 
 export function surfaceEndMinute(s: ScenarioDefinition): number {
-  return s.demoDays * MINUTES_PER_DAY;
+  return s.missionDays * MINUTES_PER_DAY;
 }

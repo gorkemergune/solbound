@@ -6,6 +6,7 @@ import { LangSwitch } from '../components/common';
 import { useStore } from '../store';
 import { echoText } from '../text';
 import { JournalList } from './Mission';
+import { RecapReel } from './Recap';
 import { Brand } from './Title';
 
 export function DebriefScreen() {
@@ -38,7 +39,9 @@ export function DebriefScreen() {
             <p className="kind-tag kt-result">{t(`dest.${r.destination}`)}</p>
             <h2>{t(`debrief.rating.${o.rating}`)}</h2>
             <p>{t(`debrief.rating.${o.rating}.desc`)}</p>
-            <p className="science">{t('debrief.science', { v: o.science })}</p>
+            <p className="science">
+              {t('debrief.days', { d: Math.round(o.daysOnSurface) })} · {t('debrief.science', { v: o.science })}
+            </p>
             {o.rating !== 'success' && o.reasons.length > 0 && (
               <div className="reasons">
                 <strong>{t('debrief.why')}</strong>
@@ -51,6 +54,8 @@ export function DebriefScreen() {
             )}
           </div>
         </section>
+
+        <RecapReel run={r} />
 
         <section className="card">
           <h2>{t('debrief.crew')}</h2>
@@ -124,7 +129,6 @@ export function DebriefScreen() {
           {showLog && <JournalList run={r} />}
         </section>
 
-        <p className="demo-badge center">{t('debrief.demo', { days: o.demoDays, target: o.targetDays })}</p>
         <div className="launch-row">
           <button type="button" className="btn big" onClick={() => startNew(r.mode, r.seed)}>
             ↻ {t('debrief.retrySame')}

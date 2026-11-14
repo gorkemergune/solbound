@@ -4,12 +4,14 @@ import { RESEARCH_BY_ID } from './research';
 import { availableCrewFor, characterById, echoesFor, eventOf, log, optionState, scenarioOf, successChance, applyEffects, type Ctx } from './rules';
 import { SITES, SURFACE_START_MINUTE, scenarioFor } from './scenarios';
 import { buildSchedule } from './schedule';
-import { advanceTime, makeHooks, openEvent, rollFor, checkEmergencies } from './sim';
+import { PREP_EVENT, bigQueue, bigStatus, buildBigEvents, prepStatusKey } from './bigevents';
+import { bulletinPlan, firstSep, type SpaceWeatherSnapshot } from './spaceweather';
+import { advanceTime, makeHooks, openEvent, rollFor, checkEmergencies, snapshot } from './sim';
 import type { Character, CoverMode, CrewState, DestinationId, GreenhouseMode, ItemId, Locale, MissionState, Mode, Phase, Routine, RunState, SiteId, Speed } from './types';
 import { PREP_PHASES } from './types';
 
-export const SCHEMA_VERSION = 2;
-export const CONTENT_VERSION = '0.3.0-demo7';
+export const SCHEMA_VERSION = 4;
+export const CONTENT_VERSION = '0.5.0-donki';
 export const REQUIRED_COMPANIONS = 3;
 
 export type Command =
@@ -31,7 +33,9 @@ export type Command =
   | { type: 'setGreenhouse'; mode: GreenhouseMode }
   | { type: 'setCover'; mode: CoverMode }
   | { type: 'setRoutine'; crewId: string; routine: Routine }
-  | { type: 'study'; researchId: string };
+  | { type: 'study'; researchId: string }
+  | { type: 'prep'; bigId: string; actionId: string; crewIds: string[] }
+  | { type: 'setSpaceWeather'; snapshot: SpaceWeatherSnapshot | null };
 
 export type CommandResult = { state: RunState; error?: string };
 
@@ -55,6 +59,7 @@ export function createRun(seed: number, locale: Locale, mode: Mode = 'standard')
     manualPause: false,
     speed: 1,
     launched: false,
+    spaceWeather: null,
   };
 }
 
@@ -107,6 +112,13 @@ function createMission(run: RunState): MissionState {
   resources.foodCrewDays += 12 * (items.food ?? 0);
   if ((items.shield ?? 0) > 0) systems.shelter = Math.min(100, systems.shelter + 30);
   const crew = ['player', ...run.crewIds].map((id) => newCrewState(run, id));
+  const sw = run.spaceWeather;
+  const big = buildBigEvents(run.seed, s, flyingCrew(run), sw);
+  const queue = [...buildSchedule(run.seed, s), ...bigQueue(big)].sort((a, b) => a.atMinute - b.atMinute);
+  // Moon: a real solar energetic particle event in the window replaces the random particle-event timing
+  const sep = sw && s.id === 'moon' ? firstSep(sw) : null;
+  if (sep !== null) for (const q of queue) if (q.eventId === 'MOON-03') q.atMinute = sep;
+  queue.sort((a, b) => a.atMinute - b.atMinute);
   return {
     minute: 0,
     resources,
@@ -118,7 +130,7 @@ function createMission(run: RunState): MissionState {
     env: { ...s.start.env },
     crew,
     items,
-    queue: buildSchedule(run.seed, s),
+    queue,
     activeEvent: null,
     resolved: [],
     decisions: [],
@@ -129,6 +141,9 @@ function createMission(run: RunState): MissionState {
     research: [],
     echoes: [],
     harvests: 0,
+    big,
+    bulletins: sw ? bulletinPlan(sw, s.id) : [],
+    history: [],
     chatUsed: [],
     nextChatMinute: SURFACE_START_MINUTE + 60,
     lastPower: null,
@@ -174,6 +189,7 @@ function reduce(run: RunState, cmd: Command): { error?: string } {
       fresh.cargo = run.cargo;
       fresh.phase = run.phase;
       fresh.revision = run.revision;
+      fresh.spaceWeather = run.spaceWeather;
       if (keepName) {
         fresh.player.name = keepName;
         fresh.player.customName = true;
@@ -237,6 +253,7 @@ function reduce(run: RunState, cmd: Command): { error?: string } {
       if (run.phase !== 'landing') return { error: 'err.phase' };
       run.phase = 'surface';
       run.mission!.minute = SURFACE_START_MINUTE;
+      snapshot(run, 0);
       log(run.mission!, run, 'journal.surfaceStart', 'info');
       return {};
     }
@@ -272,6 +289,12 @@ function reduce(run: RunState, cmd: Command): { error?: string } {
       c.routine = cmd.routine;
       return {};
     }
+    case 'prep':
+      return startPrep(run, cmd.bigId, cmd.actionId, cmd.crewIds);
+    case 'setSpaceWeather':
+      if (!prep) return { error: 'err.launched' };
+      run.spaceWeather = cmd.snapshot;
+      return {};
     case 'study': {
       const m = run.mission;
       if (!m) return { error: 'err.phase' };
@@ -354,6 +377,58 @@ export function resolveDecision(run: RunState, instanceId: string, optionId: str
   }
 
   afterDecision(run, hooks);
+  return {};
+}
+
+/**
+ * Start a preparation task for an announced big event. Same rules as a decision option (requirements,
+ * crew, cost, success roll bound to the seed), but it runs while the clock keeps going.
+ */
+export function startPrep(run: RunState, bigId: string, actionId: string, crewIds: string[]): { error?: string } {
+  const m = run.mission;
+  if (!m || run.phase !== 'surface') return { error: 'err.phase' };
+  if (m.activeEvent) return { error: 'err.noEvent' };
+  const big = m.big.find((b) => b.id === bigId);
+  if (!big || bigStatus(big, m.minute) !== 'countdown') return { error: 'err.prepClosed' };
+  const ev = eventOf(PREP_EVENT[big.kind]);
+  const option = ev.options.find((o) => o.id === actionId);
+  if (!option) return { error: 'err.unknownOption' };
+  const statusKey = prepStatusKey(bigId, actionId);
+  if (m.flags[statusKey]) return { error: 'err.alreadyResolved' };
+  const state = optionState(run, option, null);
+  if (!state.available) return { error: 'err.optionLocked' };
+  const unique = [...new Set(crewIds)];
+  if (option.crew) {
+    if (unique.length !== option.crew.count) return { error: 'err.crewCount' };
+    const free = availableCrewFor(run, option).map((c) => c.id);
+    if (!unique.every((id) => free.includes(id))) return { error: 'err.crewUnavailable' };
+  } else if (unique.length) return { error: 'err.crewCount' };
+
+  const instanceId = `${ev.id}@${bigId}`;
+  const hooks = makeHooks(run);
+  const ctx: Ctx = { run, m, scenario: scenarioOf(run), event: null, assigned: unique };
+  let probability: number | null = null;
+  let roll: number | null = null;
+  let success = true;
+  if (option.check) {
+    probability = successChance(run, option.check, unique).p;
+    roll = rollFor(run, instanceId, actionId);
+    success = roll < probability;
+  }
+  m.decisions.push({ instanceId: `${instanceId}:${actionId}`, eventId: ev.id, optionId: actionId, crewIds: unique, minute: m.minute, phase: run.phase, probability, roll, success, weight: option.weight });
+  for (const e of echoesFor(run, ev, option, unique)) m.echoes.push(e);
+  log(m, run, 'journal.prepStarted', 'info', { action: `ev.${ev.id}.${actionId}.label`, names: unique.map((id) => characterById(run, id).name).join(' & ') });
+  applyEffects(ctx, option.cost ?? [], hooks);
+  if (option.hours) {
+    m.flags[statusKey] = 'doing';
+    const taskId = `${instanceId}:${actionId}`;
+    m.tasks.push({ id: taskId, eventInstanceId: instanceId, eventId: ev.id, optionId: actionId, crewIds: unique, startedAt: m.minute, endsAt: m.minute + option.hours * 60, success });
+    for (const id of unique) m.crew.find((x) => x.id === id)!.taskId = taskId;
+  } else {
+    applyEffects(ctx, success ? option.success : (option.failure ?? option.success), hooks);
+    m.flags[statusKey] = success ? 'done' : 'failed';
+    log(m, run, `ev.${ev.id}.${actionId}.${success ? 'ok' : 'fail'}`, success ? 'good' : 'warn', { names: '' });
+  }
   return {};
 }
 

@@ -1,5 +1,6 @@
 import type { CoverMode, Crop, DestinationId, Environment, GreenhouseMode, H2Mode, ItemId, ResourceKey, SiteId, SkillKey, SystemKey, TraitId } from './types';
 import { EVENTS_2 } from './events2';
+import { EVENTS_3 } from './events3';
 
 // ---------- Declarative event DSL ----------
 
@@ -20,6 +21,10 @@ export type Cond =
   | { kind: 'site'; sites: SiteId[] }
   | { kind: 'cropIs'; crop: Crop }
   | { kind: 'cropNot'; crop: Crop }
+  | { kind: 'sysMin'; key: SystemKey; min: number }
+  | { kind: 'envMin'; key: keyof Environment; min: number }
+  | { kind: 'batteryCapMin'; min: number }
+  | { kind: 'dest'; dest: DestinationId }
   | { kind: 'any'; of: Cond[] };
 
 export type CrewTarget = 'all' | 'assigned' | 'subject' | 'unassigned';
@@ -36,6 +41,7 @@ export type Effect =
   | { kind: 'shelter'; target: CrewTarget; value: boolean }
   | { kind: 'rest'; target: CrewTarget }
   | { kind: 'use'; item: ItemId; qty?: number }
+  | { kind: 'addItem'; item: ItemId; qty: number }
   | { kind: 'evacuate'; target: 'subject' }
   | { kind: 'harvestNow'; fraction: number }
   | { kind: 'wait'; hours: number }
@@ -72,7 +78,7 @@ export type EventOption = {
   research?: string[];
 };
 
-export type EventKind = 'main' | 'small' | 'emergency' | 'transit';
+export type EventKind = 'main' | 'small' | 'emergency' | 'transit' | 'forecast' | 'prep';
 
 export type EventDef = {
   id: string;
@@ -466,6 +472,12 @@ const MARS_02: EventDef = {
         { kind: 'env', key: 'dustHours', value: 24 },
       ],
     },
+    // stowed gear and covered panel edges: dust settles more slowly (prepared during the countdown)
+    {
+      kind: 'if',
+      cond: { kind: 'flag', key: 'prep.storm.stow', value: true },
+      then: [{ kind: 'if', cond: { kind: 'site', sites: ['summer'] }, then: [{ kind: 'env', key: 'dustSettle', value: 0.35 }], else: [{ kind: 'env', key: 'dustSettle', value: 0.22 }] }, { kind: 'note', key: 'journal.stowed', tone: 'good' }],
+    },
   ],
   options: [
     {
@@ -788,6 +800,7 @@ const EMG_MED: EventDef = {
 export const EVENTS: EventDef[] = [
   OUT_01, MOON_01, MOON_S1, MOON_02, MOON_S2, MOON_03, MARS_01, MARS_S1, MARS_02, MARS_S2, MARS_03, RETURN_01, RETURN_02, EMG_O2, EMG_MED,
   ...EVENTS_2,
+  ...EVENTS_3,
 ];
 
 export const EVENT_BY_ID: Record<string, EventDef> = Object.fromEntries(EVENTS.map((e) => [e.id, e]));
@@ -802,7 +815,7 @@ export function itemUsage(itemId: ItemId): Record<DestinationId, string[]> {
       (o) => refs(o.requires) || o.check?.items?.some((i) => i.item === itemId) || JSON.stringify(o.success).includes(`"item":"${itemId}"`),
     );
     if (!uses) continue;
-    if (ev.id === 'EMG-O2' || ev.id === 'EMG-MED' || ev.id === 'HARVEST') {
+    if (ev.id === 'EMG-O2' || ev.id === 'EMG-MED' || ev.id === 'HARVEST' || ev.id === 'RESUPPLY' || ev.id === 'EMG-WATER' || ev.id === 'PREP-resupply') {
       out.moon.push(ev.id);
       out.mars.push(ev.id);
       continue;

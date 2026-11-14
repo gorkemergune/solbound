@@ -1,5 +1,5 @@
 import type { KeyboardEvent } from 'react';
-import { characterById, hourOfDay, type RunState } from '../../engine';
+import { characterById, hourOfDay, lunarSun, scenarioOf, type RunState } from '../../engine';
 import { Rng } from '../../engine/rng';
 import { lookFor } from './Portrait';
 
@@ -29,11 +29,24 @@ const TASK_MODULE: Record<string, ModuleId | 'outside'> = {
   MICRO: 'outside',
   HAYFEVER: 'hab',
   'MOON-SAR': 'outside',
+  'EMG-WATER': 'water',
+  'PREP-storm': 'solar',
+  'PREP-night': 'outside',
+  'PREP-meteor': 'outside',
+  'PREP-dark': 'solar',
+  'PREP-resupply': 'outside',
+  NIGHT: 'hab',
+  METEOR: 'outside',
+  DARK: 'solar',
+  RESUPPLY: 'outside',
   ISRU: 'outside',
   ICE: 'outside',
   SHADOW: 'solar',
   HEAT: 'outside',
 };
+
+/** Habitat windows: one per crew member (player + three companions). */
+const HAB_WINDOWS = [475, 505, 535, 565];
 
 const MODULE_X: Record<ModuleId | 'outside', number> = {
   solar: 150,
@@ -116,6 +129,14 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
   const plantColor = lerpColor('#8a6a3a', '#5fbf5a', sys.greenhouseHealth / 100);
   const generating = (power?.generationKW ?? 0) > 0.5;
   const isNight = hour >= 22 || hour < 6;
+  const scen = scenarioOf(run);
+  const equator = run.site === 'equator';
+  const lunar = equator ? lunarSun(minute) : null;
+  const lunarNight = !!lunar && !lunar.up;
+  const fission = scen.baseKW > 0;
+  const mast = !!m.flags['prep.dark.mast'];
+  const berm = !!m.flags['prep.meteor.berm'];
+  const lander = m.resolved.some((id) => id.startsWith('RESUPPLY@'));
   const airlockClosed = !!m.flags.airlockClosed;
 
   const keyAct = (id: ModuleId) => (e: KeyboardEvent) => {
@@ -193,8 +214,12 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
         <g>
           <circle cx="830" cy="90" r="34" fill="#2a6fb8" />
           <path d="M812 78c10-8 24-6 28 4-6 2-14 8-24 6z" fill="#dfeedd" opacity="0.8" />
-          <circle cx="60" cy="300" r="13" fill="#fffbe6" />
-          <circle cx="60" cy="300" r="34" fill="#fffbe6" opacity="0.07" />
+          {!lunarNight && (
+            <g transform={lunar ? `translate(${60 + lunar.cycle * 2 * 880} ${300 - Math.sin(lunar.cycle * 2 * Math.PI) * 220})` : 'translate(60 300)'}>
+              <circle r="13" fill="#fffbe6" />
+              <circle r="34" fill="#fffbe6" opacity="0.07" />
+            </g>
+          )}
         </g>
       )}
       {mars && sky.night < 0.8 && <circle cx={180 + ((hour - 5) / 14) * 640} cy={250 - Math.sin(Math.PI * Math.min(1, Math.max(0, (hour - 5) / 14))) * 170} r="13" fill="#fff6e0" opacity={(1 - env.dust) * (1 - sky.night)} />}
@@ -209,6 +234,17 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
       {/* far hills */}
       <path d={mars ? 'M0 360 L90 300 L170 340 L300 270 L420 340 L520 310 L640 350 L760 290 L880 340 L1000 320 V520 H0z' : 'M0 370 C 150 340, 260 360, 400 344 S 700 330, 1000 352 V520 H0z'} fill={mars ? '#9a4f30' : '#6c7178'} opacity="0.8" />
       <path d="M0 400 C 200 388, 400 404, 600 394 S 850 386, 1000 398 V520 H0z" fill="url(#bs-ground)" />
+      {/* ---- fission unit (equator, gameplay) with its radiator fins ---- */}
+      {fission && (
+        <g pointerEvents="none" transform="translate(742 282) scale(0.62)">
+          <path d="M-14 106v-60h28v60z" fill="#c9d2dc" stroke="#9aa4b0" strokeWidth="2" />
+          <path d="M-14 50l-16-30M14 50l16-30" stroke="#9aa4b0" strokeWidth="3" />
+          {[0, 1, 2, 3].map((i) => (
+            <rect key={i} x={-28 + i * 14} y={-6 - (i % 2) * 6} width="10" height="30" fill={m.env.fissionLoss > 0 ? '#9a8b7a' : '#dfe6ee'} stroke="#9aa4b0" />
+          ))}
+          <circle cx="0" cy="70" r="5" fill={lunarNight ? '#ffb347' : '#5fd39a'} className={lunarNight ? 'blink' : undefined} />
+        </g>
+      )}
 
       {/* ---- solar array ---- */}
       <g {...mod('solar')}>
@@ -254,8 +290,8 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
       <g {...mod('hab')}>
         <path d="M444 406v-62c0-32 34-52 76-52s76 20 76 52v62z" fill="#eef2f6" stroke="#9aa4b0" strokeWidth="2.5" />
         <path d="M452 360h136" stroke="#c9d2dc" strokeWidth="2" />
-        {[478, 520, 562].map((x) => (
-          <rect key={x} x={x - 12} y="320" width="24" height="22" rx="8" fill={isNight ? '#ffd27a' : '#2e4a6b'} opacity={isNight ? 0.95 : 1} />
+        {HAB_WINDOWS.map((x) => (
+          <rect key={x} x={x - 11} y="321" width="22" height="21" rx="7" fill={isNight ? '#ffd27a' : '#2e4a6b'} opacity={isNight ? 0.95 : 1} />
         ))}
         <rect x="500" y="372" width="40" height="34" rx="6" fill="#c9d2dc" />
         <text x="520" y="394" textAnchor="middle" fontSize="12" fontWeight="700" fill="#2e4a6b">HAB</text>
@@ -307,6 +343,28 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
         {sys.shelter >= 70 && <path d="M902 400c4-26 18-42 34-42" stroke="#4aa3df" strokeWidth="5" fill="none" opacity="0.8" />}
       </g>
 
+      {/* ---- mast array raised for the polar dark period ---- */}
+      {mast && (
+        <g pointerEvents="none" transform="translate(118 300)">
+          <path d="M0 110V-40" stroke="#9aa4b0" strokeWidth="4" />
+          <g transform="rotate(-12)">
+            <rect x="-34" y="-74" width="68" height="34" fill="#1f3f66" stroke="#9cc3ea" strokeWidth="2" />
+          </g>
+        </g>
+      )}
+      {/* ---- regolith berm (meteor shower prep) ---- */}
+      {berm && <path d="M300 420 C 360 392, 640 392, 720 420 Z" fill={mars ? '#8e4528' : '#6f747b'} opacity="0.9" pointerEvents="none" />}
+      {/* ---- delivered cargo lander ---- */}
+      {lander && (
+        <g pointerEvents="none" transform="translate(30 372)">
+          <path d="M-8 30l8-22h40l8 22" stroke="#9aa4b0" strokeWidth="3" fill="none" />
+          <rect x="2" y="-6" width="36" height="16" rx="3" fill="#e9edf2" stroke="#9aa4b0" />
+          <path d="M8 -6l12-12 12 12" fill="#f5b041" />
+        </g>
+      )}
+      {/* ---- lunar night: deep shadow on the ground ---- */}
+      {lunarNight && <rect y="380" width="1000" height="140" fill="#000814" opacity="0.45" pointerEvents="none" />}
+
       {/* ---- greenhouse cover (Mars) ---- */}
       {mars && (m.ghCover === 'closed' || (m.ghCover === 'auto' && isNight)) && (
         <path d="M732 406v-38a78 58 0 0 1 156 0v38z" fill="#c9b79a" stroke="#8a7a5f" strokeWidth="2.5" opacity="0.92" pointerEvents="none" />
@@ -342,7 +400,8 @@ export function BaseScene({ run, onInspect, label, moduleLabel }: { run: RunStat
       <g pointerEvents="none">
         {crewFigs.map(({ c, ch, color, place, busy, n }) => {
           if (place === 'inside') {
-            const x = 478 + n * 42;
+            // one window per person (four seats); a larger crew would share windows
+            const x = HAB_WINDOWS[n % HAB_WINDOWS.length] + (n >= HAB_WINDOWS.length ? 6 : 0);
             return (
               <g key={c.id} transform={`translate(${x} 336)`}>
                 <title>{ch.name}</title>

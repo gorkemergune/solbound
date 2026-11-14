@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  bigStatus,
   RESEARCH,
   RESEARCH_BY_ID,
   scenarioOf,
@@ -19,9 +20,10 @@ import { RichText } from '../components/RichText';
 import { EventCard, ResultCard } from '../components/EventCard';
 import { InfoTip, LangSwitch, Modal, StatBar, clockParts } from '../components/common';
 import { useLocale, useStore } from '../store';
-import { journalText } from '../text';
+import { journalText, swLink } from '../text';
 import { useMissionClock, type PauseReason } from '../useMissionClock';
 import { Brand } from './Title';
+import { CountdownChips, CrewAboard, PrepPanel, TimeAwareness } from './MissionExtras';
 
 // ---------------- transit (outbound / return flight) ----------------
 
@@ -54,7 +56,10 @@ export function TransitScreen({ direction }: { direction: 'out' | 'back' }) {
       <main id="main" className="transit-main">
         <div className="transit-scene">
           <TransitScene dest={r.destination!} direction={direction} progress={pending ? 1 : progress} />
-          <p className="transit-note fine">{t('transit.compressed')}</p>
+          <CrewAboard run={r} />
+          <p className="transit-note fine">
+            {t('transit.compressed')} {t(r.destination === 'mars' ? 'transit.realMars' : 'transit.realMoon')}
+          </p>
           {!arrived && !pending && (
             <button type="button" className="btn ghost skip" onClick={() => setProgress(target)}>
               {t('app.skip')} »
@@ -280,7 +285,7 @@ function ResourceStrip({ run }: { run: RunState }) {
   );
 }
 
-function Hud({ run, reason }: { run: RunState; reason: PauseReason }) {
+function Hud({ run, reason, onPlan }: { run: RunState; reason: PauseReason; onPlan: () => void }) {
   const { t, dispatch, quitToTitle } = useStore();
   const m = run.mission!;
   const s = scenarioOf(run);
@@ -305,9 +310,10 @@ function Hud({ run, reason }: { run: RunState; reason: PauseReason }) {
         </button>
         <div className="clock" aria-live="off">
           <span className="clock-dest">{t(`dest.${run.destination}`)}</span>
-          <span className="clock-day">{t('hud.dayOf', { day: Math.min(day, s.demoDays + 1), total: s.demoDays })}</span>
-          <span className="clock-time">{t('hud.time', { hh, mm })}</span>
-          <span className="clock-demo fine">{t('app.demoBadge', { days: s.demoDays, target: s.campaignTargetDays })}</span>
+          <span className="clock-day">{t(run.destination === 'mars' ? 'hud.sol' : 'hud.dayOf', { day: Math.min(day, s.missionDays), total: s.missionDays })}</span>
+          <span className="clock-time" title={t(run.destination === 'mars' ? 'time.localMars' : 'time.localMoon')}>
+            {t('hud.time', { hh, mm })}
+          </span>
         </div>
         <div className={`status ${surface && reason ? 'paused' : 'running'}`} role="status">
           <span className="status-dot" aria-hidden="true" />
@@ -319,6 +325,7 @@ function Hud({ run, reason }: { run: RunState; reason: PauseReason }) {
               {run.manualPause ? `▶ ${t('hud.resume')}` : `❚❚ ${t('hud.pause')}`}
             </button>
             <div className="speed" role="group" aria-label={t('hud.speed', { x: run.speed })}>
+              <span className="speed-label">{t('hud.speedLabel')}</span>
               {([1, 2, 4, 8, 16] as Speed[]).map((x) => (
                 <button key={x} type="button" className={run.speed === x ? 'on' : ''} aria-pressed={run.speed === x} onClick={() => dispatch({ type: 'setSpeed', speed: x })}>
                   {x}×
@@ -329,6 +336,12 @@ function Hud({ run, reason }: { run: RunState; reason: PauseReason }) {
         )}
         <LangSwitch compact />
       </div>
+      {run.mission && run.phase === 'surface' && (
+        <div className="hud-sub">
+          <TimeAwareness run={run} />
+          <CountdownChips run={run} onOpen={onPlan} />
+        </div>
+      )}
       <ResourceStrip run={run} />
     </header>
   );
@@ -518,6 +531,14 @@ export function JournalList({ run, limit }: { run: RunState; limit?: number }) {
             <span className="j-stamp">{stamp}</span>
             <span className="j-text">
               <RichText text={journalText(t, run, j)} />
+              {j.tone === 'sw' && swLink(run, j.params?.rec) && (
+                <>
+                  {' '}
+                  <a className="sw-link" href={swLink(run, j.params?.rec)!} target="_blank" rel="noopener noreferrer">
+                    NASA ↗
+                  </a>
+                </>
+              )}
             </span>
           </li>
         );
@@ -630,7 +651,7 @@ export function ResearchModal() {
   );
 }
 
-type Tab = 'base' | 'crew' | 'log' | 'research';
+type Tab = 'base' | 'prep' | 'crew' | 'log' | 'research';
 
 export function SurfaceScreen() {
   const { run, t, pending } = useStore();
@@ -640,11 +661,16 @@ export function SurfaceScreen() {
   const [tab, setTab] = useState<Tab>('base');
   const [inspect, setInspect] = useState<ModuleId | null>(null);
   const showEvent = !!m.activeEvent && !pending;
-  const s = scenarioOf(r);
   const crewActive = activeCrew(m).length;
+  // "Open the preparation plan" on a forecast card switches to the Plan tab
+  const lastDecision = m.decisions.at(-1);
+  useEffect(() => {
+    if (lastDecision?.eventId.startsWith('FC-') && lastDecision.optionId === 'plan') setTab('prep');
+  }, [lastDecision?.instanceId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const prepLive = m.big.some((b) => bigStatus(b, m.minute) === 'countdown');
   return (
     <div className={`surface theme-${r.destination}`}>
-      <Hud run={r} reason={reason} />
+      <Hud run={r} reason={reason} onPlan={() => setTab('prep')} />
       <main id="main" className="surface-main">
         <div className="scene-wrap">
           <div className="scene-stage">
@@ -665,7 +691,7 @@ export function SurfaceScreen() {
             </div>
           )}
           <div className="scene-caption fine">
-            {t(`phase.${r.phase}`)} · {crewActive}/4 · {t('app.demoBadge', { days: s.demoDays, target: s.campaignTargetDays })}
+            {t(`phase.${r.phase}`)} · {crewActive}/4 · {t(`site.${r.site}`)}
           </div>
           <section className="recent-log" aria-label={t('journal.title')}>
             <h3>{t('journal.title')}</h3>
@@ -674,15 +700,17 @@ export function SurfaceScreen() {
         </div>
         <aside className="side">
           <div className="tabs" role="tablist" aria-label={t('crewPanel.title')}>
-            {(['base', 'crew', 'log', 'research'] as Tab[]).map((x) => (
+            {(['base', 'prep', 'crew', 'log', 'research'] as Tab[]).map((x) => (
               <button key={x} role="tab" type="button" id={`tab-${x}`} aria-selected={tab === x} aria-controls={`panel-${x}`} className={tab === x ? 'on' : ''} onClick={() => setTab(x)}>
                 {t(`tabs.${x}`)}
                 {x === 'log' && m.journal.length > 0 && <span className="count">{m.journal.length}</span>}
+                {x === 'prep' && prepLive && <span className="count dot" aria-hidden="true">!</span>}
               </button>
             ))}
           </div>
           <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="tabpanel">
             {tab === 'base' && <BasePanel run={r} inspect={inspect} setInspect={setInspect} />}
+            {tab === 'prep' && <PrepPanel run={r} />}
             {tab === 'crew' && <CrewPanel run={r} />}
             {tab === 'log' && (
               <div className="panel-body">

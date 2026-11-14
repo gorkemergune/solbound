@@ -4,3 +4,8 @@ dist
 *.log
 test-results
 e2e-screens
+
+# local secrets (NASA API key)
+.env
+.env.*
+!.env.example

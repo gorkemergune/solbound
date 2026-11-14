@@ -1,7 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import {
-  DEMO_DAYS,
-  CAMPAIGN_TARGET_DAYS,
+  MISSION_DAYS,
   EVENT_BY_ID,
   ITEMS,
   ITEM_BY_ID,
@@ -28,6 +27,8 @@ import { Portrait } from '../art/Portrait';
 import { Landscape } from '../art/Scenes';
 import { InfoTip, LangSwitch, StatBar } from '../components/common';
 import { RichText } from '../components/RichText';
+import { SpaceWeatherCard } from '../components/SpaceWeatherCard';
+import { useSpaceWeather } from '../../live/useSpaceWeather';
 import { newSeed, useLocale, useStore } from '../store';
 import { Brand } from './Title';
 
@@ -272,17 +273,24 @@ function DestinationScreen() {
           );
         })}
       </div>
-      <p className="demo-badge">{t('app.demoBadge', { days: DEMO_DAYS, target: CAMPAIGN_TARGET_DAYS })}</p>
+      <p className="demo-badge">{t('app.missionBadge')}</p>
     </div>
   );
 }
 
 // ---------------- crew ----------------
 
-function CandidateCard({ c, selected, full }: { c: Character; selected: boolean; full: boolean }) {
+/**
+ * Details open and close only with the Details button (never on hover or focus), so several cards
+ * can stay open side by side for comparison. `allOpen` is the "show / hide all" switch.
+ */
+function CandidateCard({ c, selected, full, allOpen }: { c: Character; selected: boolean; full: boolean; allOpen: { v: boolean; n: number } }) {
   const { t, dispatch } = useStore();
   const locale = useLocale();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(allOpen.v);
+  useEffect(() => {
+    if (allOpen.n) setOpen(allOpen.v);
+  }, [allOpen]);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(c.name);
   useEffect(() => setDraft(c.name), [c.name]);
@@ -291,7 +299,7 @@ function CandidateCard({ c, selected, full }: { c: Character; selected: boolean;
     setEditing(false);
   };
   return (
-    <article className={`cand ${selected ? 'sel' : ''}`} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <article className={`cand ${selected ? 'sel' : ''} ${open ? 'open' : ''}`}>
       <div className="cand-top">
         <Portrait seed={c.portraitSeed} size={64} title={c.name} />
         <div className="cand-id">
@@ -318,11 +326,11 @@ function CandidateCard({ c, selected, full }: { c: Character; selected: boolean;
         </div>
       </div>
       <SkillRows c={c} compact />
-      <button type="button" className="link-btn" aria-expanded={open} onClick={() => setOpen(!open)} onFocus={() => setOpen(true)}>
-        {open ? t('crew.hideDetails') : t('crew.details')}
+      <button type="button" className="link-btn details-btn" aria-expanded={open} aria-controls={`cd-${c.id}`} onClick={() => setOpen(!open)}>
+        {open ? `▴ ${t('crew.hideDetails')}` : `▾ ${t('crew.details')}`}
       </button>
       {open && (
-        <div className="cand-details">
+        <div className="cand-details" id={`cd-${c.id}`}>
           <p>
             <strong>{t(`trait.${c.traitId}`)}:</strong> {t(`trait.${c.traitId}.desc`)}
           </p>
@@ -389,16 +397,23 @@ function CrewScreen() {
   const { run, t } = useStore();
   const r = run!;
   const full = r.crewIds.length >= 3;
+  const [allOpen, setAllOpen] = useState({ v: false, n: 0 });
   return (
     <div className="crew-screen">
       <div className="crew-head">
         <h1>{t('crew.heading')}</h1>
         <p className="muted">{t('crew.sub')}</p>
+        <div className="row gap crew-tools">
+          <span className="fine">{t('crew.count', { n: r.candidates.length })}</span>
+          <button type="button" className="btn small" aria-pressed={allOpen.v} onClick={() => setAllOpen((a) => ({ v: !a.v, n: a.n + 1 }))}>
+            {allOpen.v ? `▴ ${t('crew.hideAll')}` : `▾ ${t('crew.showAll')}`}
+          </button>
+        </div>
       </div>
       <div className="crew-layout">
         <div className="cand-grid">
           {r.candidates.map((c) => (
-            <CandidateCard key={c.id} c={c} selected={r.crewIds.includes(c.id)} full={full} />
+            <CandidateCard key={c.id} c={c} selected={r.crewIds.includes(c.id)} full={full} allOpen={allOpen} />
           ))}
         </div>
         <CrewSummary />
@@ -565,18 +580,33 @@ function BriefingScreen() {
   const pay = payloadOf(r);
   const used = pay.cargoKg;
   const [launching, setLaunching] = useState(false);
+  // attach the current NASA DONKI snapshot to the run; it is frozen at launch
+  const { snapshot } = useSpaceWeather();
+  useEffect(() => {
+    if (!r.launched && r.spaceWeather?.fetchedAt !== snapshot.fetchedAt) dispatch({ type: 'setSpaceWeather', snapshot });
+  }, [snapshot, r.launched, r.spaceWeather?.fetchedAt, dispatch]);
+  const sw = r.spaceWeather;
+  const cmeHere = sw ? sw.records.filter((x) => (dest === 'mars' ? x.arrivalMars : x.arrivalEarth)).length : 0;
   return (
     <div className={`briefing theme-${dest}`}>
       <div className="brief-banner">
         <Landscape dest={dest} />
         <div className="brief-banner-text">
           <h1>{t('brief.heading')}</h1>
-          <p>{t('brief.goal', { days: DEMO_DAYS })}</p>
+          <p>{t('brief.goal', { days: MISSION_DAYS })}</p>
           <p>
             <strong>{t(`site.${r.site}`)}</strong> · {t('brief.payload', { used: pay.totalKg, cap: pay.capacityKg })}
           </p>
-          <p className="demo-badge">{t('app.demoBadge', { days: DEMO_DAYS, target: CAMPAIGN_TARGET_DAYS })}</p>
+          <p className="demo-badge">{t('app.missionBadge')}</p>
+          {sw && (
+            <p className="sw-brief">
+              <span className="sw-badge">NASA DONKI</span> {t('sw.brief', { start: sw.rangeStart, end: sw.rangeEnd, source: t(`sw.source.${sw.source}`), dest: t(`dest.${dest}`), n: cmeHere })}
+            </p>
+          )}
         </div>
+      </div>
+      <div className="brief-sw">
+        <SpaceWeatherCard dest={dest} compact />
       </div>
       <div className="brief-grid">
         <section className="card">

@@ -5,11 +5,14 @@ import '@fontsource-variable/space-grotesk';
 import './ui/styles.css';
 import { App } from './ui/App';
 import { StoreProvider } from './ui/store';
+import { SpaceWeatherProvider } from './live/useSpaceWeather';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <StoreProvider>
-      <App />
-    </StoreProvider>
+    <SpaceWeatherProvider>
+      <StoreProvider>
+        <App />
+      </StoreProvider>
+    </SpaceWeatherProvider>
   </StrictMode>,
 );

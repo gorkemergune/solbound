@@ -121,7 +121,50 @@ export const RESEARCH: ResearchCard[] = [
   { id: 'R-MOON-POLE', appliesTo: ['moon'], kind: 'sourced', sources: [{ title: 'NASA Science — Shackleton Crater’s Illuminated Rim & Shadowed Interior', url: 'https://science.nasa.gov/resource/shackleton-craters-illuminated-rim-shadowed-interior/' }], accessedAt: '2026-11-14', unlocks: [], gameRules: ['moonPolar', 'shadow12'] },
   { id: 'R-MOONQUAKE', appliesTo: ['moon'], kind: 'sourced', sources: [{ title: 'NASA — Shrinking Moon Causing Moonquakes and Faults Near Lunar South Pole', url: 'https://www.nasa.gov/solar-system/moon/shrinking-moon-causing-moonquakes-and-faults-near-lunar-south-pole/' }], accessedAt: '2026-11-14', unlocks: [], gameRules: [] },
   { id: 'R-MICRO', appliesTo: ['moon'], kind: 'sourced', sources: [{ title: 'NASA Meteoroid Environment Office — About Lunar Impact Monitoring', url: 'https://www.nasa.gov/meteoroid-environment-office/about-lunar-impact-monitoring/' }], accessedAt: '2026-11-14', unlocks: [], gameRules: [] },
-  { id: 'R-MOON-NIGHT', appliesTo: ['moon'], kind: 'sourced', sources: [{ title: 'NASA Glenn — NASA’s Fission Surface Power Project Energizes Lunar Exploration', url: 'https://www.nasa.gov/centers-and-facilities/glenn/nasas-fission-surface-power-project-energizes-lunar-exploration/' }], accessedAt: '2026-11-14', unlocks: [], gameRules: [] },
+  { id: 'R-MOON-NIGHT', appliesTo: ['moon'], kind: 'sourced', sources: [{ title: 'NASA Glenn — NASA’s Fission Surface Power Project Energizes Lunar Exploration', url: 'https://www.nasa.gov/centers-and-facilities/glenn/nasas-fission-surface-power-project-energizes-lunar-exploration/' }], accessedAt: '2026-11-14', unlocks: [], gameRules: ['lunarCycle', 'nightLoads'] },
+  // ---- 30-day mission: countdown events and time ----
+  { id: 'R-FISSION', appliesTo: ['moon'], kind: 'gameplay', sources: [{ title: 'NASA Glenn — NASA’s Fission Surface Power Project Energizes Lunar Exploration', url: 'https://www.nasa.gov/centers-and-facilities/glenn/nasas-fission-surface-power-project-energizes-lunar-exploration/' }], accessedAt: '2026-11-14', unlocks: ['NIGHT:wasteHeat'], gameRules: ['fission4', 'radiatorDust'] },
+  { id: 'R-STORMWATCH', appliesTo: ['mars'], kind: 'sourced', sources: [{ title: 'NASA — “Storm Chasers” on Mars Searching for Dusty Secrets', url: 'https://www.nasa.gov/missions/storm-chasers-on-mars-searching-for-dusty-secrets/' }], accessedAt: '2026-11-14', unlocks: [], gameRules: ['stormNotice'] },
+  {
+    id: 'R-METEOR',
+    appliesTo: ['moon'],
+    kind: 'sourced',
+    sources: [
+      { title: 'NASA Meteoroid Environment Office — About Lunar Impact Monitoring', url: 'https://www.nasa.gov/meteoroid-environment-office/about-lunar-impact-monitoring/' },
+      { title: 'NASA NTRS — Lunar Impact Detections During the 2010 Geminid Meteor Shower', url: 'https://ntrs.nasa.gov/citations/20110015807' },
+    ],
+    accessedAt: '2026-11-14',
+    unlocks: [],
+    gameRules: ['meteorNotice'],
+  },
+  { id: 'R-RESUPPLY', appliesTo: ['moon', 'mars'], kind: 'gameplay', sources: [], accessedAt: '2026-11-14', unlocks: [], gameRules: ['resupplyContents'] },
+  {
+    id: 'R-DONKI',
+    appliesTo: ['moon', 'mars'],
+    kind: 'sourced',
+    sources: [
+      { title: 'NASA CCMC — DONKI (Space Weather Database Of Notifications, Knowledge, Information)', url: 'https://ccmc.gsfc.nasa.gov/tools/DONKI/' },
+      { title: 'NASA Open APIs — api.nasa.gov (DONKI endpoints)', url: 'https://api.nasa.gov/' },
+    ],
+    accessedAt: '2026-11-14',
+    unlocks: [],
+    gameRules: ['donkiMap'],
+  },
+  {
+    id: 'R-TIME',
+    appliesTo: ['moon', 'mars'],
+    kind: 'sourced',
+    sources: [
+      { title: 'NASA GISS — Mars24 Sunclock: Technical Notes on Mars Solar Time', url: 'https://www.giss.nasa.gov/tools/mars24/help/notes.html' },
+      { title: 'NASA — Lunar Time', url: 'https://www.nasa.gov/communicating-with-missions/lunar-time/' },
+      { title: 'NASA/JPL — Mars Global Surveyor: Questions About the Flight Plan (one-way light time)', url: 'https://mars.nasa.gov/mgs/faqs/faq_mplan.html' },
+      { title: 'NASA/JPL SSD — Approximate Positions of the Planets', url: 'https://ssd.jpl.nasa.gov/planets/approx_pos.html' },
+      { title: 'NASA/JPL — Horizons System (used to check the formula)', url: 'https://ssd.jpl.nasa.gov/horizons/' },
+    ],
+    accessedAt: '2026-11-14',
+    unlocks: [],
+    gameRules: ['marsClock', 'lightTime'],
+  },
   { id: 'R-MOON-O2', appliesTo: ['moon'], kind: 'sourced', sources: [{ title: 'NASA NTRS — Moon to Mars ISRU Status Update (Sanders, 2024)', url: 'https://ntrs.nasa.gov/api/citations/20240013906/downloads/M2M%20ISRU%20Status_SandersV2.pdf' }], accessedAt: '2026-11-14', unlocks: [], gameRules: ['isruYield'] },
 ];
 

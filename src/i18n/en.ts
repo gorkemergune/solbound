@@ -1,12 +1,12 @@
 // English strings. tr.ts must provide every key (enforced by the type checker).
 import { moreEn } from './more_en';
+import { more2En } from './more2_en';
+import { more3En } from './more3_en';
 
 const enBase = {
   // ---------- app ----------
   'app.name': 'Solbound',
   'app.tagline': 'Who you take, what you pack and how you protect each other decides how you get home.',
-  'app.demoBadge': 'Demo: {days} of {target} planned surface days',
-  'app.demoNote': 'This build plays a shortened 7-day mission. The full 30-day campaign is the project target and is not finished yet.',
   'app.footer': 'Independent student project for METU NASA Space Apps Challenge 2026. Not an official NASA product.',
   'app.language': 'Language',
   'app.skip': 'Skip to content',
@@ -130,7 +130,6 @@ const enBase = {
   'dest.mars': 'Mars',
   'dest.moon.tag': 'Close to home, no air at all',
   'dest.mars.tag': 'Far from home, thin dusty air',
-  'dest.moon.p1': 'Polar site with long sunlight: steady solar power during the demo.',
   'dest.moon.p2': 'No atmosphere: radiation and hot, powdery regolith dust are your main hazards.',
   'dest.moon.p3': 'Radio to Earth takes about a second, so Mission Control can help live.',
   'dest.mars.p1': 'Sunlit days and dark nights: the battery carries you through each night.',
@@ -138,12 +137,10 @@ const enBase = {
   'dest.mars.p3': 'Messages to Earth take many minutes each way, so the crew decides alone.',
   'dest.select': 'Choose {dest}',
   'dest.selected': 'Selected',
-  'dest.events': 'Demo events: {list}',
 
   // ---------- crew ----------
   'crew.heading': 'Choose three companions',
   'crew.sub': 'Together with you that makes four. Strengths in one area always cost something in another.',
-  'crew.count': '{n} / 3 selected',
   'crew.add': 'Add to crew',
   'crew.remove': 'Remove',
   'crew.full': 'Crew is full',
@@ -218,7 +215,6 @@ const enBase = {
 
   // ---------- briefing ----------
   'brief.heading': 'Mission briefing',
-  'brief.goal': 'Goal: run the outpost for {days} demo days, prepare the return and bring the crew home.',
   'brief.crew': 'Crew of four',
   'brief.cargo': 'Cargo ({used} kg)',
   'brief.cargoNone': 'No extra cargo',
@@ -300,7 +296,6 @@ const enBase = {
   'gh.full.desc': '1.3 kW · fastest growth',
   'gh.eco.desc': '0.5 kW · slower growth',
   'gh.off.desc': '0 kW · no growth',
-  'gh.compressed': 'Plant growth is time-compressed for the demo.',
 
   'crewPanel.title': 'Crew',
   'crewPanel.health': 'Health',
@@ -665,7 +660,6 @@ const enBase = {
   'debrief.rating.partial': 'Home, but at a cost',
   'debrief.rating.aborted': 'Mission ended early, crew safe',
   'debrief.rating.lost': 'Mission lost',
-  'debrief.rating.success.desc': 'Your crew completed the demo mission and returned safely.',
   'debrief.rating.partial.desc': 'The crew made it back, but not everything went well.',
   'debrief.rating.aborted.desc': 'You chose safety over the mission. That is a real commander’s decision.',
   'debrief.rating.lost.desc': 'The mission could not continue. The log below shows the chain of causes.',
@@ -684,12 +678,10 @@ const enBase = {
   'reason.aborted': 'The surface mission was ended early.',
   'reason.ration': 'You lifted off without the reserves the checklist asked for and rationed on the way home.',
   'reason.rough': 'The power fault on the way home was not fixed, so the trip was cold and hard on everyone.',
-  'cargo.unused': 'Not used in this destination’s demo events',
   'debrief.lessons': 'What the systems taught',
   'debrief.timeline': 'Mission log',
   'debrief.retrySame': 'Retry with the same seed',
   'debrief.retryNew': 'New mission',
-  'debrief.demo': 'This was the {days}-day demo. The full {target}-day campaign is still in development.',
   'debrief.chanceWas': 'chance {pct}%',
   'debrief.success': 'succeeded',
   'debrief.failed': 'did not work out',
@@ -779,7 +771,6 @@ const enBase = {
   'R-COMMS.inGame': 'On the Moon, some tasks get a “live help from Earth” bonus. On Mars, that bonus does not exist.',
   'R-CROPS.title': 'Growing food far from Earth',
   'R-CROPS.claim': 'NASA plant researchers note that crops need water, light, nutrients and a growing medium; Martian dust storms could block a lot of sunlight, and local water would be briny. Potatoes, sweet potatoes, wheat and soybeans are candidate crops.',
-  'R-CROPS.inGame': 'The greenhouse needs power for lights and some water. Growth is compressed so a harvest fits into the demo.',
   'R-MOXIE.title': 'Oxygen from Martian air',
   'R-MOXIE.claim': 'NASA’s MOXIE experiment on Perseverance extracted oxygen from the carbon-dioxide-rich Martian atmosphere: 122 g in total, up to about 12 g per hour at its most efficient.',
   'R-MOXIE.inGame': 'The CO₂→O₂ unit in your cargo is a scaled-up, imagined version (40 g/h). It only works on Mars, because the Moon has no CO₂ atmosphere.',
@@ -787,15 +778,12 @@ const enBase = {
   'rule.o2Production': 'Life support makes up to 0.16 kg O₂ per hour; each person uses 0.035 kg per hour.',
   'rule.electrolysisWater': 'About 1.125 kg of water per kg of O₂ (from the molar masses of H₂O and O₂).',
   'rule.recycler85': 'Recycler recovers 85% of crew water at full condition and full power.',
-  'rule.dustLight': 'The demo storm blocks 50% of sunlight for about 34 hours.',
   'rule.dustSettle': 'Settling dust lowers panel condition by 0.5% per hour during the storm.',
   'rule.batteryLoss': '90% charging efficiency, 8 kW max charge/discharge.',
   'rule.priority': 'Priority: life support, thermal, water, CO₂ unit, greenhouse.',
-  'rule.moonPolar': 'The polar demo site has steady, low sunlight; the 7 demo days happen in lunar daytime, the lunar night is not in the demo.',
   'rule.moonThermal': 'Thermal control draws 1.8 kW in sunlight.',
   'rule.radIndex': 'Outside during the event: +6 index and −4 health per hour. Shelter scales exposure down.',
   'rule.earthBonus': 'Moon tasks marked “live help” get +8% success.',
-  'rule.growthCompressed': 'Greens ripen in about 3 demo days, soy about 4, potatoes about 4.5 at full power.',
   'rule.moxieScaled': 'Imagined unit: 0.04 kg O₂/h for 0.3 kW.',
 
   // ---------- errors ----------
@@ -821,7 +809,7 @@ const enBase = {
   'err.cargo.overCapacity': 'That would exceed the launch mass.',
 };
 
-export const en = { ...enBase, ...moreEn };
+export const en = { ...enBase, ...moreEn, ...more2En, ...more3En };
 export type BaseDict = Record<keyof typeof enBase, string>;
 export type Dict = Record<keyof typeof en, string>;
 export type TKey = keyof typeof en;

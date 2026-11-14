@@ -111,6 +111,14 @@ export function evalCond(ctx: Ctx, cond: Cond): boolean {
       return m.crop === cond.crop;
     case 'cropNot':
       return m.crop !== cond.crop;
+    case 'sysMin':
+      return m.systems[cond.key] >= cond.min;
+    case 'envMin':
+      return (m.env[cond.key] as number) >= cond.min;
+    case 'batteryCapMin':
+      return m.resources.batteryCapKWh >= cond.min;
+    case 'dest':
+      return run.destination === cond.dest;
     case 'any':
       return cond.of.some((c) => evalCond(ctx, c));
   }
@@ -180,6 +188,14 @@ function lockReason(cond: Cond): LockReason {
       return { key: 'lock.cropIs', params: { crop: cond.crop } };
     case 'cropNot':
       return { key: 'lock.cropNot', params: { crop: cond.crop } };
+    case 'sysMin':
+      return { key: 'lock.sysMin', params: { sys: cond.key, min: cond.min } };
+    case 'envMin':
+      return { key: 'lock.envMin' };
+    case 'batteryCapMin':
+      return { key: 'lock.batteryCap', params: { min: cond.min } };
+    case 'dest':
+      return { key: 'lock.site' };
   }
 }
 
@@ -237,6 +253,8 @@ export function successChance(run: RunState, check: Check, crewIds: string[]): {
     if (m.flags[f.key] === f.value) factors.push({ key: `flag.${f.key}.${String(f.value)}`, value: f.bonus });
   }
   if (check.earth && s.commDelay === 'seconds') factors.push({ key: 'earth', value: 0.08 });
+  // Mars: Earth answers 4–21 minutes late, but a communications officer makes the support usable
+  else if (check.earth && hasTrait(run, m, 'comms')) factors.push({ key: 'earthComms', value: 0.05 });
   if (check.hazard) factors.push({ key: 'hazard', value: -check.hazard });
   const raw = factors.reduce((a, f) => a + f.value, 0);
   return { p: Math.min(P_MAX, Math.max(P_MIN, raw)), factors };
@@ -334,6 +352,10 @@ export function applyEffects(ctx: Ctx, effects: Effect[], hooks: EffectHooks) {
       case 'rest':
         for (const c of targets(ctx, e.target)) c.routine = 'rest';
         break;
+      case 'addItem':
+        m.items[e.item] = (m.items[e.item] ?? 0) + e.qty;
+        log(m, run, 'journal.itemAdded', 'good', { item: e.item, qty: e.qty });
+        break;
       case 'use': {
         const have = m.items[e.item] ?? 0;
         m.items[e.item] = Math.max(0, have - (e.qty ?? 1));
@@ -348,7 +370,7 @@ export function applyEffects(ctx: Ctx, effects: Effect[], hooks: EffectHooks) {
         }
         break;
       case 'harvestNow': {
-        const food = CROPS[m.crop].yield * e.fraction * (m.systems.greenhouseGrowth / 100) * (m.systems.greenhouseHealth / 100);
+        const food = CROPS[m.crop].yield * e.fraction * (m.systems.greenhouseGrowth / 100) * (m.systems.greenhouseHealth / 100) * nutritionBonus(run, m);
         m.resources.foodCrewDays += food;
         m.systems.greenhouseGrowth = 0;
         m.harvests += 1;
@@ -388,7 +410,8 @@ export function applyEffects(ctx: Ctx, effects: Effect[], hooks: EffectHooks) {
 /** Harvest the greenhouse. Yield depends on crop and plant health; soy adds protein (health). */
 export function harvest(ctx: Ctx, fraction: number, regrow: number) {
   const { m, run } = ctx;
-  const food = CROPS[m.crop].yield * (m.systems.greenhouseHealth / 100) * fraction * (m.systems.greenhouseGrowth >= 100 ? 1 : m.systems.greenhouseGrowth / 100);
+  const food =
+    CROPS[m.crop].yield * (m.systems.greenhouseHealth / 100) * fraction * (m.systems.greenhouseGrowth >= 100 ? 1 : m.systems.greenhouseGrowth / 100) * nutritionBonus(run, m);
   m.resources.foodCrewDays += food;
   m.systems.greenhouseGrowth = regrow;
   m.harvests += 1;
@@ -400,6 +423,11 @@ export function harvest(ctx: Ctx, fraction: number, regrow: number) {
     }
     log(m, run, 'journal.protein', 'good');
   }
+}
+
+/** A nutritionist gets 10% more food out of every harvest (careful processing, less waste; gameplay rule). */
+export function nutritionBonus(run: RunState, m: MissionState): number {
+  return hasTrait(run, m, 'nutrition') ? 1.1 : 1;
 }
 
 /** Experience and the "steady" trait damp stress gains (explained in the identity screen). */

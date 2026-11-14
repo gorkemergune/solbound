@@ -122,11 +122,11 @@ const SAB: EventDef = {
     { id: 'vent', success: [{ kind: 'h2', mode: 'vent' }], weight: 3 },
     {
       id: 'sabatier',
-      requires: [{ kind: 'any', of: [{ kind: 'research', id: 'R-LOOP' }, { kind: 'trait', trait: 'mechanic' }] }],
-      crew: { count: 2, skill: 'technical', traits: ['mechanic'] },
+      requires: [{ kind: 'any', of: [{ kind: 'research', id: 'R-LOOP' }, { kind: 'trait', trait: 'mechanic' }, { kind: 'trait', trait: 'chemist' }] }],
+      crew: { count: 2, skill: 'technical', traits: ['mechanic', 'chemist'] },
       hours: 3,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 10 }],
-      check: { base: 0.7, skill: 'technical', traits: ['mechanic'], earth: true },
+      check: { base: 0.7, skill: 'technical', traits: ['mechanic', 'chemist'], earth: true },
       success: [{ kind: 'h2', mode: 'sabatier' }],
       failure: [{ kind: 'h2', mode: 'vent' }, { kind: 'sys', key: 'lifeSupport', delta: -5 }],
       weight: 3,
@@ -231,10 +231,10 @@ const BRINE: EventDef = {
     },
     {
       id: 'distill',
-      crew: { count: 2, skill: 'technical', traits: ['mechanic'] },
+      crew: { count: 2, skill: 'technical', traits: ['mechanic', 'chemist'] },
       hours: 5,
       cost: [{ kind: 'res', key: 'batteryKWh', delta: -10 }, { kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 12 }],
-      check: { base: 0.6, skill: 'technical', traits: ['mechanic'] },
+      check: { base: 0.6, skill: 'technical', traits: ['mechanic', 'chemist'] },
       success: [{ kind: 'res', key: 'waterL', delta: 16 }, { kind: 'sys', key: 'waterRecycler', delta: -5 }],
       failure: [{ kind: 'res', key: 'waterL', delta: 5 }, { kind: 'sys', key: 'waterRecycler', delta: -8 }],
       weight: 3,
@@ -260,10 +260,10 @@ const MARS_SAR: EventDef = {
   options: [
     {
       id: 'rescue',
-      crew: { count: 2, skill: 'technical', traits: ['eva', 'pilot'], outside: true },
+      crew: { count: 2, skill: 'technical', traits: ['eva', 'pilot', 'rover'], outside: true },
       hours: 3,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 14 }],
-      check: { base: 0.6, skill: 'technical', traits: ['eva', 'pilot'] },
+      check: { base: 0.6, skill: 'technical', traits: ['eva', 'pilot', 'rover'] },
       success: [{ kind: 'crew', target: 'subject', stat: 'fatigue', delta: 10 }],
       failure: [{ kind: 'crew', target: 'subject', stat: 'health', delta: -15 }, { kind: 'crew', target: 'subject', stat: 'stress', delta: 15 }],
       weight: 3,
@@ -424,10 +424,10 @@ const MOON_SAR: EventDef = {
   options: [
     {
       id: 'rescue',
-      crew: { count: 2, skill: 'technical', traits: ['eva', 'pilot'], outside: true },
+      crew: { count: 2, skill: 'technical', traits: ['eva', 'pilot', 'rover'], outside: true },
       hours: 3,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 14 }],
-      check: { base: 0.6, skill: 'technical', traits: ['eva', 'pilot'] },
+      check: { base: 0.6, skill: 'technical', traits: ['eva', 'pilot', 'rover'] },
       success: [{ kind: 'crew', target: 'subject', stat: 'fatigue', delta: 10 }],
       failure: [{ kind: 'crew', target: 'subject', stat: 'health', delta: -14 }, { kind: 'crew', target: 'subject', stat: 'stress', delta: 12 }],
       weight: 3,
@@ -462,7 +462,7 @@ const ISRU: EventDef = {
       crew: { count: 1, skill: 'science', traits: ['geologist'] },
       hours: 6,
       cost: [{ kind: 'res', key: 'batteryKWh', delta: -12 }],
-      check: { base: 0.7, skill: 'science', traits: ['geologist'] },
+      check: { base: 0.7, skill: 'science', traits: ['geologist', 'chemist'] },
       success: [{ kind: 'res', key: 'o2Kg', delta: 2.5 }, { kind: 'res', key: 'science', delta: 10 }],
       failure: [{ kind: 'res', key: 'science', delta: 4 }],
       weight: 2,
@@ -489,7 +489,7 @@ const ICE: EventDef = {
   options: [
     {
       id: 'traverse',
-      crew: { count: 2, skill: 'science', traits: ['geologist', 'eva'], outside: true },
+      crew: { count: 2, skill: 'science', traits: ['geologist', 'eva', 'rover'], outside: true },
       hours: 4,
       cost: [{ kind: 'crew', target: 'assigned', stat: 'fatigue', delta: 14 }],
       check: { base: 0.55, skill: 'science', traits: ['geologist', 'eva'], items: [{ item: 'spectro', bonus: 0.1 }] },
@@ -516,6 +516,7 @@ const SHADOW: EventDef = {
   illustration: 'shadow',
   speaker: 'technical',
   research: ['R-MOON-POLE', 'R-BATTERY'],
+  onOpen: [{ kind: 'env', key: 'darkFactor', value: 0 }],
   options: [
     {
       id: 'essentials',

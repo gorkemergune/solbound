@@ -1,4 +1,5 @@
-import { activeCrew, characterById, type Echo, type JournalEntry, type LockReason, type RunState, type SkillKey } from '../engine';
+import {
+  FORECAST_EVENT, activeCrew, characterById, type Echo, type JournalEntry, type LockReason, type RunState, type SkillKey } from '../engine';
 import { orList } from '../i18n';
 import type { Delta } from './store';
 
@@ -17,6 +18,7 @@ export function lockText(t: T, r: LockReason, locale: 'en' | 'tr'): string {
   if (typeof p.trait === 'string') p.trait = t(`trait.${p.trait}`);
   if (typeof p.research === 'string') p.research = t(`${p.research}.title`);
   if (typeof p.crop === 'string') p.crop = t(`crop.${p.crop}`);
+  if (typeof p.sys === 'string') p.sys = t(`sys.${p.sys}`);
   return t(r.key, p);
 }
 
@@ -46,6 +48,8 @@ export function journalText(t: T, run: RunState, j: JournalEntry): string {
   if (typeof p.dest === 'string') p.dest = t(`dest.${p.dest}`);
   if (typeof p.cause === 'string') p.cause = t(`cause.${p.cause}`);
   if (typeof p.crop === 'string') p.crop = t(`crop.${p.crop}`);
+  if (typeof p.action === 'string') p.action = t(p.action);
+  if (j.key.endsWith('.title') && j.key.startsWith('ev.FC-')) p.days = forecastDays(run, j.minute, j.key.split('.')[1]);
   if (j.key.endsWith('.title') && j.key.startsWith('ev.')) p.dest = destName(t, run);
   return t(j.key, p);
 }
@@ -97,4 +101,30 @@ export function computeDeltas(before: RunState, after: RunState): Delta[] {
   if (a.greenhouseMode !== b.greenhouseMode) out.push({ key: `gh.${b.greenhouseMode}`, value: 0, unit: 'gh' });
   if (a.env.leakKgH > 0 && b.env.leakKgH === 0) out.push({ key: 'sys.seal', value: 0, unit: 'leakFixed' });
   return out;
+}
+
+/** Whole days from `minute` until the big event announced by forecast `fcId` hits (for forecast titles). */
+export function forecastDays(run: RunState, minute: number, fcId: string, instanceId?: string): number {
+  const m = run.mission!;
+  const bigId = instanceId?.split('@')[1];
+  const b =
+    (bigId && m.big.find((x) => x.id === bigId)) ||
+    m.big.filter((x) => FORECAST_EVENT[x.kind] === fcId && x.announceAt <= minute + 1).sort((a, c) => c.announceAt - a.announceAt)[0];
+  return b ? Math.max(1, Math.round((b.startAt - minute) / 1440)) : 0;
+}
+
+/** NASA DONKI record behind a CME forecast / hit card (params for the texts + the record link). */
+export function swParams(run: RunState, instanceId: string): { date: string; speed: string | number; arrival: string; link: string } | null {
+  const m = run.mission;
+  const bigId = instanceId.split('@')[1];
+  const b = m?.big.find((x) => x.id === bigId);
+  const r = b?.swIndex !== undefined ? run.spaceWeather?.records[b.swIndex] : undefined;
+  if (!r) return null;
+  const arrival = (run.destination === 'mars' ? r.arrivalMars : r.arrivalEarth) ?? '';
+  return { date: r.time.slice(0, 16).replace('T', ' '), speed: r.speed ?? '?', arrival: arrival.slice(0, 16).replace('T', ' '), link: r.link };
+}
+
+/** Link to the NASA record behind a journal bulletin. */
+export function swLink(run: RunState, rec: unknown): string | null {
+  return typeof rec === 'number' ? (run.spaceWeather?.records[rec]?.link ?? null) : null;
 }

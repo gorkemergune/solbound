@@ -456,7 +456,43 @@ export function EventArt({ id, dest }: { id: string; dest: DestinationId }) {
           </g>
         </g>
       );
-      break
+      break;
+    case 'night':
+      fg = (
+        <g>
+          <rect width="320" height="140" fill="#03050b" opacity="0.85" />
+          <Stars seed={17} count={40} w={320} h={90} />
+          <circle cx="250" cy="34" r="16" fill="#2a6fb8" />
+          <path d="M240 26c6-4 14-3 16 2-3 1-8 4-13 3z" fill="#dfeedd" opacity="0.8" />
+          <path d="M0 112 C 80 104, 160 118, 240 106 S 300 104, 320 108 V140 H0z" fill="#2a2d33" />
+          <rect x="120" y="74" width="60" height="34" rx="10" fill="#cfd6de" />
+          {[132, 150, 168].map((x) => (
+            <rect key={x} x={x - 5} y="82" width="10" height="9" rx="3" fill="#ffd27a" />
+          ))}
+          <g transform="translate(220 80)">
+            <rect x="-8" y="0" width="16" height="28" fill="#c9d2dc" />
+            <circle cx="0" cy="8" r="3" fill="#ffb347" className="blink" />
+          </g>
+        </g>
+      );
+      break;
+    case 'lander':
+      fg = (
+        <g>
+          <path d="M160 18 v20" stroke="#ffb347" strokeWidth="3" strokeDasharray="3 4" />
+          <g transform="translate(160 70)">
+            <path d="M-30 34l10-26h40l10 26" stroke="#9aa4b0" strokeWidth="3" fill="none" />
+            <rect x="-22" y="-14" width="44" height="24" rx="4" fill="#e9edf2" stroke="#9aa4b0" strokeWidth="2" />
+            <path d="M-14 -14l14-16 14 16" fill="#f5b041" />
+            <path d="M-6 30l-6 10M6 30l6 10" stroke="#ffb347" strokeWidth="3" opacity="0.8" />
+          </g>
+          <g fill="#c9a36a">
+            <rect x="60" y="96" width="18" height="12" rx="2" />
+            <rect x="82" y="100" width="14" height="9" rx="2" />
+          </g>
+        </g>
+      );
+      break;
     default:
       fg = <Ship x={160} y={66} scale={1.1} />;
   }

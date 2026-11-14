@@ -1,9 +1,9 @@
 import { decisionRoll } from './rng';
-import { activeCrew, applyEffects, characterById, dayOf, eventOf, harvest, log, scenarioOf, type Ctx, type EffectHooks } from './rules';
+import { activeCrew, applyEffects, characterById, dayOf, eventOf, harvest, hasTrait, log, scenarioOf, type Ctx, type EffectHooks } from './rules';
 import { CROPS, surfaceEndMinute } from './scenarios';
 import { maybeChat } from './chatter';
 import { Rng, deriveSeed } from './rng';
-import type { MissionState, PowerReport, RunState } from './types';
+import type { DaySnapshot, MissionState, PowerReport, RunState } from './types';
 
 const clamp = (v: number, lo = 0, hi = 100) => Math.min(hi, Math.max(lo, v));
 
@@ -46,13 +46,21 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
   const coverHeatLoss = mars && !sunUp && !coverClosed;
 
   // ---- power ----
-  const gen = env.darkHours > 0 ? 0 : s.solarKW(hour, day) * (1 - env.dust) * (sys.solar / 100);
-  const night = gen < 1;
+  const solarNow = s.solarKW(hour, day);
+  const solarGen = solarNow * (env.darkHours > 0 ? env.darkFactor : 1) * (1 - env.dust) * (sys.solar / 100);
+  const baseGen = s.baseKW * (1 - env.fissionLoss);
+  const gen = solarGen + baseGen;
+  const night = solarGen < 1;
+  // Lunar night at the equator: heaters run on fission power; insulation, waste heat and a quiet base help.
+  const lunarNight = s.baseKW > 0 && solarNow <= 0;
+  const nightRelief = lunarNight
+    ? (m.flags['prep.night.insulate'] ? 0.8 : 0) + (m.flags.wasteHeat ? 0.6 : 0) + (m.flags.nightMode === 'hibernate' ? 0.5 : 0)
+    : 0;
   let waterLoad = s.loads.water;
   if (m.flags.loadShift) waterLoad = night ? 0 : s.loads.water * 1.7;
   const loads: Record<LoadKey, number> = {
     lifeSupport: s.loads.lifeSupport,
-    thermal: s.loads.thermal(hour, day) + (env.heatHours > 0 ? 1.0 : 0) + (coverHeatLoss ? 0.5 : 0),
+    thermal: Math.max(0.8, s.loads.thermal(hour, day) - nightRelief) + (env.heatHours > 0 ? 1.0 : 0) + (coverHeatLoss ? 0.5 : 0),
     water: waterLoad,
     sabatier: m.h2Mode === 'sabatier' ? s.loads.sabatier : 0,
     moxie: (m.items.moxie ?? 0) > 0 ? s.loads.moxie : 0,
@@ -73,10 +81,12 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
   const fromBattery = Math.max(0, used - gen);
   r.batteryKWh = Math.max(0, r.batteryKWh - fromBattery);
   const surplus = Math.max(0, gen - used);
-  r.batteryKWh = Math.min(r.batteryCapKWh, r.batteryKWh + Math.min(surplus, s.battery.maxRateKW) * s.battery.chargeEfficiency);
+  // power engineer on board: better charge management (gameplay rule)
+  const eff = hasTrait(run, m, 'power') ? Math.min(0.96, s.battery.chargeEfficiency + 0.05) : s.battery.chargeEfficiency;
+  r.batteryKWh = Math.min(r.batteryCapKWh, r.batteryKWh + Math.min(surplus, s.battery.maxRateKW) * eff);
   const unmet = demand - used;
   m.unmet.powerKWh += unmet;
-  m.lastPower = { generationKW: gen, demandKW: demand, servedFraction: served, unmetKWh: unmet };
+  m.lastPower = { generationKW: gen, baseKW: baseGen, demandKW: demand, servedFraction: served, unmetKWh: unmet };
   if (unmet > 0.05 && !m.flags[`shed@${day}`]) {
     m.flags[`shed@${day}`] = true;
     log(m, run, served.lifeSupport < 1 ? 'journal.shedLifeSupport' : 'journal.shed', served.lifeSupport < 1 ? 'bad' : 'warn');
@@ -85,6 +95,7 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
     env.darkHours -= 1;
     if (env.darkHours <= 0) {
       log(m, run, 'journal.shadowOver', 'good');
+      env.darkFactor = 0;
       if (m.flags.shadowEssentials) {
         m.flags.shadowEssentials = false;
         m.greenhouseMode = 'full';
@@ -108,6 +119,8 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
   // ---- water ----
   // Quartermaster on board: 10% lower food and water use (gameplay rule).
   const qm = crew.some((c) => characterById(run, c.id).traitId === 'quartermaster') ? 0.9 : 1;
+  // Nutritionist: meals planned to the gram, 8% less food used (gameplay rule)
+  const nut = hasTrait(run, m, 'nutrition') ? 0.92 : 1;
   const crewWater = s.waterPerCrewLH * n * (m.flags.waterRation ? 0.7 : 1) * qm;
   const recovered = crewWater * s.recyclerRecovery * (sys.waterRecycler / 100) * served.water;
   const ghWater = s.greenhouseWaterLH[m.greenhouseMode] * served.greenhouse * (m.flags.nutrientLoop ? 0.6 : 1);
@@ -118,7 +131,7 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
   sys.waterRecycler = clamp(sys.waterRecycler - env.recyclerWear);
 
   // ---- food & greenhouse ----
-  r.foodCrewDays -= (n / 24) * qm;
+  r.foodCrewDays -= (n / 24) * qm * nut;
   m.lastFlows = {
     o2Prod,
     moxieProd,
@@ -128,7 +141,7 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
     crewWater,
     electrolysisWater: o2Prod * WATER_PER_KG_O2,
     greenhouseWater: ghWater,
-    foodUse: (n / 24) * qm,
+    foodUse: (n / 24) * qm * nut,
     batteryDelta: r.batteryKWh - battery0,
     sabatierWater,
   };
@@ -242,10 +255,79 @@ export function tickHour(run: RunState, hooks: EffectHooks) {
   }
 
   m.minute = (Math.floor(m.minute / 60) + 1) * 60;
+  if (run.phase === 'surface') {
+    closeBigEvents(run);
+    deliverBulletins(run);
+    if (hourOfDay(m.minute) === 0) snapshot(run, dayOf(m.minute) - 1);
+  }
 
   completeTasks(run, hooks, false);
   handleLosses(run, hooks);
   if (run.phase === 'surface' && !m.ended) maybeChat(run);
+}
+
+/** Record one row of the month's history (for the debrief chart and the recap video). */
+export function snapshot(run: RunState, day: number) {
+  const m = run.mission!;
+  if (m.history.some((h) => h.day === day)) return;
+  const act = activeCrew(m);
+  const avg = (k: 'health' | 'stress') => (act.length ? act.reduce((a, c) => a + c[k], 0) / act.length : 0);
+  const row: DaySnapshot = {
+    day,
+    food: m.resources.foodCrewDays,
+    o2: m.resources.o2Kg,
+    water: m.resources.waterL,
+    battery: m.resources.batteryKWh,
+    batteryCap: m.resources.batteryCapKWh,
+    health: avg('health'),
+    stress: avg('stress'),
+    science: m.resources.science,
+    crew: act.length,
+  };
+  m.history.push(row);
+}
+
+/** Real NASA DONKI records reach the base as bulletins on their real day (mapped onto the mission). */
+export function deliverBulletins(run: RunState) {
+  const m = run.mission!;
+  const sw = run.spaceWeather;
+  if (!sw || !m.bulletins.length) return;
+  while (m.bulletins.length && m.bulletins[0].at <= m.minute) {
+    const b = m.bulletins.shift()!;
+    const r = sw.records[b.rec];
+    if (!r) continue;
+    const arrives = r.kind === 'cme' && (run.destination === 'mars' ? r.arrivalMars : r.arrivalEarth);
+    log(m, run, arrives ? 'journal.sw.cmeArr' : `journal.sw.${r.kind}`, 'sw', {
+      rec: b.rec,
+      date: r.time.slice(0, 16).replace('T', ' '),
+      speed: r.speed ?? '',
+      cls: r.cls ?? '',
+      location: r.location ?? '',
+      arrival: (run.destination === 'mars' ? r.arrivalMars : r.arrivalEarth)?.slice(0, 16).replace('T', ' ') ?? '',
+    });
+  }
+}
+
+/** When a big event is over: clear its preparation flags and undo its temporary modes. */
+export function closeBigEvents(run: RunState) {
+  const m = run.mission!;
+  for (const b of m.big) {
+    if (b.closed || m.minute < b.endAt) continue;
+    if (!m.resolved.some((id) => id === `${b.hitEventId}@${b.id}`)) continue; // never hit (e.g. still waiting in the queue)
+    b.closed = true;
+    for (const k of Object.keys(m.flags)) if (k.startsWith(`prep.${b.kind}.`)) delete m.flags[k];
+    if (b.kind === 'night') {
+      m.env.fissionLoss = 0;
+      if (m.flags.nightMode === 'hibernate' || m.flags.nightMode === 'eco') {
+        m.greenhouseMode = 'full';
+        log(m, run, 'journal.ghRestored', 'info');
+      }
+      delete m.flags.nightMode;
+      delete m.flags.wasteHeat;
+      log(m, run, 'journal.dawn', 'good');
+    }
+    if (b.kind === 'meteor') log(m, run, 'journal.meteorOver', 'good');
+  }
 }
 
 /** Finish tasks whose end time has been reached (or all of them when `force`). Outcome was rolled at commit. */
@@ -263,6 +345,7 @@ export function completeTasks(run: RunState, hooks: EffectHooks, force: boolean)
     }
     const ctx: Ctx = { run, m, scenario: scenarioOf(run), event: null, assigned: t.crewIds };
     applyEffects(ctx, t.success ? opt.success : (opt.failure ?? opt.success), hooks);
+    if (ev.kind === 'prep') m.flags[`prep@${t.eventInstanceId.split('@')[1]}:${t.optionId}`] = t.success ? 'done' : 'failed';
     log(m, run, `ev.${t.eventId}.${t.optionId}.${t.success ? 'ok' : 'fail'}`, t.success ? 'good' : 'warn', {
       names: t.crewIds.map((id) => characterById(run, id).name).join(' & '),
     });
@@ -313,6 +396,12 @@ export function openEvent(run: RunState, eventId: string, instanceId: string, ho
     if (pool.length < ev.subjects) return false;
     subjects = new Rng(deriveSeed(run.seed, 'subjects', instanceId)).shuffle(pool.map((c) => c.id)).slice(0, ev.subjects);
   }
+  if (eventId === 'CME') {
+    // strength of this real CME (glancing blow or direct hit, from the model run)
+    const big = m.big.find((b) => `${b.hitEventId}@${b.id}` === instanceId);
+    const r = big?.swIndex !== undefined ? run.spaceWeather?.records[big.swIndex] : undefined;
+    m.flags.cmeGlancing = !!(r && (run.destination === 'mars' ? r.glancingMars : r.glancingEarth));
+  }
   m.activeEvent = { instanceId, eventId, openedAt: m.minute, subjectCrewId, subjects };
   if (ev.onOpen) applyEffects({ run, m, scenario: scenarioOf(run), event: m.activeEvent, assigned: [] }, ev.onOpen, hooks);
   log(m, run, `ev.${eventId}.title`, ev.kind === 'emergency' ? 'bad' : 'info', {
@@ -338,6 +427,19 @@ export function checkEmergencies(run: RunState, hooks: EffectHooks) {
   if (hoursLeft < 12 && !m.flags[`emgO2@${day}`]) {
     m.flags[`emgO2@${day}`] = true;
     openEvent(run, 'EMG-O2', `EMG-O2@${day}`, hooks);
+    return;
+  }
+  // Water: warn, then offer a decision, before the tanks run dry.
+  const f = m.lastFlows;
+  const waterRate = f ? f.waterRecovered + f.sabatierWater - f.crewWater - f.electrolysisWater - f.greenhouseWater : 0;
+  const waterLeft = waterRate < -1e-6 ? m.resources.waterL / -waterRate : Infinity;
+  if (waterLeft < 72 && !m.flags[`waterWarn@${day}`]) {
+    m.flags[`waterWarn@${day}`] = true;
+    log(m, run, 'journal.waterWarning', 'warn', { hours: Math.max(0, Math.floor(waterLeft)) });
+  }
+  if (waterLeft < 36 && !m.flags.waterRation && !m.flags[`emgWater@${day}`]) {
+    m.flags[`emgWater@${day}`] = true;
+    openEvent(run, 'EMG-WATER', `EMG-WATER@${day}`, hooks);
     return;
   }
   for (const c of activeCrew(m)) {
@@ -397,7 +499,7 @@ export function advanceTime(run: RunState, deltaMinutes: number) {
     const next = m.queue[0];
     if (next && next.atMinute <= m.minute + 1e-9) {
       m.queue.shift();
-      if (openEvent(run, next.eventId, next.eventId, hooks)) return;
+      if (openEvent(run, next.eventId, next.instanceId ?? next.eventId, hooks)) return;
       continue;
     }
     const nextHour = (Math.floor(m.minute / 60) + 1) * 60;
@@ -424,7 +526,8 @@ export function endSurface(run: RunState) {
   for (const c of m.crew) c.sheltered = false;
   m.env.speHours = 0;
   run.phase = 'returnPrep';
-  log(m, run, 'journal.surfaceDone', 'good', { days: scenarioOf(run).demoDays });
+  snapshot(run, scenarioOf(run).missionDays);
+  log(m, run, 'journal.surfaceDone', 'good', { days: scenarioOf(run).missionDays });
   openEvent(run, 'RETURN-01', 'RETURN-01', hooks);
 }
 

@@ -1,4 +1,5 @@
 // Domain types for the Solbound simulation. Pure data — no React, no browser APIs.
+import type { SpaceWeatherSnapshot } from './spaceweather';
 
 export type Locale = 'en' | 'tr';
 export type DestinationId = 'moon' | 'mars';
@@ -40,7 +41,12 @@ export type TraitId =
   | 'spaceWeather'
   | 'mediator'
   | 'steady'
-  | 'quartermaster';
+  | 'quartermaster'
+  | 'comms'
+  | 'power'
+  | 'chemist'
+  | 'nutrition'
+  | 'rover';
 
 export type Profile = {
   age: number;
@@ -133,12 +139,51 @@ export type Environment = {
   darkHours: number;
   /** hours of extra heat load (lunar noon at the equator) */
   heatHours: number;
+  /** fraction of solar output left while darkHours > 0 (0 = fully dark; a raised mast array keeps some) */
+  darkFactor: number;
+  /** fraction of the fission unit's output lost (dusty radiator during the lunar night) */
+  fissionLoss: number;
+};
+
+/** Predictable "big" events with a visible countdown and preparation tasks. */
+export type BigKind = 'storm' | 'night' | 'meteor' | 'dark' | 'resupply' | 'cme';
+export type BigEventState = {
+  id: string;
+  kind: BigKind;
+  /** minute the forecast arrives (countdown becomes visible) */
+  announceAt: number;
+  /** minute the event hits */
+  startAt: number;
+  /** minute it is over */
+  endAt: number;
+  /** event card that opens when it hits */
+  hitEventId: string;
+  /** set once the end has been processed */
+  closed: boolean;
+  /** real NASA DONKI record this event is based on (index into run.spaceWeather.records) */
+  swIndex?: number;
+};
+
+/** One row per mission day, recorded at midnight (used by the debrief charts and the recap video). */
+export type DaySnapshot = {
+  day: number;
+  food: number;
+  o2: number;
+  water: number;
+  battery: number;
+  batteryCap: number;
+  health: number;
+  stress: number;
+  science: number;
+  crew: number;
 };
 
 export type PowerReport = {
   generationKW: number;
   demandKW: number;
   servedFraction: Record<'lifeSupport' | 'thermal' | 'water' | 'greenhouse' | 'moxie' | 'sabatier', number>;
+  /** constant (fission) part of generation */
+  baseKW: number;
   unmetKWh: number;
 };
 
@@ -163,7 +208,7 @@ export type JournalEntry = {
   phase: Phase;
   key: string;
   params?: Record<string, string | number>;
-  tone: 'info' | 'good' | 'warn' | 'bad' | 'echo' | 'loss' | 'chat';
+  tone: 'info' | 'good' | 'warn' | 'bad' | 'echo' | 'loss' | 'chat' | 'sw';
 };
 
 export type Echo = {
@@ -193,7 +238,7 @@ export type ActiveEvent = {
   subjects?: string[];
 };
 
-export type ScheduledEvent = { eventId: string; atMinute: number };
+export type ScheduledEvent = { eventId: string; atMinute: number; /** unique id when an event can happen more than once */ instanceId?: string };
 
 export type DecisionRecord = {
   instanceId: string;
@@ -231,6 +276,10 @@ export type MissionState = {
   research: string[];
   echoes: Echo[];
   harvests: number;
+  big: BigEventState[];
+  /** real space-weather bulletins still to deliver (record index into run.spaceWeather.records) */
+  bulletins: { at: number; rec: number }[];
+  history: DaySnapshot[];
   chatUsed: string[];
   nextChatMinute: number;
   lastPower: PowerReport | null;
@@ -257,4 +306,6 @@ export type RunState = {
   manualPause: boolean;
   speed: Speed;
   launched: boolean;
+  /** NASA DONKI snapshot attached before launch (null = no real data; the mission still works) */
+  spaceWeather: SpaceWeatherSnapshot | null;
 };

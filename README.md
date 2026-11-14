@@ -4,7 +4,7 @@
 
 Solbound is an interactive STEM outpost management game planned for the **METU NASA Space Apps Challenge 2026**. Students become mission commanders and experience how connected engineering systems determine whether a crew survives.
 
-> Status: playable vertical slice (7-day demo on both Moon and Mars, two landing sites / arrival seasons each, randomized event mix per run). The 30-day campaign is not built yet. Event context and challenge wording were supplied by the team; this is an independent project, not an official NASA product.
+> Status: playable 30-day mission on both Moon and Mars (two landing sites / arrival seasons each, randomized event mix per run, countdowns for predictable big events, a shareable recap film at the end). Event context and challenge wording were supplied by the team; this is an independent project, not an official NASA product.
 
 > Current design: v0.2. Start with [the current product and flow documents](docs/00_START_HERE.md). Older v0.1 proposals are retained with historical notices.
 
@@ -12,7 +12,13 @@ Solbound is an interactive STEM outpost management game planned for the **METU N
 
 Space education can hide the difficult choices that make a mission work. Solbound makes those choices visible: powering a greenhouse can reduce the energy available to life support; building a shelter uses the same crew time needed for maintenance.
 
-The current direction is a personal, story-driven 2D experience inspired by the sense of identity, passing time, and life records in [1 in 8 Billion](https://1in8b.life/). Players choose EN/TR, receive a generated astronaut, select Moon or Mars, choose three companions from a candidate pool, and pack within a launch mass budget that includes everyone's body mass and personal kit. The full campaign targets about 30 surface mission days plus separate outbound and return chapters. The first implementation slice is an explicitly labeled seven-day demo for both destinations; it is not the complete campaign.
+The current direction is a personal, story-driven 2D experience inspired by the sense of identity, passing time, and life records in [1 in 8 Billion](https://1in8b.life/). Players choose EN/TR, receive a generated astronaut, select Moon or Mars, choose three companions from a candidate pool, and pack within a launch mass budget that includes everyone's body mass and personal kit. The mission lasts 30 surface days with compressed outbound and return chapters. Predictable big events (Mars dust storms, the lunar night at the equator, meteor showers, a polar dark period, a cargo lander) are announced with a countdown so the crew can prepare.
+
+## Live NASA data
+
+- **Space weather (NASA DONKI):** the title screen shows the last 30 days of real records and refreshes itself every 30 minutes (cached in the browser). When a mission starts, that window is stored with it: mission day 1 is the first day of the window. CMEs that NASA's WSA-ENLIL model sends toward Mars (or Earth–Moon) become countdown events, and other records arrive as bulletins with links to the NASA record. If NASA is unreachable, the game uses the last saved copy or the bundled snapshot in `src/live/donki-fallback.json` (refresh it with `npm run donki:snapshot`).
+- **Signal delay:** the Earth–Mars distance is computed in the browser from JPL's *Approximate Positions of the Planets*. Tests check it against JPL Horizons; it agrees to within 0.02%. Horizons itself cannot be called from a browser because it sends no CORS header.
+- **API key:** copy `.env.example` to `.env` and set `NASA_API_KEY` to a free key from https://api.nasa.gov/. `.env` is git-ignored, but the key is built into the browser bundle, so only use a free api.nasa.gov key. Without a key, `DEMO_KEY` is used, which has low rate limits.
 
 ## How it plays
 
@@ -25,8 +31,8 @@ The current direction is a personal, story-driven 2D experience inspired by the 
 
 ## First playable target
 
-- Complete preparation flow, EN/TR throughout, generated profiles and a default pool of 12 candidates.
-- Meaningfully different Moon/Mars scenarios with a seven-day demo each, two sites/seasons per destination and a different event mix every run.
+- Complete preparation flow, EN/TR throughout, generated profiles and a pool of 16 candidates with 15 specialties.
+- Meaningfully different Moon/Mars scenarios over 30 days, two sites/seasons per destination, a different event mix every run, countdown events with preparation tasks, base time next to Earth time, and a recap film (video/image) to share.
 - One outbound task, three main and two small surface events per destination, and two return decisions.
 - Visible time and pause state; resources, crew consequences, local saves, and an explanatory ending.
 - Original 2D scenes, character portraits, cargo view, and a responsive outpost interface.
