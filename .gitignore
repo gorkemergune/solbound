@@ -9,3 +9,9 @@ e2e-screens
 .env
 .env.*
 !.env.example
+
+
+bug1.png
+bug2.png
+eksikler.md
+bug/
