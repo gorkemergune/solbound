@@ -152,3 +152,12 @@ Demo için önerilen en küçük set: **F-01, F-02, F-04, F-07, F-09**. Bunlar m
 3. **Doğrulanmamış satırlar:** CR-01, CR-03'teki yumru bilgisi, CR-05 ve "çiğ tüketim" ifadesi bir sonraki kaynak okumasında kontrol edilmeli.
 4. **Kullanılmayan kaynaklar:** NASA-LSS ve NASA-POWER. Özellikle NASA-POWER, Mars'ta güneş yerine başka güç seçeneklerini karşılaştırmak için faydalı olabilir.
 5. **Sayısal değer yok:** kaynaklarda geri kazanım oranı (%90, ISS), güneş ışığı oranı (%43) ve rüzgâr hızı (60 mph) dışında sayı yok. Enerji tüketimi, büyüme süresi, LED gücü ve fırtına olasılığı gibi bütün oyun sayıları **O** etiketiyle seçilecek.
+
+---
+
+## 7. Uygulama durumu (Claude, 14 Kasım 2026)
+
+- **F-01…F-16 oyunda uygulandı** (ayrıntı: [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md) “v0.3” bölümü). P1 diye işaretlenenler de demoya alındı; 30 günlük döngüye yayılması hâlâ P1.
+- **Doğrulandı:** CR-01 (“water, light and soil, along with some kind of nutrients”), CR-03 yumru bilgisi (“potatoes are tubers…”), CR-05 (“You can’t pack everything you need for a long-duration spaceflight.”) — NASA-CROPS sayfası 14 Kasım 2026’da okundu.
+- **Boşluk 1 ve 2 kısmen kapatıldı (Ay ve radyasyon):** Ay tozu (NASA Science Moon Dust), güney kutbu aydınlanması ve kalıcı gölgeli bölgeler (NASA Science Shackleton), sığ Ay depremleri (NASA Shrinking Moon), mikrometeoroitler (NASA Lunar Impact Monitoring), Ay gecesi uzunluğu (NASA Glenn Fission Surface Power), regolitte oksijen (NTRS 20240013906), parçacık olayı sığınağı (NASA OCHMO radyasyon özeti). Her biri oyunda ayrı araştırma kartıdır.
+- “Çiğ tüketim” ifadesi yine kullanılmadı. LED bilgisi yalnız “ISS Veggie” olarak geçer.
