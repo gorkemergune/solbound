@@ -4,11 +4,11 @@
   <p><strong>Choose your crew. Pack every kilo. Bring everyone home.</strong></p>
   <p>
     <a href="https://solbound.vercel.app"><strong>▶ Play now</strong></a> ·
-    <a href="docs/media/solbound-trailer.mp4">Watch the trailer</a> ·
+    <a href="https://www.youtube.com/watch?v=k4y-1OFfU08">Watch the trailer</a> ·
     English / Türkçe
   </p>
-  <a href="docs/media/solbound-trailer.mp4">
-    <img src="docs/media/trailer-poster.jpg" width="820" alt="Solbound trailer — click to watch (30 s)" />
+  <a href="https://www.youtube.com/watch?v=k4y-1OFfU08">
+    <img src="docs/media/trailer-poster.jpg" width="820" alt="Solbound trailer on YouTube — click to watch (30 s)" />
   </a>
 </div>
 
