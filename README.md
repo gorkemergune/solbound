@@ -31,6 +31,31 @@ The solar storms are real: solar eruptions recorded in **NASA DONKI** become rad
 | :-----------------------------------------------------------: | :-------------------------------------------------------: |
 | ![Choosing companions with different skills](docs/media/crew.png) | ![Packing within the 520 kg launch budget](docs/media/cargo.png) |
 
+## Why we built it
+
+Running a base on the Moon or Mars means you can't do everything at once. Power, oxygen, water, food and shielding all compete for the same mass, time and people. Solbound lets students feel that trade-off and see *why* a decision worked or failed. It runs free in any browser, in English or Turkish, on a laptop or a phone, with no install and no account.
+
+## Fit with the challenge
+
+| The challenge asks for | In Solbound |
+| --- | --- |
+| Life support: oxygen and water | O₂ and water stocks with daily use, MOXIE and electrolysis, water recovery, leaks and emergency reserves |
+| Energy: production, use and storage | Solar output that depends on the landing site, day and night, dust and storms; a battery; greenhouse modes and crew routines that change power use |
+| Food: stock versus future harvest | Packed food against greenhouse growth; harvest events; the greenhouse costs power |
+| Radiation protection | A shelter that costs crew time and work. Real NASA DONKI solar eruptions arrive as radiation events |
+| Learning why a decision worked | Every decision shows its chance and cost. Research cards explain the science behind it, and the debrief lists the lessons from your run |
+
+## What is real and what is a game rule
+
+- **NASA DONKI:** space-weather events recorded by NASA in the last 30 days, such as coronal mass ejections (CMEs), happen in the game on the same days, with their real dates and speeds.
+- **Signal delay:** computed from the planets' real positions using JPL's approximate-position formulas.
+- **Research cards:** 12 cards that cite 25 NASA and JPL sources.
+- **Game rules:** landing-site multipliers, success chances and consumption values are game-design assumptions. The cards keep sourced facts, derived values and game rules on separate lines. See [`docs/RESEARCH.md`](docs/RESEARCH.md).
+
+## Cost and sustainability
+
+Solbound is a static web page with no server, no database and no paid service, so it costs nothing to run on Vercel's free plan. NASA's open APIs are free. A scheduled GitHub Action refreshes the NASA data with the team's own key, so the browser never needs a key. There are no accounts and no analytics: game progress is saved only in the player's browser. The code is MIT-licensed, so teachers or other teams can host or adapt it.
+
 ## Run locally
 
 Requires Node.js 20.19+.

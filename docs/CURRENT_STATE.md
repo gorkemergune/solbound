@@ -2,7 +2,7 @@
 
 Son güncelleme: 14 Kasım 2026 · içerik sürümü `0.8.0-landing` · kayıt şeması 7
 
-Bu belge oyunun **şu anki** kapsamını özetler. Diğer belgelerle çelişirse bu belge ve kod geçerlidir. Eski belgeler `docs/archive/` klasöründedir: `00_START_HERE.md` ve v0.2 belgeleri tasarım geçmişidir; `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md`, `CLAUDE_DISCOVERY_TASK.md` ise v0.1 önerisidir. Değişiklik günlüğü ve doğrulama sonuçları için [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), kullanıcının açık listesi için `bug/eksikler.md` (git’e girmez), son bağımsız test için [V4_TEST.md](archive/V4_TEST.md) okunmalıdır. [V4_PROMPT.md](archive/V4_PROMPT.md) bir önceki test görevidir.
+Bu belge oyunun **şu anki** kapsamını özetler. Diğer belgelerle çelişirse bu belge ve kod geçerlidir. Eski belgeler `docs/archive/` klasöründedir: `00_START_HERE.md` ve v0.2 belgeleri tasarım geçmişidir; `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md`, `CLAUDE_DISCOVERY_TASK.md` ise v0.1 önerisidir. Değişiklik günlüğü ve doğrulama sonuçları için [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), kullanıcının açık listesi için `bug/eksikler.md` (git’e girmez), son bağımsız test için [V4_TEST.md](archive/V4_TEST.md) okunmalıdır. [V4_PROMPT.md](archive/V4_PROMPT.md) bir önceki test görevidir; sıradaki test görevi (mentör formuna göre puanlama dahil) [V5_PROMPT.md](archive/V5_PROMPT.md).
 
 ## Ürün
 
@@ -50,6 +50,6 @@ NASA kayıtlarından beslenen, hikâye ağırlıklı bir **eğitim simülasyonu*
 1. “Başka bir karar verseydin?” karşılaştırması yok.
 2. Video yalnız Chromium’da test edildi; Safari’de MP4 ve dosya paylaşımı denenmedi; GIF çıktısı yok.
 3. Safari/Firefox, gerçek cihaz ve ekran okuyucu testleri yapılmadı.
-4. GitHub Action, depo sırrı tanımlanıp gönderilmeden çalışmaz; yayın (deploy) kurulmadı.
+4. Uygulama Vercel’de yayında: https://solbound.vercel.app. GitHub Action, depoda `NASA_API_KEY` sırrı tanımlanmadan çalışmaz. 15 Kasım 2026’da uzak depoda henüz bot commit’i yoktu; canlı DONKI verisi 14 Kasım tarihli.
 5. Yapanlar penceresindeki isimler ve portföy linki boş (`src/credits.ts`).
 6. v0.8 için uzun 30 günlük e2e ve büyük denge taraması yapılmadı; iniş yerlerinin zorluk etiketleri yalnız kısa bir bot taramasına dayanıyor. E2E’nin Windows düzeltmesi Windows’ta denenmedi.
