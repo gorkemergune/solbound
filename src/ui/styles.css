@@ -2918,10 +2918,6 @@ div.option:focus-visible {
   color: var(--text);
   font-weight: 600;
 }
-.ta-why .infotip-btn,
-.ta-why > button {
-  font-size: 0.78rem;
-}
 .countdowns {
   display: flex;
   flex-wrap: wrap;

@@ -22,7 +22,6 @@ import {
 } from '../../engine';
 import { formatFixed } from '../../i18n';
 import { Portrait } from '../art/Portrait';
-import { InfoTip } from '../components/common';
 import { RichText } from '../components/RichText';
 import { useLocale, useStore } from '../store';
 import { journalText, lockText, swLink } from '../text';
@@ -125,9 +124,6 @@ export function TimeAwareness({ run }: { run: RunState }) {
         </span>
       )}
       {run.site === 'polar' && <span className="ta-sun">{t('time.polar')}</span>}
-      <InfoTip label={t('time.why')} className="ta-why">
-        <RichText text={t('time.whyText')} />
-      </InfoTip>
     </div>
   );
 }
