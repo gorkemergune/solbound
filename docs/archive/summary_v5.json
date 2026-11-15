@@ -1,0 +1,2677 @@
+{
+ "meta": {
+  "version": "0.8.0-landing (CONTENT_VERSION)",
+  "commit": "e6230ab",
+  "date": "2026-11-15",
+  "os": "Windows 11 Pro 10.0.26200",
+  "node": "v24.17.0",
+  "npm": "11.13.0",
+  "browsers": {
+   "chrome": "157.0.8103.51",
+   "edge": "157.0.4341.60",
+   "playwrightChromium": "159.0.8154.6",
+   "firefox": "kurulu değil"
+  }
+ },
+ "rubric": {
+  "impact": {
+   "score": 3,
+   "evidence": "Ücretsiz, kurulum yok, EN/TR, 360/390 px yatay taşma 0, klavyeyle yüzeye kadar oynanıyor; öğretmen rehberi yok, ilk karara kadar 5 hazırlık ekranı, kullanıcı testi yok"
+  },
+  "creativity": {
+   "score": 4,
+   "evidence": "Gerçek DONKI CME kayıtları görev gününe eşleniyor (Gale: CME/49254, 873 km/s, Mars varışı 31 Ekim); kütle bütçesine vücut kütlesi, geri sayımlı olaylar, özet filmi. DONKI sonuç oranlarını değiştirmiyor (37,7 / 37,3)"
+  },
+  "validity": {
+   "score": 3,
+   "evidence": "66/66 test, 95/95 e2e; 10 kaynaktan 6 destekliyor, 3 kısmen, 1 desteklemiyor (R-MOLD); README kart sayısı yanlış; iniş zorluk etiketleri Ay’da ters; maliyet bölümü yüzeysel; DONKI yenileme çalışmıyor"
+  },
+  "relevance": {
+   "score": 4,
+   "evidence": "Dört sistemin her biri karar kartı ve kaynak olarak var; kartta şans ve bedel, sonda dersler. NASA verisi görünür ama sonuca etkisi ölçülemeyecek kadar küçük"
+  },
+  "presentation": {
+   "score": 3,
+   "evidence": "Video 29,8 sn, cilalı, gerçek NASA kaydı kartı gösteriyor; problemi ve öğrenme hedefini söylemiyor; Yapanlar boş; canlı sitede açılış kartı “NASA’ya ulaşılamadı” diyor"
+  },
+  "total": 17,
+  "max": 25
+ },
+ "live": {
+  "games": [
+   {
+    "name": "g1-moon-tr",
+    "browser": "Playwright Chromium 159.0.8154.6",
+    "viewport": "1440x900",
+    "lang": "tr",
+    "dest": "moon",
+    "seed": 2115317617,
+    "landing": "mons-mouton",
+    "goal": {
+     "estimate": 30,
+     "target": 25,
+     "limiting": null
+    },
+    "preLaunchRange": "Tahmini kalış süresi i Tahmini kalış: iniş yerine göre 15–30 gün Hedef: 12.–25. gün, inişte belirlenir",
+    "returnPlan": "goal",
+    "pressed": {
+     "day": 26,
+     "clock": "00:20",
+     "chip": "Kalkış planlandı12 sa sonra"
+    },
+    "endMinute": 36780,
+    "rating": "Evdeyiz, ama bedeli oldu",
+    "decisions": 34,
+    "crewSize": 6,
+    "surfaceSeconds16x": 172,
+    "overflowPx": {
+     "title": 0,
+     "destination": 0,
+     "crew": 0,
+     "cargo": 0,
+     "briefing": 0,
+     "surface": 0,
+     "surface-booked": 0,
+     "debrief": 0
+    },
+    "pageErrors": 0,
+    "consoleErrors": 5,
+    "failedRequests": [
+     "429 https://api.nasa.gov/DONKI/CME?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/GST?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/FLR?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/SEP?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/IPS?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY"
+    ],
+    "pngCard": "solbound-moon-yzelip.png",
+    "video": null,
+    "copiedText": "Solbound’da 6 kişilik bir ekibi 26 gün boyunca Ay (Mons Mouton) yönettim. 1 hasat, 5 önceden bilinen büyük olay, 573 bilim puanı. Sonuç: Evdeyiz, ama bedeli oldu. #Solbound #SpaceApps",
+    "cmeFromDonki": [
+     {
+      "startAt": 8280,
+      "time": "2026-10-16T12:38Z",
+      "speed": 247,
+      "arrivalMars": null,
+      "arrivalEarth": "2026-10-20T18:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49137/-1"
+     }
+    ],
+    "whyTwoHoursButton": 0,
+    "loadMs": 405
+   },
+   {
+    "name": "g2-moon-en",
+    "browser": "Playwright Chromium 159.0.8154.6",
+    "viewport": "1440x900",
+    "lang": "en",
+    "dest": "moon",
+    "seed": 995475337,
+    "landing": "malapert",
+    "goal": {
+     "estimate": 25,
+     "target": 21,
+     "limiting": "food"
+    },
+    "preLaunchRange": "Estimated stay i Estimated stay: 15–25 days, depending on where you land Goal: day 12–21, fixed on landing",
+    "returnPlan": "never",
+    "pressed": null,
+    "endMinute": 42600,
+    "rating": "Home, but at a cost",
+    "decisions": 44,
+    "crewSize": 6,
+    "surfaceSeconds16x": 191,
+    "overflowPx": {
+     "title": 0,
+     "destination": 0,
+     "crew": 0,
+     "cargo": 0,
+     "briefing": 0,
+     "surface": 0,
+     "debrief": 0
+    },
+    "pageErrors": 0,
+    "consoleErrors": 5,
+    "failedRequests": [
+     "429 https://api.nasa.gov/DONKI/FLR?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/SEP?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/CME?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/IPS?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/GST?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY"
+    ],
+    "pngCard": "solbound-moon-ggohop.png",
+    "video": null,
+    "copiedText": "I commanded a crew of 6 on the The Moon (Malapert Massif) for 30 days in Solbound. 6 harvests, 7 predicted events faced, 461 science points. Result: Home, but at a cost. #Solbound #SpaceApps",
+    "cmeFromDonki": [
+     {
+      "startAt": 8280,
+      "time": "2026-10-16T12:38Z",
+      "speed": 247,
+      "arrivalMars": null,
+      "arrivalEarth": "2026-10-20T18:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49137/-1"
+     },
+     {
+      "startAt": 14760,
+      "time": "2026-10-21T08:53Z",
+      "speed": 310,
+      "arrivalMars": null,
+      "arrivalEarth": "2026-10-25T06:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49185/-1"
+     },
+     {
+      "startAt": 30540,
+      "time": "2026-11-01T19:00Z",
+      "speed": 357,
+      "arrivalMars": "2026-11-07T06:00Z",
+      "arrivalEarth": "2026-11-05T05:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49358/-1"
+     }
+    ],
+    "whyTwoHoursButton": 0,
+    "loadMs": 402
+   },
+   {
+    "name": "g3-mars-tr",
+    "browser": "Playwright Chromium 159.0.8154.6",
+    "viewport": "1440x900",
+    "lang": "tr",
+    "dest": "mars",
+    "seed": 2091790821,
+    "landing": "utopia",
+    "goal": {
+     "estimate": 24,
+     "target": 20,
+     "limiting": "food"
+    },
+    "preLaunchRange": "Tahmini kalış süresi i Tahmini kalış: iniş yerine göre 24–28 gün Hedef: 20.–23. gün, inişte belirlenir",
+    "returnPlan": "day:4",
+    "pressed": {
+     "day": 4,
+     "clock": "00:45",
+     "chip": "Kalkış planlandı12 sa sonra"
+    },
+    "endMinute": 5100,
+    "rating": "Evdeyiz, ama bedeli oldu",
+    "decisions": 9,
+    "crewSize": 4,
+    "surfaceSeconds16x": 77,
+    "overflowPx": {
+     "title": 0,
+     "destination": 0,
+     "crew": 0,
+     "cargo": 0,
+     "briefing": 0,
+     "surface": 0,
+     "surface-booked": 0,
+     "debrief": 0
+    },
+    "pageErrors": 0,
+    "consoleErrors": 5,
+    "failedRequests": [
+     "429 https://api.nasa.gov/DONKI/CME?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/GST?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/SEP?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/IPS?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/FLR?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY"
+    ],
+    "pngCard": "solbound-mars-ylec4l.png",
+    "video": "solbound-mars-ylec4l.webm",
+    "copiedText": "FAIL locator.click: Timeout 3000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole(",
+    "cmeFromDonki": [],
+    "whyTwoHoursButton": 0,
+    "loadMs": 494
+   },
+   {
+    "name": "g4-mars-en",
+    "browser": "Playwright Chromium 159.0.8154.6",
+    "viewport": "1440x900",
+    "lang": "en",
+    "dest": "mars",
+    "seed": 3034734154,
+    "landing": "gale",
+    "goal": {
+     "estimate": 30,
+     "target": 25,
+     "limiting": null
+    },
+    "preLaunchRange": "Estimated stay i Estimated stay: 29–30 days, depending on where you land Goal: day 24–25, fixed on landing",
+    "returnPlan": "goal",
+    "pressed": {
+     "day": 26,
+     "clock": "01:52",
+     "chip": "Departure bookedin 11 h"
+    },
+    "endMinute": 36780,
+    "rating": "Everyone came home",
+    "decisions": 31,
+    "crewSize": 4,
+    "surfaceSeconds16x": 170,
+    "overflowPx": {
+     "title": 0,
+     "destination": 0,
+     "crew": 0,
+     "cargo": 0,
+     "briefing": 0,
+     "surface": 0,
+     "surface-booked": 0,
+     "debrief": 0
+    },
+    "pageErrors": 0,
+    "consoleErrors": 5,
+    "failedRequests": [
+     "429 https://api.nasa.gov/DONKI/CME?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/SEP?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/FLR?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/GST?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/IPS?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY"
+    ],
+    "pngCard": "solbound-mars-1e6svuy.png",
+    "video": null,
+    "copiedText": "I commanded a crew of 4 on the Mars (Gale Crater) for 26 days in Solbound. 4 harvests, 5 predicted events faced, 91 science points. Result: Everyone came home. #Solbound #SpaceApps",
+    "cmeFromDonki": [
+     {
+      "startAt": 23040,
+      "time": "2026-10-26T09:00Z",
+      "speed": 873,
+      "arrivalMars": "2026-10-31T00:00Z",
+      "arrivalEarth": null,
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49254/-1"
+     },
+     {
+      "startAt": 33480,
+      "time": "2026-11-01T19:00Z",
+      "speed": 357,
+      "arrivalMars": "2026-11-07T06:00Z",
+      "arrivalEarth": "2026-11-05T05:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49358/-1"
+     }
+    ],
+    "whyTwoHoursButton": 0,
+    "loadMs": 399
+   },
+   {
+    "name": "b-chrome",
+    "browser": "chrome 157.0.8103.51",
+    "viewport": "1366x768",
+    "lang": "en",
+    "dest": "moon",
+    "seed": 2559619333,
+    "landing": "shackleton",
+    "goal": {
+     "estimate": 28,
+     "target": 23,
+     "limiting": "water"
+    },
+    "preLaunchRange": "Estimated stay i Estimated stay: 15–30 days, depending on where you land Goal: day 12–25, fixed on landing",
+    "returnPlan": "day:3",
+    "pressed": {
+     "day": 3,
+     "clock": "00:59",
+     "chip": "Departure bookedin 12 h"
+    },
+    "endMinute": 3660,
+    "rating": "Home, but at a cost",
+    "decisions": 8,
+    "crewSize": 4,
+    "surfaceSeconds16x": 43,
+    "overflowPx": {
+     "title": 0,
+     "destination": 0,
+     "crew": 0,
+     "cargo": 0,
+     "briefing": 0,
+     "surface": 0,
+     "surface-booked": 0,
+     "debrief": 0
+    },
+    "pageErrors": 0,
+    "consoleErrors": 5,
+    "failedRequests": [
+     "429 https://api.nasa.gov/DONKI/GST?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/FLR?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/CME?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/IPS?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/SEP?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY"
+    ],
+    "pngCard": "solbound-moon-16bxix1.png",
+    "video": null,
+    "copiedText": "I commanded a crew of 4 on the The Moon (Peak near Shackleton) for 3 days in Solbound. 0 harvests, 0 predicted events faced, 6 science points. Result: Home, but at a cost. #Solbound #SpaceApps",
+    "cmeFromDonki": [
+     {
+      "startAt": 8280,
+      "time": "2026-10-16T12:38Z",
+      "speed": 247,
+      "arrivalMars": null,
+      "arrivalEarth": "2026-10-20T18:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49137/-1"
+     },
+     {
+      "startAt": 14760,
+      "time": "2026-10-21T08:53Z",
+      "speed": 310,
+      "arrivalMars": null,
+      "arrivalEarth": "2026-10-25T06:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49185/-1"
+     },
+     {
+      "startAt": 30540,
+      "time": "2026-11-01T19:00Z",
+      "speed": 357,
+      "arrivalMars": "2026-11-07T06:00Z",
+      "arrivalEarth": "2026-11-05T05:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49358/-1"
+     }
+    ],
+    "whyTwoHoursButton": 0,
+    "loadMs": 536
+   },
+   {
+    "name": "b-edge",
+    "browser": "msedge 157.0.4341.60",
+    "viewport": "1366x768",
+    "lang": "tr",
+    "dest": "mars",
+    "seed": 76446112,
+    "landing": "meridiani",
+    "goal": {
+     "estimate": 27,
+     "target": 22,
+     "limiting": "food"
+    },
+    "preLaunchRange": "Tahmini kalış süresi i Tahmini kalış: iniş yerine göre 21–27 gün Hedef: 17.–22. gün, inişte belirlenir",
+    "returnPlan": "day:3",
+    "pressed": {
+     "day": 3,
+     "clock": "01:00",
+     "chip": "Kalkış planlandı12 sa sonra"
+    },
+    "endMinute": 3660,
+    "rating": "Evdeyiz, ama bedeli oldu",
+    "decisions": 7,
+    "crewSize": 4,
+    "surfaceSeconds16x": 42,
+    "overflowPx": {
+     "title": 0,
+     "destination": 0,
+     "crew": 0,
+     "cargo": 0,
+     "briefing": 0,
+     "surface": 0,
+     "surface-booked": 0,
+     "debrief": 0
+    },
+    "pageErrors": 0,
+    "consoleErrors": 5,
+    "failedRequests": [
+     "429 https://api.nasa.gov/DONKI/SEP?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/FLR?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/GST?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/IPS?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/CME?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY"
+    ],
+    "pngCard": "solbound-mars-19ii74.png",
+    "video": null,
+    "copiedText": "Solbound’da 4 kişilik bir ekibi 3 gün boyunca Mars (Meridiani Planum) yönettim. 1 hasat, 0 önceden bilinen büyük olay, 12 bilim puanı. Sonuç: Evdeyiz, ama bedeli oldu. #Solbound #SpaceApps",
+    "cmeFromDonki": [
+     {
+      "startAt": 23040,
+      "time": "2026-10-26T09:00Z",
+      "speed": 873,
+      "arrivalMars": "2026-10-31T00:00Z",
+      "arrivalEarth": null,
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49254/-1"
+     }
+    ],
+    "whyTwoHoursButton": 0,
+    "loadMs": 499
+   },
+   {
+    "name": "m390",
+    "browser": "Playwright Chromium 159.0.8154.6",
+    "viewport": "390x844",
+    "lang": "en",
+    "dest": "moon",
+    "seed": 3658881666,
+    "landing": "procellarum",
+    "goal": {
+     "estimate": 15,
+     "target": 12,
+     "limiting": "battery"
+    },
+    "preLaunchRange": "Estimated stay i Estimated stay: 15–30 days, depending on where you land Goal: day 12–25, fixed on landing",
+    "returnPlan": "day:3",
+    "pressed": {
+     "day": 3,
+     "clock": "01:27",
+     "chip": "Departure bookedin 11 h"
+    },
+    "endMinute": 3660,
+    "rating": "Home, but at a cost",
+    "decisions": 7,
+    "crewSize": 4,
+    "surfaceSeconds16x": 72,
+    "overflowPx": {
+     "title": 0,
+     "destination": 0,
+     "crew": 0,
+     "cargo": 0,
+     "briefing": 0,
+     "surface": 0,
+     "surface-booked": 0,
+     "debrief": 0
+    },
+    "pageErrors": 0,
+    "consoleErrors": 5,
+    "failedRequests": [
+     "429 https://api.nasa.gov/DONKI/FLR?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/GST?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/IPS?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/SEP?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/CME?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY"
+    ],
+    "pngCard": "solbound-moon-1oiej5u.png",
+    "video": null,
+    "copiedText": "I commanded a crew of 4 on the The Moon (Oceanus Procellarum) for 3 days in Solbound. 0 harvests, 0 predicted events faced, 23 science points. Result: Home, but at a cost. #Solbound #SpaceApps",
+    "cmeFromDonki": [
+     {
+      "startAt": 8280,
+      "time": "2026-10-16T12:38Z",
+      "speed": 247,
+      "arrivalMars": null,
+      "arrivalEarth": "2026-10-20T18:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49137/-1"
+     },
+     {
+      "startAt": 30540,
+      "time": "2026-11-01T19:00Z",
+      "speed": 357,
+      "arrivalMars": "2026-11-07T06:00Z",
+      "arrivalEarth": "2026-11-05T05:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49358/-1"
+     }
+    ],
+    "whyTwoHoursButton": 0,
+    "loadMs": 443
+   },
+   {
+    "name": "m360",
+    "browser": "Playwright Chromium 159.0.8154.6",
+    "viewport": "360x740",
+    "lang": "tr",
+    "dest": "mars",
+    "seed": 3649575266,
+    "landing": "elysium",
+    "goal": {
+     "estimate": 24,
+     "target": 20,
+     "limiting": "food"
+    },
+    "preLaunchRange": "Tahmini kalış süresi i Tahmini kalış: iniş yerine göre 20–24 gün Hedef: 17.–20. gün, inişte belirlenir",
+    "returnPlan": "day:3",
+    "pressed": {
+     "day": 3,
+     "clock": "01:16",
+     "chip": "Kalkış planlandı11 sa sonra"
+    },
+    "endMinute": 3660,
+    "rating": "Evdeyiz, ama bedeli oldu",
+    "decisions": 8,
+    "crewSize": 4,
+    "surfaceSeconds16x": 73,
+    "overflowPx": {
+     "title": 0,
+     "destination": 0,
+     "crew": 0,
+     "cargo": 0,
+     "briefing": 0,
+     "surface": 0,
+     "surface-booked": 0,
+     "debrief": 0
+    },
+    "pageErrors": 0,
+    "consoleErrors": 5,
+    "failedRequests": [
+     "429 https://api.nasa.gov/DONKI/SEP?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/CME?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/IPS?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/GST?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY",
+     "429 https://api.nasa.gov/DONKI/FLR?startDate=2026-10-16&endDate=2026-11-15&api_key=DEMO_KEY"
+    ],
+    "pngCard": "solbound-mars-1ocv2aq.png",
+    "video": null,
+    "copiedText": "Solbound’da 4 kişilik bir ekibi 3 gün boyunca Mars (Elysium Planitia) yönettim. 1 hasat, 0 önceden bilinen büyük olay, 23 bilim puanı. Sonuç: Evdeyiz, ama bedeli oldu. #Solbound #SpaceApps",
+    "cmeFromDonki": [
+     {
+      "startAt": 18000,
+      "time": "2026-10-23T04:18Z",
+      "speed": 597,
+      "arrivalMars": "2026-10-27T12:00Z",
+      "arrivalEarth": null,
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49212/-1"
+     },
+     {
+      "startAt": 23040,
+      "time": "2026-10-26T09:00Z",
+      "speed": 873,
+      "arrivalMars": "2026-10-31T00:00Z",
+      "arrivalEarth": null,
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49254/-1"
+     },
+     {
+      "startAt": 33480,
+      "time": "2026-11-01T19:00Z",
+      "speed": 357,
+      "arrivalMars": "2026-11-07T06:00Z",
+      "arrivalEarth": "2026-11-05T05:00Z",
+      "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49358/-1"
+     }
+    ],
+    "whyTwoHoursButton": 0,
+    "loadMs": 480
+   }
+  ],
+  "measurements": {
+   "coldLoad": [
+    {
+     "label": "Chrome 157 masaüstü, önbelleksiz",
+     "loadMs": 534,
+     "networkIdleMs": 2738,
+     "lcpMs": 1252,
+     "transferredKB": 451,
+     "note": "TR dil parçası ve latin-ext yazı tipi dahil"
+    },
+    {
+     "label": "Chromium 390 px, 9 Mbit/150 ms yavaşlatma, önbelleksiz",
+     "loadMs": 692,
+     "networkIdleMs": 2963,
+     "lcpMs": 1388,
+     "transferredKB": 297
+    },
+    {
+     "label": "Playwright oyun koşuları (yeni bağlam)",
+     "loadMs": "399–536"
+    }
+   ]
+  },
+  "donki": {
+   "fetchedAt": "2026-11-14T14:06:32.680Z",
+   "ageAtTestHours": 25,
+   "failedLists": [
+    "FLR"
+   ],
+   "cmeRecords": 86,
+   "olderThan2Days": false,
+   "githubActionRuns": 2,
+   "githubActionCommits": 0,
+   "demoKeyResponses": "429 on all 5 endpoints in every run (8/8)",
+   "titleCardText": "Canlı uzay havası NASA DONKI ↻ Yenile NASA’ya ulaşılamadı, kayıtlı veri gösteriliyor · Kayıtlar 2026-10-15 – 2026-11-14 · İndirildi 14 Kas 17:06 (kayıtlı kopya) · Son kontrol 15 Kas 14:49 86 CME 10 Mars’a varması bekleniyor 3 Dünya–Ay’a varması bekleniyor 1 jeomanyetik fırtına 0 parçacık olayı — M/X patlaması · alınamadı Alınamayanlar: Güneş patlamaları. Bunların sayısı sıfır değil, bilinmiyor. NA",
+   "briefingText": "NASA DONKI Bu görevin gerçek uzay havası: 2026-10-15 – 2026-11-14 (kayıtlı kopya). Mars için beklenen CME varışı: 10."
+  },
+  "apiKey": {
+   "assetsDownloaded": 20,
+   "identicalToLocalHeadBuild": true,
+   "apiKeyQuery": "only template api_key=${encodeURIComponent(e)} in Title-*.js",
+   "demoKeyPresent": true,
+   "fortyCharKeyLikeStrings": 0,
+   "realKeyFound": false
+  },
+  "accessibility": {
+   "screens": {
+    "title": [
+     {
+      "id": "heading-order",
+      "impact": "moderate",
+      "n": 1,
+      "sample": [
+       "h3 ::   Heading order invalid"
+      ]
+     }
+    ],
+    "howToPlay": [
+     {
+      "id": "heading-order",
+      "impact": "moderate",
+      "n": 1,
+      "sample": [
+       "h3 ::   Heading order invalid"
+      ]
+     }
+    ],
+    "identity": [],
+    "destination": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "n": 1,
+      "sample": [
+       ".random-landing > .fine ::   Element has insufficient color contrast of 3.69 (foreground color: #7d88a0, background color: #332e3d, font size: 9.6pt (12.75px), font we"
+      ]
+     }
+    ],
+    "crew": [
+     {
+      "id": "heading-order",
+      "impact": "moderate",
+      "n": 1,
+      "sample": [
+       ".sel:nth-child(1) > .cand-top > .cand-id > h3 ::   Heading order invalid"
+      ]
+     }
+    ],
+    "cargo": [
+     {
+      "id": "heading-order",
+      "impact": "moderate",
+      "n": 1,
+      "sample": [
+       ".stay-goal > h3 ::   Heading order invalid"
+      ]
+     }
+    ],
+    "briefing": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "n": 1,
+      "sample": [
+       ".random-landing > .fine ::   Element has insufficient color contrast of 3.69 (foreground color: #7d88a0, background color: #332e3d, font size: 9.6pt (12.75px), font we"
+      ]
+     }
+    ],
+    "event": [],
+    "surface": [
+     {
+      "id": "color-contrast",
+      "impact": "serious",
+      "n": 2,
+      "sample": [
+       "div[aria-label=\"Greenhouse mode\"] > .on[role=\"radio\"] > span ::   Element has insufficient color contrast of 3.89 (foreground color: #7d88a0, background color: #2c2c32, font size: 8.1pt (10.8px), font wei",
+       "div[aria-label=\"Greenhouse cover\"] > .on[role=\"radio\"] > span ::   Element has insufficient color contrast of 3.89 (foreground color: #7d88a0, background color: #2c2c32, font size: 8.1pt (10.8px), font wei"
+      ]
+     },
+     {
+      "id": "page-has-heading-one",
+      "impact": "moderate",
+      "n": 1,
+      "sample": [
+       "html ::   Page must have a level-one heading"
+      ]
+     }
+    ]
+   },
+   "keyboard": {
+    "tabsToNewMission": 14,
+    "identityReached": true,
+    "focusStyleAfterEnter": {
+     "tag": "MAIN",
+     "outline": "none 3px",
+     "boxShadow": "none"
+    },
+    "destinationReached": true,
+    "crewReached": true,
+    "crewAddedByKeyboard": 3,
+    "cargoReached": true,
+    "briefingReached": true,
+    "launchedByKeyboard": true,
+    "eventResolvedByKeyboard": true,
+    "surfaceReached": true
+   },
+   "reducedMotion": {
+    "title": 0,
+    "surface": 0
+   },
+   "howToPlayButton": 1,
+   "howToPlay": "How to play Prepare: choose your astronaut, the Moon or Mars, three companions and your cargo within the launch mass budget. Where you land is a surprise: one of eight sites, from easy to very hard. Live 30 days on the surface: the clock runs (about a minute per day at 1×, up to 16×) and stops for every decision. Decide: read what you know, check the chance and the cost, open research cards. Words with ⓘ explain themselves. Some big events can be predicted. When a countdown appears, plan your preparations. Then pass the reserve checklist and bring everyone home. Close",
+   "credits": "Who made Solbound Thanks to NASA’s open data teams (DONKI, JPL SSD, NASA Science) whose public work made this possible. NASA data and imagery are used under NASA’s open data policy; this is not an official NASA product. Close"
+  },
+  "trailer": {
+   "durationS": 29.8,
+   "youtubeApproxDurationMs": 29799,
+   "resolution": "1920x1080",
+   "showsSiteSelection": false,
+   "statesProblem": false,
+   "showsNasaRecord": true
+  },
+  "v08Checklist": {
+   "randomLandingAndCard": "çalışıyor",
+   "preLaunchRange": "çalışıyor",
+   "departure1300": "çalışıyor",
+   "beyondEstimateTier": "canlıda görülmedi; motor taramasında çalışıyor",
+   "crewCrisis": "görülmedi (taramada 20.000 oyunun 17’sinde)",
+   "shelterExitAfterStorm": "çalışıyor (sınırlı kanıt)",
+   "briefingDonkiExplain": "çalışıyor",
+   "credits": "sorunlu (boş)",
+   "whyTwoHoursRemoved": "çalışıyor (düğme yok; i18n anahtarı ölü)"
+  }
+ },
+ "repo": {
+  "note": "Gerçek klasörde npm ci EPERM ile başarısız oldu (çalışan vite süreçleri rolldown .node dosyasını kilitliyordu). Bütün komutlar git archive HEAD ile çıkarılan temiz kopyada çalıştırıldı.",
+  "npmCiRealFolder": {
+   "ok": false,
+   "error": "EPERM unlink node_modules/@rolldown/binding-win32-x64-msvc/rolldown-binding.win32-x64-msvc.node"
+  },
+  "npmCi": {
+   "ok": true,
+   "ms": 3272,
+   "note": "sıcak npm önbelleği"
+  },
+  "typecheck": {
+   "ok": true,
+   "ms": 1514
+  },
+  "test": {
+   "ok": true,
+   "ms": 32123,
+   "tests": "66/66",
+   "files": "3/3"
+  },
+  "build": {
+   "ok": true,
+   "ms": 1929
+  },
+  "e2eShort": {
+   "npmScript": "başlamadı: 'E2E_SHORT' is not recognized as an internal or external command",
+   "directEnvRun": "62/62, 34,6 sn",
+   "secondRunAfterOrphan": "preview did not start (port 4179 artık süreçte)"
+  },
+  "e2eFull": {
+   "result": "95/95",
+   "ms": 255924,
+   "orphanPreviewLeft": true
+  },
+  "links": {
+   "readme": "hepsi açılıyor (11)",
+   "docsReadme": "hepsi açılıyor (13)"
+  },
+  "readmeClaimsWrong": [
+   "Research cards: 12 cards → kodda 31 (Ay 23, Mars 21)",
+   "A scheduled GitHub Action refreshes the NASA data → Action yeşil ama 14 Kasım’dan beri commit yok"
+  ]
+ },
+ "balance": {
+  "N": 20000,
+  "errors": 0,
+  "overall": {
+   "n": 20000,
+   "full": 37.5,
+   "excellent": 18.7,
+   "success": 18.8,
+   "partial": 42.6,
+   "aborted": 14,
+   "lost": 5.9,
+   "anyDeath": 6.8
+  },
+  "byArche": {
+   "careful": {
+    "n": 4875,
+    "full": 65.7,
+    "excellent": 65.7,
+    "success": 0,
+    "partial": 30.7,
+    "aborted": 2.1,
+    "lost": 1.5,
+    "anyDeath": 1.8
+   },
+   "carefulGoal": {
+    "n": 1875,
+    "full": 72.3,
+    "excellent": 0,
+    "success": 72.3,
+    "partial": 25,
+    "aborted": 1.2,
+    "lost": 1.4,
+    "anyDeath": 1.8
+   },
+   "early": {
+    "n": 2076,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 99.1,
+    "aborted": 0.7,
+    "lost": 0.2,
+    "anyDeath": 0.3
+   },
+   "mixed": {
+    "n": 5113,
+    "full": 48.7,
+    "excellent": 9.8,
+    "success": 39,
+    "partial": 42.2,
+    "aborted": 7,
+    "lost": 2.1,
+    "anyDeath": 2.3
+   },
+   "random": {
+    "n": 4070,
+    "full": 11,
+    "excellent": 1,
+    "success": 10,
+    "partial": 48.5,
+    "aborted": 33.1,
+    "lost": 7.4,
+    "anyDeath": 9.6
+   },
+   "reckless": {
+    "n": 1991,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 19,
+    "aborted": 48,
+    "lost": 33,
+    "anyDeath": 36.7
+   }
+  },
+  "byDestArche": {
+   "mars careful": {
+    "n": 2420,
+    "full": 65.7,
+    "excellent": 65.7,
+    "success": 0,
+    "partial": 30.7,
+    "aborted": 2.2,
+    "lost": 1.3,
+    "anyDeath": 1.7
+   },
+   "mars carefulGoal": {
+    "n": 932,
+    "full": 76.2,
+    "excellent": 0,
+    "success": 76.2,
+    "partial": 22.6,
+    "aborted": 0.4,
+    "lost": 0.8,
+    "anyDeath": 0.9
+   },
+   "mars early": {
+    "n": 1043,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 100,
+    "aborted": 0,
+    "lost": 0,
+    "anyDeath": 0
+   },
+   "mars mixed": {
+    "n": 2528,
+    "full": 50.6,
+    "excellent": 10.2,
+    "success": 40.4,
+    "partial": 45.5,
+    "aborted": 3,
+    "lost": 0.9,
+    "anyDeath": 1.1
+   },
+   "mars random": {
+    "n": 2055,
+    "full": 10.9,
+    "excellent": 1,
+    "success": 9.9,
+    "partial": 63.3,
+    "aborted": 19.6,
+    "lost": 6.2,
+    "anyDeath": 8.2
+   },
+   "mars reckless": {
+    "n": 1022,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 35.8,
+    "aborted": 44,
+    "lost": 20.2,
+    "anyDeath": 26.4
+   },
+   "moon careful": {
+    "n": 2455,
+    "full": 65.7,
+    "excellent": 65.7,
+    "success": 0,
+    "partial": 30.6,
+    "aborted": 2,
+    "lost": 1.7,
+    "anyDeath": 2
+   },
+   "moon carefulGoal": {
+    "n": 943,
+    "full": 68.5,
+    "excellent": 0,
+    "success": 68.5,
+    "partial": 27.4,
+    "aborted": 2,
+    "lost": 2.1,
+    "anyDeath": 2.7
+   },
+   "moon early": {
+    "n": 1033,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 98.2,
+    "aborted": 1.4,
+    "lost": 0.5,
+    "anyDeath": 0.7
+   },
+   "moon mixed": {
+    "n": 2585,
+    "full": 46.8,
+    "excellent": 9.3,
+    "success": 37.6,
+    "partial": 39,
+    "aborted": 11,
+    "lost": 3.1,
+    "anyDeath": 3.6
+   },
+   "moon random": {
+    "n": 2015,
+    "full": 11,
+    "excellent": 1,
+    "success": 10,
+    "partial": 33.3,
+    "aborted": 47,
+    "lost": 8.7,
+    "anyDeath": 10.9
+   },
+   "moon reckless": {
+    "n": 969,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 1.2,
+    "aborted": 52.1,
+    "lost": 46.6,
+    "anyDeath": 47.6
+   }
+  },
+  "byBaseArche": {
+   "mars/spring careful": {
+    "n": 1197,
+    "full": 75,
+    "excellent": 75,
+    "success": 0,
+    "partial": 22.8,
+    "aborted": 1.3,
+    "lost": 0.8,
+    "anyDeath": 1.1
+   },
+   "mars/spring carefulGoal": {
+    "n": 462,
+    "full": 79.2,
+    "excellent": 0,
+    "success": 79.2,
+    "partial": 20.1,
+    "aborted": 0.2,
+    "lost": 0.4,
+    "anyDeath": 0.6
+   },
+   "mars/summer careful": {
+    "n": 1223,
+    "full": 56.6,
+    "excellent": 56.6,
+    "success": 0,
+    "partial": 38.5,
+    "aborted": 3.1,
+    "lost": 1.8,
+    "anyDeath": 2.2
+   },
+   "mars/summer carefulGoal": {
+    "n": 470,
+    "full": 73.2,
+    "excellent": 0,
+    "success": 73.2,
+    "partial": 25.1,
+    "aborted": 0.6,
+    "lost": 1.1,
+    "anyDeath": 1.1
+   },
+   "moon/equator careful": {
+    "n": 943,
+    "full": 76.5,
+    "excellent": 76.5,
+    "success": 0,
+    "partial": 21.3,
+    "aborted": 1.1,
+    "lost": 1.2,
+    "anyDeath": 1.8
+   },
+   "moon/equator carefulGoal": {
+    "n": 341,
+    "full": 78.6,
+    "excellent": 0,
+    "success": 78.6,
+    "partial": 18.5,
+    "aborted": 1.5,
+    "lost": 1.5,
+    "anyDeath": 2.1
+   },
+   "moon/polar careful": {
+    "n": 1512,
+    "full": 58.9,
+    "excellent": 58.9,
+    "success": 0,
+    "partial": 36.4,
+    "aborted": 2.6,
+    "lost": 2,
+    "anyDeath": 2.1
+   },
+   "moon/polar carefulGoal": {
+    "n": 602,
+    "full": 62.8,
+    "excellent": 0,
+    "success": 62.8,
+    "partial": 32.4,
+    "aborted": 2.3,
+    "lost": 2.5,
+    "anyDeath": 3
+   }
+  },
+  "byCargo": {
+   "empty": {
+    "n": 2030,
+    "full": 33.6,
+    "excellent": 16.8,
+    "success": 16.8,
+    "partial": 44,
+    "aborted": 17.2,
+    "lost": 5.1,
+    "anyDeath": 5.6
+   },
+   "full": {
+    "n": 6071,
+    "full": 41.4,
+    "excellent": 20.6,
+    "success": 20.8,
+    "partial": 42,
+    "aborted": 10.5,
+    "lost": 6.2,
+    "anyDeath": 7.4
+   },
+   "light": {
+    "n": 4959,
+    "full": 34.4,
+    "excellent": 17,
+    "success": 17.5,
+    "partial": 43,
+    "aborted": 16.9,
+    "lost": 5.6,
+    "anyDeath": 6.3
+   },
+   "random": {
+    "n": 6940,
+    "full": 37.3,
+    "excellent": 18.8,
+    "success": 18.5,
+    "partial": 42.6,
+    "aborted": 14.2,
+    "lost": 5.9,
+    "anyDeath": 7.1
+   }
+  },
+  "byMode": {
+   "explorer": {
+    "n": 5065,
+    "full": 37.7,
+    "excellent": 18,
+    "success": 19.6,
+    "partial": 42.2,
+    "aborted": 20.2,
+    "lost": 0,
+    "anyDeath": 0
+   },
+   "standard": {
+    "n": 14935,
+    "full": 37.4,
+    "excellent": 18.9,
+    "success": 18.5,
+    "partial": 42.8,
+    "aborted": 11.9,
+    "lost": 7.8,
+    "anyDeath": 9.2
+   }
+  },
+  "bySw": {
+   "false": {
+    "n": 9999,
+    "full": 37.3,
+    "excellent": 18.6,
+    "success": 18.7,
+    "partial": 43.1,
+    "aborted": 14,
+    "lost": 5.7,
+    "anyDeath": 6.6
+   },
+   "true": {
+    "n": 10001,
+    "full": 37.7,
+    "excellent": 18.8,
+    "success": 18.9,
+    "partial": 42.2,
+    "aborted": 14.1,
+    "lost": 6,
+    "anyDeath": 7.1
+   }
+  },
+  "bySwArche": {
+   "false careful": {
+    "n": 2440,
+    "full": 66.1,
+    "excellent": 66.1,
+    "success": 0,
+    "partial": 30.8,
+    "aborted": 1.9,
+    "lost": 1.2,
+    "anyDeath": 1.6
+   },
+   "false carefulGoal": {
+    "n": 909,
+    "full": 74,
+    "excellent": 0,
+    "success": 74,
+    "partial": 22.8,
+    "aborted": 1.3,
+    "lost": 1.9,
+    "anyDeath": 2
+   },
+   "false early": {
+    "n": 1034,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 99.2,
+    "aborted": 0.6,
+    "lost": 0.2,
+    "anyDeath": 0.3
+   },
+   "false mixed": {
+    "n": 2546,
+    "full": 48.6,
+    "excellent": 8.8,
+    "success": 39.7,
+    "partial": 42.6,
+    "aborted": 6.8,
+    "lost": 2,
+    "anyDeath": 2.2
+   },
+   "false random": {
+    "n": 2065,
+    "full": 9.9,
+    "excellent": 1.1,
+    "success": 8.8,
+    "partial": 49.4,
+    "aborted": 33.2,
+    "lost": 7.5,
+    "anyDeath": 9.6
+   },
+   "false reckless": {
+    "n": 1005,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 22.1,
+    "aborted": 46.8,
+    "lost": 31.1,
+    "anyDeath": 34.5
+   },
+   "true careful": {
+    "n": 2435,
+    "full": 65.3,
+    "excellent": 65.3,
+    "success": 0,
+    "partial": 30.6,
+    "aborted": 2.3,
+    "lost": 1.8,
+    "anyDeath": 2
+   },
+   "true carefulGoal": {
+    "n": 966,
+    "full": 70.7,
+    "excellent": 0,
+    "success": 70.7,
+    "partial": 27.1,
+    "aborted": 1.1,
+    "lost": 1,
+    "anyDeath": 1.6
+   },
+   "true early": {
+    "n": 1042,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 98.9,
+    "aborted": 0.8,
+    "lost": 0.3,
+    "anyDeath": 0.4
+   },
+   "true mixed": {
+    "n": 2567,
+    "full": 48.9,
+    "excellent": 10.7,
+    "success": 38.2,
+    "partial": 41.8,
+    "aborted": 7.2,
+    "lost": 2.1,
+    "anyDeath": 2.5
+   },
+   "true random": {
+    "n": 2005,
+    "full": 12.1,
+    "excellent": 0.8,
+    "success": 11.2,
+    "partial": 47.5,
+    "aborted": 33.1,
+    "lost": 7.4,
+    "anyDeath": 9.5
+   },
+   "true reckless": {
+    "n": 986,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 15.8,
+    "aborted": 49.2,
+    "lost": 35,
+    "anyDeath": 38.9
+   }
+  },
+  "bySwDest": {
+   "false mars": {
+    "n": 5071,
+    "full": 37.7,
+    "excellent": 18.4,
+    "success": 19.3,
+    "partial": 48.9,
+    "aborted": 9.5,
+    "lost": 3.9,
+    "anyDeath": 5
+   },
+   "false moon": {
+    "n": 4928,
+    "full": 36.8,
+    "excellent": 18.8,
+    "success": 18,
+    "partial": 37.1,
+    "aborted": 18.5,
+    "lost": 7.5,
+    "anyDeath": 8.3
+   },
+   "true mars": {
+    "n": 4929,
+    "full": 38.4,
+    "excellent": 19,
+    "success": 19.4,
+    "partial": 47.3,
+    "aborted": 10.2,
+    "lost": 4.1,
+    "anyDeath": 5.3
+   },
+   "true moon": {
+    "n": 5072,
+    "full": 37,
+    "excellent": 18.6,
+    "success": 18.4,
+    "partial": 37.2,
+    "aborted": 17.9,
+    "lost": 7.9,
+    "anyDeath": 8.8
+   }
+  },
+  "bySwDestCareful": {
+   "false mars": {
+    "n": 1229,
+    "full": 66.6,
+    "excellent": 66.6,
+    "success": 0,
+    "partial": 30.7,
+    "aborted": 2,
+    "lost": 0.7,
+    "anyDeath": 1.1
+   },
+   "false moon": {
+    "n": 1211,
+    "full": 65.6,
+    "excellent": 65.6,
+    "success": 0,
+    "partial": 30.9,
+    "aborted": 1.8,
+    "lost": 1.7,
+    "anyDeath": 2.1
+   },
+   "true mars": {
+    "n": 1191,
+    "full": 64.8,
+    "excellent": 64.8,
+    "success": 0,
+    "partial": 30.8,
+    "aborted": 2.4,
+    "lost": 1.9,
+    "anyDeath": 2.2
+   },
+   "true moon": {
+    "n": 1244,
+    "full": 65.7,
+    "excellent": 65.7,
+    "success": 0,
+    "partial": 30.4,
+    "aborted": 2.3,
+    "lost": 1.7,
+    "anyDeath": 1.8
+   }
+  },
+  "sites": {
+   "shackleton": {
+    "dest": "moon",
+    "base": "polar",
+    "label": "easy",
+    "n": 1250,
+    "careful": {
+     "n": 300,
+     "full": 70.3,
+     "excellent": 70.3,
+     "success": 0,
+     "partial": 24,
+     "aborted": 2.7,
+     "lost": 3,
+     "anyDeath": 3.3
+    },
+    "carefulGoal": {
+     "n": 128,
+     "full": 69.5,
+     "excellent": 0,
+     "success": 69.5,
+     "partial": 25,
+     "aborted": 3.9,
+     "lost": 1.6,
+     "anyDeath": 1.6
+    },
+    "random": {
+     "n": 250,
+     "full": 6,
+     "excellent": 0.8,
+     "success": 5.2,
+     "partial": 35.6,
+     "aborted": 50,
+     "lost": 8.4,
+     "anyDeath": 12.4
+    },
+    "all": {
+     "n": 1250,
+     "full": 38.6,
+     "excellent": 19.5,
+     "success": 19,
+     "partial": 34.8,
+     "aborted": 18.6,
+     "lost": 8,
+     "anyDeath": 9.1
+    },
+    "medianEstimate": 25,
+    "medianTarget": 21,
+    "limiting": "food 75.2%, water 20.8%, none 4%"
+   },
+   "mons-mouton": {
+    "dest": "moon",
+    "base": "polar",
+    "label": "easy",
+    "n": 1250,
+    "careful": {
+     "n": 319,
+     "full": 74.3,
+     "excellent": 74.3,
+     "success": 0,
+     "partial": 21.6,
+     "aborted": 3.1,
+     "lost": 0.9,
+     "anyDeath": 0.9
+    },
+    "carefulGoal": {
+     "n": 114,
+     "full": 85.1,
+     "excellent": 0,
+     "success": 85.1,
+     "partial": 11.4,
+     "aborted": 1.8,
+     "lost": 1.8,
+     "anyDeath": 3.5
+    },
+    "random": {
+     "n": 259,
+     "full": 13.9,
+     "excellent": 3.1,
+     "success": 10.8,
+     "partial": 29.7,
+     "aborted": 49.4,
+     "lost": 6.9,
+     "anyDeath": 7.3
+    },
+    "all": {
+     "n": 1250,
+     "full": 43,
+     "excellent": 22,
+     "success": 21,
+     "partial": 30.7,
+     "aborted": 18.2,
+     "lost": 8,
+     "anyDeath": 8.6
+    },
+    "medianEstimate": 25,
+    "medianTarget": 21,
+    "limiting": "none 23.3%, food 76.7%"
+   },
+   "malapert": {
+    "dest": "moon",
+    "base": "polar",
+    "label": "medium",
+    "n": 1250,
+    "careful": {
+     "n": 280,
+     "full": 46.1,
+     "excellent": 46.1,
+     "success": 0,
+     "partial": 48.9,
+     "aborted": 3.2,
+     "lost": 1.8,
+     "anyDeath": 1.8
+    },
+    "carefulGoal": {
+     "n": 134,
+     "full": 52.2,
+     "excellent": 0,
+     "success": 52.2,
+     "partial": 46.3,
+     "aborted": 0,
+     "lost": 1.5,
+     "anyDeath": 2.2
+    },
+    "random": {
+     "n": 259,
+     "full": 5,
+     "excellent": 0,
+     "success": 5,
+     "partial": 37.1,
+     "aborted": 51,
+     "lost": 6.9,
+     "anyDeath": 8.9
+    },
+    "all": {
+     "n": 1250,
+     "full": 24.4,
+     "excellent": 11.1,
+     "success": 13.3,
+     "partial": 48.5,
+     "aborted": 19.2,
+     "lost": 7.9,
+     "anyDeath": 8.8
+    },
+    "medianEstimate": 25,
+    "medianTarget": 21,
+    "limiting": "food 52.4%, water 47.6%"
+   },
+   "nobile": {
+    "dest": "moon",
+    "base": "polar",
+    "label": "medium",
+    "n": 1250,
+    "careful": {
+     "n": 300,
+     "full": 48.7,
+     "excellent": 48.7,
+     "success": 0,
+     "partial": 47.3,
+     "aborted": 2,
+     "lost": 2,
+     "anyDeath": 2
+    },
+    "carefulGoal": {
+     "n": 112,
+     "full": 60.7,
+     "excellent": 0,
+     "success": 60.7,
+     "partial": 33.9,
+     "aborted": 2.7,
+     "lost": 2.7,
+     "anyDeath": 2.7
+    },
+    "random": {
+     "n": 244,
+     "full": 3.3,
+     "excellent": 1.2,
+     "success": 2,
+     "partial": 41.4,
+     "aborted": 44.3,
+     "lost": 11.1,
+     "anyDeath": 13.5
+    },
+    "all": {
+     "n": 1250,
+     "full": 25.8,
+     "excellent": 13.9,
+     "success": 11.8,
+     "partial": 47.3,
+     "aborted": 18.3,
+     "lost": 8.6,
+     "anyDeath": 9.4
+    },
+    "medianEstimate": 24,
+    "medianTarget": 20,
+    "limiting": "food 83.1%, none 16.9%"
+   },
+   "haworth": {
+    "dest": "moon",
+    "base": "polar",
+    "label": "medium",
+    "n": 1250,
+    "careful": {
+     "n": 313,
+     "full": 53.7,
+     "excellent": 53.7,
+     "success": 0,
+     "partial": 41.9,
+     "aborted": 2.2,
+     "lost": 2.2,
+     "anyDeath": 2.2
+    },
+    "carefulGoal": {
+     "n": 114,
+     "full": 47.4,
+     "excellent": 0,
+     "success": 47.4,
+     "partial": 43.9,
+     "aborted": 3.5,
+     "lost": 5.3,
+     "anyDeath": 5.3
+    },
+    "random": {
+     "n": 263,
+     "full": 4.9,
+     "excellent": 0,
+     "success": 4.9,
+     "partial": 34.2,
+     "aborted": 52.1,
+     "lost": 8.7,
+     "anyDeath": 9.5
+    },
+    "all": {
+     "n": 1250,
+     "full": 27,
+     "excellent": 15.1,
+     "success": 11.8,
+     "partial": 43.7,
+     "aborted": 20.8,
+     "lost": 8.6,
+     "anyDeath": 8.8
+    },
+    "medianEstimate": 24,
+    "medianTarget": 20,
+    "limiting": "water 11.7%, food 86%, none 2.3%"
+   },
+   "tranquillitatis": {
+    "dest": "moon",
+    "base": "equator",
+    "label": "hard",
+    "n": 1250,
+    "careful": {
+     "n": 304,
+     "full": 73.7,
+     "excellent": 73.7,
+     "success": 0,
+     "partial": 22.7,
+     "aborted": 1.6,
+     "lost": 2,
+     "anyDeath": 3
+    },
+    "carefulGoal": {
+     "n": 109,
+     "full": 77.1,
+     "excellent": 0,
+     "success": 77.1,
+     "partial": 20.2,
+     "aborted": 0.9,
+     "lost": 1.8,
+     "anyDeath": 1.8
+    },
+    "random": {
+     "n": 247,
+     "full": 22.7,
+     "excellent": 1.6,
+     "success": 21.1,
+     "partial": 25.1,
+     "aborted": 44.1,
+     "lost": 8.1,
+     "anyDeath": 10.1
+    },
+    "all": {
+     "n": 1250,
+     "full": 44.6,
+     "excellent": 21.5,
+     "success": 23,
+     "partial": 29.9,
+     "aborted": 18.6,
+     "lost": 6.9,
+     "anyDeath": 7.7
+    },
+    "medianEstimate": 15,
+    "medianTarget": 12,
+    "limiting": "battery 100%"
+   },
+   "marius-hills": {
+    "dest": "moon",
+    "base": "equator",
+    "label": "hard",
+    "n": 1250,
+    "careful": {
+     "n": 335,
+     "full": 78.8,
+     "excellent": 78.8,
+     "success": 0,
+     "partial": 20,
+     "aborted": 0.9,
+     "lost": 0.3,
+     "anyDeath": 0.3
+    },
+    "carefulGoal": {
+     "n": 120,
+     "full": 81.7,
+     "excellent": 0,
+     "success": 81.7,
+     "partial": 14.2,
+     "aborted": 1.7,
+     "lost": 2.5,
+     "anyDeath": 4.2
+    },
+    "random": {
+     "n": 236,
+     "full": 16.5,
+     "excellent": 0.8,
+     "success": 15.7,
+     "partial": 29.7,
+     "aborted": 45.3,
+     "lost": 8.5,
+     "anyDeath": 12.3
+    },
+    "all": {
+     "n": 1250,
+     "full": 47.8,
+     "excellent": 24.5,
+     "success": 23.3,
+     "partial": 29.1,
+     "aborted": 16.5,
+     "lost": 6.6,
+     "anyDeath": 7.6
+    },
+    "medianEstimate": 16,
+    "medianTarget": 13,
+    "limiting": "battery 100%"
+   },
+   "procellarum": {
+    "dest": "moon",
+    "base": "equator",
+    "label": "veryHard",
+    "n": 1250,
+    "careful": {
+     "n": 304,
+     "full": 76.6,
+     "excellent": 76.6,
+     "success": 0,
+     "partial": 21.4,
+     "aborted": 0.7,
+     "lost": 1.3,
+     "anyDeath": 2.3
+    },
+    "carefulGoal": {
+     "n": 112,
+     "full": 76.8,
+     "excellent": 0,
+     "success": 76.8,
+     "partial": 21.4,
+     "aborted": 1.8,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "random": {
+     "n": 257,
+     "full": 16.3,
+     "excellent": 0.4,
+     "success": 16,
+     "partial": 33.5,
+     "aborted": 39.3,
+     "lost": 10.9,
+     "anyDeath": 13.6
+    },
+    "all": {
+     "n": 1250,
+     "full": 44.2,
+     "excellent": 22.1,
+     "success": 22.2,
+     "partial": 33.2,
+     "aborted": 15.3,
+     "lost": 7.3,
+     "anyDeath": 8.3
+    },
+    "medianEstimate": 15,
+    "medianTarget": 12,
+    "limiting": "battery 100%"
+   },
+   "jezero": {
+    "dest": "mars",
+    "base": "spring",
+    "label": "medium",
+    "n": 1250,
+    "careful": {
+     "n": 316,
+     "full": 72.8,
+     "excellent": 72.8,
+     "success": 0,
+     "partial": 23.7,
+     "aborted": 2.5,
+     "lost": 0.9,
+     "anyDeath": 1.3
+    },
+    "carefulGoal": {
+     "n": 112,
+     "full": 76.8,
+     "excellent": 0,
+     "success": 76.8,
+     "partial": 22.3,
+     "aborted": 0.9,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "random": {
+     "n": 242,
+     "full": 11.6,
+     "excellent": 1.7,
+     "success": 9.9,
+     "partial": 57.4,
+     "aborted": 25.2,
+     "lost": 5.8,
+     "anyDeath": 7
+    },
+    "all": {
+     "n": 1250,
+     "full": 41.4,
+     "excellent": 21.8,
+     "success": 19.7,
+     "partial": 45.4,
+     "aborted": 10.8,
+     "lost": 2.3,
+     "anyDeath": 3.7
+    },
+    "medianEstimate": 23,
+    "medianTarget": 19,
+    "limiting": "food 90.4%, none 9.6%"
+   },
+   "elysium": {
+    "dest": "mars",
+    "base": "spring",
+    "label": "easy",
+    "n": 1250,
+    "careful": {
+     "n": 294,
+     "full": 77.6,
+     "excellent": 77.6,
+     "success": 0,
+     "partial": 18.4,
+     "aborted": 2,
+     "lost": 2,
+     "anyDeath": 2
+    },
+    "carefulGoal": {
+     "n": 110,
+     "full": 81.8,
+     "excellent": 0,
+     "success": 81.8,
+     "partial": 16.4,
+     "aborted": 0,
+     "lost": 1.8,
+     "anyDeath": 2.7
+    },
+    "random": {
+     "n": 274,
+     "full": 11.3,
+     "excellent": 0.7,
+     "success": 10.6,
+     "partial": 64.6,
+     "aborted": 19,
+     "lost": 5.1,
+     "anyDeath": 8.8
+    },
+    "all": {
+     "n": 1250,
+     "full": 41.3,
+     "excellent": 20.8,
+     "success": 20.5,
+     "partial": 45.7,
+     "aborted": 10.4,
+     "lost": 2.6,
+     "anyDeath": 5
+    },
+    "medianEstimate": 24,
+    "medianTarget": 20,
+    "limiting": "food 89.4%, none 10.6%"
+   },
+   "arcadia": {
+    "dest": "mars",
+    "base": "spring",
+    "label": "medium",
+    "n": 1250,
+    "careful": {
+     "n": 281,
+     "full": 73.7,
+     "excellent": 73.7,
+     "success": 0,
+     "partial": 26,
+     "aborted": 0,
+     "lost": 0.4,
+     "anyDeath": 1.1
+    },
+    "carefulGoal": {
+     "n": 118,
+     "full": 78.8,
+     "excellent": 0,
+     "success": 78.8,
+     "partial": 21.2,
+     "aborted": 0,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "random": {
+     "n": 276,
+     "full": 10.9,
+     "excellent": 0.7,
+     "success": 10.1,
+     "partial": 68.8,
+     "aborted": 14.9,
+     "lost": 5.4,
+     "anyDeath": 5.8
+    },
+    "all": {
+     "n": 1250,
+     "full": 38.3,
+     "excellent": 19.9,
+     "success": 18.4,
+     "partial": 53.4,
+     "aborted": 5.9,
+     "lost": 2.4,
+     "anyDeath": 3.1
+    },
+    "medianEstimate": 20,
+    "medianTarget": 17,
+    "limiting": "food 95.7%, none 4.3%"
+   },
+   "utopia": {
+    "dest": "mars",
+    "base": "spring",
+    "label": "hard",
+    "n": 1250,
+    "careful": {
+     "n": 306,
+     "full": 76.1,
+     "excellent": 76.1,
+     "success": 0,
+     "partial": 23.2,
+     "aborted": 0.7,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "carefulGoal": {
+     "n": 122,
+     "full": 79.5,
+     "excellent": 0,
+     "success": 79.5,
+     "partial": 20.5,
+     "aborted": 0,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "random": {
+     "n": 229,
+     "full": 12.7,
+     "excellent": 0.4,
+     "success": 12.2,
+     "partial": 62.4,
+     "aborted": 20.1,
+     "lost": 4.8,
+     "anyDeath": 7
+    },
+    "all": {
+     "n": 1250,
+     "full": 44.4,
+     "excellent": 22.2,
+     "success": 22.2,
+     "partial": 46.5,
+     "aborted": 7,
+     "lost": 2.2,
+     "anyDeath": 3.1
+    },
+    "medianEstimate": 20,
+    "medianTarget": 17,
+    "limiting": "food 94.6%, none 5.4%"
+   },
+   "gale": {
+    "dest": "mars",
+    "base": "summer",
+    "label": "hard",
+    "n": 1250,
+    "careful": {
+     "n": 321,
+     "full": 62.9,
+     "excellent": 62.9,
+     "success": 0,
+     "partial": 32.4,
+     "aborted": 2.2,
+     "lost": 2.5,
+     "anyDeath": 3.1
+    },
+    "carefulGoal": {
+     "n": 108,
+     "full": 75.9,
+     "excellent": 0,
+     "success": 75.9,
+     "partial": 23.1,
+     "aborted": 0,
+     "lost": 0.9,
+     "anyDeath": 0.9
+    },
+    "random": {
+     "n": 251,
+     "full": 12.7,
+     "excellent": 2,
+     "success": 10.8,
+     "partial": 63.3,
+     "aborted": 19.5,
+     "lost": 4.4,
+     "anyDeath": 6.4
+    },
+    "all": {
+     "n": 1250,
+     "full": 39.3,
+     "excellent": 19,
+     "success": 20.3,
+     "partial": 44.8,
+     "aborted": 10.7,
+     "lost": 5.2,
+     "anyDeath": 6
+    },
+    "medianEstimate": 23,
+    "medianTarget": 19,
+    "limiting": "food 88.2%, none 11.8%"
+   },
+   "meridiani": {
+    "dest": "mars",
+    "base": "summer",
+    "label": "medium",
+    "n": 1250,
+    "careful": {
+     "n": 304,
+     "full": 68.4,
+     "excellent": 68.4,
+     "success": 0,
+     "partial": 26,
+     "aborted": 4.6,
+     "lost": 1,
+     "anyDeath": 1.3
+    },
+    "carefulGoal": {
+     "n": 101,
+     "full": 86.1,
+     "excellent": 0,
+     "success": 86.1,
+     "partial": 12.9,
+     "aborted": 0,
+     "lost": 1,
+     "anyDeath": 1
+    },
+    "random": {
+     "n": 266,
+     "full": 13.2,
+     "excellent": 1.1,
+     "success": 12,
+     "partial": 61.7,
+     "aborted": 16.2,
+     "lost": 9,
+     "anyDeath": 11.3
+    },
+    "all": {
+     "n": 1250,
+     "full": 40.6,
+     "excellent": 19.7,
+     "success": 20.9,
+     "partial": 44,
+     "aborted": 10.5,
+     "lost": 5,
+     "anyDeath": 5.9
+    },
+    "medianEstimate": 24,
+    "medianTarget": 20,
+    "limiting": "food 89.7%, none 10.3%"
+   },
+   "valles": {
+    "dest": "mars",
+    "base": "summer",
+    "label": "hard",
+    "n": 1250,
+    "careful": {
+     "n": 299,
+     "full": 53.5,
+     "excellent": 53.5,
+     "success": 0,
+     "partial": 40.8,
+     "aborted": 4,
+     "lost": 1.7,
+     "anyDeath": 1.7
+    },
+    "carefulGoal": {
+     "n": 136,
+     "full": 67.6,
+     "excellent": 0,
+     "success": 67.6,
+     "partial": 30.1,
+     "aborted": 0.7,
+     "lost": 1.5,
+     "anyDeath": 1.5
+    },
+    "random": {
+     "n": 265,
+     "full": 6,
+     "excellent": 0.8,
+     "success": 5.3,
+     "partial": 64.9,
+     "aborted": 20,
+     "lost": 9.1,
+     "anyDeath": 11.7
+    },
+    "all": {
+     "n": 1250,
+     "full": 31.8,
+     "excellent": 15,
+     "success": 16.9,
+     "partial": 51.2,
+     "aborted": 11.1,
+     "lost": 5.8,
+     "anyDeath": 7.1
+    },
+    "medianEstimate": 23,
+    "medianTarget": 19,
+    "limiting": "food 89.6%, none 10.4%"
+   },
+   "hellas": {
+    "dest": "mars",
+    "base": "summer",
+    "label": "veryHard",
+    "n": 1250,
+    "careful": {
+     "n": 299,
+     "full": 40.8,
+     "excellent": 40.8,
+     "success": 0,
+     "partial": 55.5,
+     "aborted": 1.7,
+     "lost": 2,
+     "anyDeath": 2.7
+    },
+    "carefulGoal": {
+     "n": 125,
+     "full": 66.4,
+     "excellent": 0,
+     "success": 66.4,
+     "partial": 31.2,
+     "aborted": 1.6,
+     "lost": 0.8,
+     "anyDeath": 0.8
+    },
+    "random": {
+     "n": 252,
+     "full": 9.1,
+     "excellent": 0.4,
+     "success": 8.7,
+     "partial": 62.3,
+     "aborted": 22.6,
+     "lost": 6,
+     "anyDeath": 7.5
+    },
+    "all": {
+     "n": 1250,
+     "full": 27.2,
+     "excellent": 11.2,
+     "success": 16,
+     "partial": 54.2,
+     "aborted": 12.4,
+     "lost": 6.2,
+     "anyDeath": 7.2
+    },
+    "medianEstimate": 23,
+    "medianTarget": 19,
+    "limiting": "food 90.1%, none 9.9%"
+   }
+  },
+  "range": {
+   "checked": 2500,
+   "insideRange": 2500,
+   "equalsBySite": 2500,
+   "mismatch": [],
+   "rangeWidth": {
+    "moon": 21,
+    "mars": 0
+   },
+   "medianWidth": 10
+  },
+  "departure": {
+   "pressed": 14283,
+   "deathsWhileWaiting": 61,
+   "lostWhileWaiting": 35,
+   "endedNotComplete": {
+    "playerLost": 35,
+    "aborted": 29
+   },
+   "missedGoalAfterPressingAtGoal": 0,
+   "pressedAtOrAfterGoal": 12222,
+   "readyAtPressButRation": 96,
+   "notReadyAtPress": 9221,
+   "notReadyAtPressRation": 4116,
+   "waitHoursMedian": 5,
+   "departHourAlways13": true,
+   "departHourCounts": {
+    "13": 14259
+   }
+  },
+  "crisis": {
+   "runsWithCrisis": 17,
+   "pctRuns": 0.1,
+   "cards": 47,
+   "byArche": {
+    "careful": 0,
+    "carefulGoal": 0,
+    "early": 0,
+    "mixed": 0.2,
+    "random": 0.2,
+    "reckless": 0
+   },
+   "byFirstChoice": {
+    "talk": {
+     "n": 8,
+     "full": 25,
+     "excellent": 25,
+     "success": 0,
+     "partial": 50,
+     "aborted": 0,
+     "lost": 25,
+     "anyDeath": 25
+    },
+    "push": {
+     "n": 6,
+     "full": 33.3,
+     "excellent": 16.7,
+     "success": 16.7,
+     "partial": 50,
+     "aborted": 16.7,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "dayOff": {
+     "n": 3,
+     "full": 33.3,
+     "excellent": 0,
+     "success": 33.3,
+     "partial": 66.7,
+     "aborted": 0,
+     "lost": 0,
+     "anyDeath": 0
+    }
+   },
+   "byFirstChoiceRandom": {
+    "talk": {
+     "n": 4,
+     "full": 25,
+     "excellent": 25,
+     "success": 0,
+     "partial": 50,
+     "aborted": 0,
+     "lost": 25,
+     "anyDeath": 25
+    },
+    "dayOff": {
+     "n": 1,
+     "full": 0,
+     "excellent": 0,
+     "success": 0,
+     "partial": 100,
+     "aborted": 0,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "push": {
+     "n": 2,
+     "full": 50,
+     "excellent": 0,
+     "success": 50,
+     "partial": 0,
+     "aborted": 50,
+     "lost": 0,
+     "anyDeath": 0
+    }
+   },
+   "noCrisisBaseline": {
+    "n": 19983,
+    "full": 37.5,
+    "excellent": 18.7,
+    "success": 18.8,
+    "partial": 42.6,
+    "aborted": 14,
+    "lost": 5.8,
+    "anyDeath": 6.8
+   },
+   "maxStressOver98": 0.3
+  },
+  "emgMed": {
+   "runs": 3357,
+   "pctRuns": 16.8,
+   "uniformBots": {
+    "evacuate": {
+     "n": 88,
+     "full": 0,
+     "excellent": 0,
+     "success": 0,
+     "partial": 27.3,
+     "aborted": 33,
+     "lost": 39.8,
+     "anyDeath": 43.2
+    },
+    "abort": {
+     "n": 200,
+     "full": 0,
+     "excellent": 0,
+     "success": 0,
+     "partial": 0,
+     "aborted": 100,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "treatCause": {
+     "n": 272,
+     "full": 6.3,
+     "excellent": 2.6,
+     "success": 3.7,
+     "partial": 28.3,
+     "aborted": 19.5,
+     "lost": 46,
+     "anyDeath": 50
+    },
+    "medic": {
+     "n": 34,
+     "full": 2.9,
+     "excellent": 0,
+     "success": 2.9,
+     "partial": 14.7,
+     "aborted": 11.8,
+     "lost": 70.6,
+     "anyDeath": 76.5
+    },
+    "medkit": {
+     "n": 62,
+     "full": 1.6,
+     "excellent": 0,
+     "success": 1.6,
+     "partial": 41.9,
+     "aborted": 24.2,
+     "lost": 32.3,
+     "anyDeath": 62.9
+    },
+    "stabilize": {
+     "n": 22,
+     "full": 9.1,
+     "excellent": 0,
+     "success": 9.1,
+     "partial": 36.4,
+     "aborted": 27.3,
+     "lost": 27.3,
+     "anyDeath": 40.9
+    }
+   },
+   "random": {
+    "evacuate": {
+     "n": 102,
+     "full": 0,
+     "excellent": 0,
+     "success": 0,
+     "partial": 24.5,
+     "aborted": 43.1,
+     "lost": 32.4,
+     "anyDeath": 45.1
+    },
+    "treatCause": {
+     "n": 306,
+     "full": 1,
+     "excellent": 0,
+     "success": 1,
+     "partial": 17.3,
+     "aborted": 26.8,
+     "lost": 54.9,
+     "anyDeath": 62.7
+    },
+    "medkit": {
+     "n": 105,
+     "full": 0,
+     "excellent": 0,
+     "success": 0,
+     "partial": 25.7,
+     "aborted": 43.8,
+     "lost": 30.5,
+     "anyDeath": 53.3
+    },
+    "abort": {
+     "n": 209,
+     "full": 0,
+     "excellent": 0,
+     "success": 0,
+     "partial": 0,
+     "aborted": 100,
+     "lost": 0,
+     "anyDeath": 0
+    },
+    "stabilize": {
+     "n": 184,
+     "full": 0,
+     "excellent": 0,
+     "success": 0,
+     "partial": 34.2,
+     "aborted": 45.1,
+     "lost": 20.7,
+     "anyDeath": 32.6
+    },
+    "medic": {
+     "n": 53,
+     "full": 0,
+     "excellent": 0,
+     "success": 0,
+     "partial": 17,
+     "aborted": 22.6,
+     "lost": 60.4,
+     "anyDeath": 66
+    }
+   },
+   "v4": "V4: EMG-MED görülen oyunlarda tam başarı %0,4"
+  },
+  "reasons": {
+   "reason.lost": 1368,
+   "reason.evacuated": 783,
+   "reason.excellent": 3754,
+   "reason.early": 2057,
+   "reason.aborted": 2935,
+   "reason.ration": 5522,
+   "reason.rough": 3480
+  },
+  "shelteredAtEnd": 38,
+  "cme": {
+   "swRuns": 10001,
+   "cmeBigMean": 1.94,
+   "cmeHitRunsPct": 90.8,
+   "noSwCmeBig": 0,
+   "byDest": {
+    "moon": 1.67,
+    "mars": 2.21
+   }
+  },
+  "cmeEffectCareful": {
+   "hit": {
+    "n": 2374,
+    "full": 65.1,
+    "excellent": 65.1,
+    "success": 0,
+    "partial": 30.6,
+    "aborted": 2.4,
+    "lost": 1.9,
+    "anyDeath": 2.1
+   },
+   "none": {
+    "n": 61,
+    "full": 70.5,
+    "excellent": 70.5,
+    "success": 0,
+    "partial": 29.5,
+    "aborted": 0,
+    "lost": 0,
+    "anyDeath": 0
+   }
+  },
+  "cmeEffectRandom": {
+   "hit": {
+    "n": 1892,
+    "full": 12,
+    "excellent": 0.9,
+    "success": 11.1,
+    "partial": 47,
+    "aborted": 33.2,
+    "lost": 7.8,
+    "anyDeath": 10
+   },
+   "none": {
+    "n": 113,
+    "full": 13.3,
+    "excellent": 0,
+    "success": 13.3,
+    "partial": 55.8,
+    "aborted": 31,
+    "lost": 0,
+    "anyDeath": 0.9
+   }
+  },
+  "reinforcement": {
+   "accept": {
+    "n": 1481,
+    "full": 36.3,
+    "excellent": 19.6,
+    "success": 16.7,
+    "partial": 35.7,
+    "aborted": 17.9,
+    "lost": 10.1,
+    "anyDeath": 11.3
+   },
+   "cargo": {
+    "n": 1458,
+    "full": 30.8,
+    "excellent": 14.3,
+    "success": 16.5,
+    "partial": 44.6,
+    "aborted": 17.6,
+    "lost": 7.1,
+    "anyDeath": 7.3
+   },
+   "decline": {
+    "n": 1487,
+    "full": 29.3,
+    "excellent": 15.6,
+    "success": 13.7,
+    "partial": 43.3,
+    "aborted": 19.8,
+    "lost": 7.7,
+    "anyDeath": 8.3
+   }
+  },
+  "reinfOfferedPctMoon": 44.3,
+  "sixCrew": 1007,
+  "earlyByShare": {
+   "50-99%": {
+    "n": 1153,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 98.6,
+    "aborted": 1,
+    "lost": 0.4,
+    "anyDeath": 0.6
+   },
+   "<50%": {
+    "n": 923,
+    "full": 0,
+    "excellent": 0,
+    "success": 0,
+    "partial": 99.7,
+    "aborted": 0.3,
+    "lost": 0,
+    "anyDeath": 0
+   }
+  },
+  "medianDays": {
+   "careful": 21.3,
+   "carefulGoal": 17.3,
+   "mixed": 19.3,
+   "random": 20.3,
+   "reckless": 22.8,
+   "early": 9.3
+  },
+  "meanSci": {
+   "careful": 241,
+   "carefulGoal": 198
+  }
+ },
+ "bugs": [
+  {
+   "id": "B1",
+   "severity": "sunumdan önce",
+   "title": "DONKI verisi bayat; site DEMO_KEY ile 429 alıyor, açılış kartı ‘NASA’ya ulaşılamadı’ diyor",
+   "files": [
+    "src/live/useSpaceWeather.tsx:15",
+    "scripts/donki-snapshot.ts:9",
+    ".github/workflows/donki-snapshot.yml"
+   ],
+   "repro": "Önbelleği temiz bir tarayıcıda https://solbound.vercel.app açın; donki-latest.json 6 saatten eski olduğu için 5 DEMO_KEY isteği atılıyor, 8/8 koşuda hepsi 429",
+   "fix": "Depoya NASA_API_KEY sırrını ekleyip workflow_dispatch ile çalıştırın; betik anahtar yoksa hata versin; STATIC_MS’yi 48 saate çıkarın ya da durum metnini ‘sitenin kayıtlı NASA kopyası’ yapın"
+  },
+  {
+   "id": "B2",
+   "severity": "sunumdan önce",
+   "title": "Yapanlar penceresi boş",
+   "files": [
+    "src/credits.ts:5-10"
+   ],
+   "repro": "Başlıkta Yapanlar düğmesi → yalnız NASA notu",
+   "fix": "Takım adlarını ve rollerini doldurun"
+  },
+  {
+   "id": "B3",
+   "severity": "sunumdan önce",
+   "title": "EN paylaşım metni: ‘on the The Moon’, ‘on the Mars’",
+   "files": [
+    "src/i18n/more2_en.ts:361"
+   ],
+   "repro": "EN oyunda özet ekranı → Copy summary text",
+   "fix": "‘on the {dest}’ yerine hedefe göre ayrı metin (on the Moon / on Mars)"
+  },
+  {
+   "id": "B4",
+   "severity": "sunumdan önce",
+   "title": "README ‘12 research cards’ diyor; kodda 31 kart",
+   "files": [
+    "README.md:52"
+   ],
+   "repro": "grep -c \"id: 'R-\" src/engine/research.ts → 31",
+   "fix": "‘31 research cards (23 Moon, 21 Mars)’"
+  },
+  {
+   "id": "B5",
+   "severity": "sunumdan önce",
+   "title": "R-MOLD kaynağı iddiayı desteklemiyor (zinnia değil, VEG-05 domates)",
+   "files": [
+    "src/engine/research.ts:141",
+    "src/i18n/more4_en.ts:176"
+   ],
+   "repro": "Kaynak sayfayı açın: zinnia, hava akışı ve ölen bitki geçmiyor",
+   "fix": "Zinnia küf olayını anlatan NASA sayfasını bulup bağlayın ya da iddiayı sayfadaki domates/nem olayına göre yeniden yazın"
+  },
+  {
+   "id": "B6",
+   "severity": "sonra",
+   "title": "İniş yeri zorluk etiketleri sonuçlarla uyuşmuyor (Ay ekvatoru ‘zor/çok zor’ ama en kolay)",
+   "files": [
+    "src/engine/landing.ts:35-53"
+   ],
+   "repro": "Bölüm 6 tablosu: Procellarum (çok zor) özenli %76,6; Malapert (orta) %46,1",
+   "fix": "Etiketleri ölçüme göre yeniden atayın ya da çarpanları ayarlayın"
+  },
+  {
+   "id": "B7",
+   "severity": "sonra",
+   "title": "‘success’ sonucunda ‘Why not a full success?’ başlığı ve ‘30-day mission’ metni",
+   "files": [
+    "src/engine/outcome.ts:58",
+    "src/ui/screens/Debrief.tsx:47",
+    "src/i18n/en.ts:678",
+    "src/i18n/more2_en.ts:13"
+   ],
+   "repro": "Hedefe ulaşıp tahminden önce dönün (seed 3034734154, Gale): ‘Everyone came home … completed the 30-day mission … 26 days … Why not a full success?’",
+   "fix": "success için başlık ‘How to reach the top tier’; açıklama gün sayısını kullansın"
+  },
+  {
+   "id": "B8",
+   "severity": "sonra",
+   "title": "npm run e2e:short Windows’ta başlamıyor",
+   "files": [
+    "package.json:15"
+   ],
+   "repro": "Windows’ta npm run e2e:short → 'E2E_SHORT' is not recognized",
+   "fix": "node scripts/e2e.mjs --short ya da cross-env"
+  },
+  {
+   "id": "B9",
+   "severity": "sonra",
+   "title": "E2E Windows’ta vite preview sürecini öksüz bırakıyor; ikinci çalıştırma ‘preview did not start’",
+   "files": [
+    "scripts/e2e.mjs:16",
+    "scripts/e2e.mjs:454"
+   ],
+   "repro": "npm run e2e iki kez üst üste",
+   "fix": "shell olmadan process.execPath + node_modules/vite/bin/vite.js başlatın ya da Windows’ta taskkill /T /F; ayrıca stderr’deki ‘Port is already in use’ mesajını gösterin"
+  },
+  {
+   "id": "B10",
+   "severity": "sonra",
+   "title": "Ekip krizi kartı neredeyse hiç açılmıyor",
+   "files": [
+    "src/engine/sim.ts:506"
+   ],
+   "repro": "20.000 oyunda 17 oyun (%0,1); özenli oyuncuda 0",
+   "fix": "Eşiği 90’a indirin ya da stres artışını yükseltin; özellik sunumda anlatılacaksa görünür olmalı"
+  },
+  {
+   "id": "B11",
+   "severity": "sonra",
+   "title": "Tıbbi acil durum hâlâ neredeyse kesin başarısızlık; treatCause baskın değil",
+   "files": [
+    "src/engine/events.ts:820-880"
+   ],
+   "repro": "EMG-MED görülen 3.357 oyunda tam başarı %0,7 (V4 %0,4); rastgele oyuncuda treatCause kayıp %54,9, stabilize %20,7",
+   "fix": "treatCause görevini kısaltın/hastayı hemen dengeleyin; kartı daha erken (sağlık <50) açın"
+  },
+  {
+   "id": "B12",
+   "severity": "sonra",
+   "title": "Kontrast ve başlık sırası (axe)",
+   "files": [
+    "src/ui/styles.css:10"
+   ],
+   "repro": "axe-core 4.10.2: .random-landing > .fine 3,69:1; sera modu radyo etiketleri 3,89:1; yüzeyde h1 yok; birkaç heading-order",
+   "fix": "--faint rengini açın (≥4,5:1), başlık düzeyini düzeltin"
+  },
+  {
+   "id": "B13",
+   "severity": "sonra",
+   "title": "Özet videosunda süre bilgisi yok (WebM duration = Infinity)",
+   "files": [
+    "src/ui/screens/Recap.tsx"
+   ],
+   "repro": "İndirilen .webm Chromium’da oynuyor ama duration null; bazı oynatıcılarda ileri sarma çalışmaz",
+   "fix": "Kayıttan sonra süreyi başlığa yazan küçük bir düzeltme ya da MP4"
+  },
+  {
+   "id": "B14",
+   "severity": "sonra",
+   "title": "Ölü i18n anahtarı time.why",
+   "files": [
+    "src/i18n/more2_tr.ts:60"
+   ],
+   "repro": "Anahtar hiçbir .tsx dosyasında kullanılmıyor",
+   "fix": "Silin"
+  }
+ ]
+}
