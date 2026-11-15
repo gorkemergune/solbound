@@ -356,7 +356,7 @@ export const more2En = {
   'recap.n.big': 'predicted events faced',
   'recap.n.home': 'crew home',
   'recap.n.preps': 'preparation tasks done',
-  'recap.summary': 'I commanded a crew of {crew} for {days} days at {site} ({dest}) in Solbound. {harvests} harvests, {big} predicted events faced, {science} science points. Result: {rating}. #Solbound #SpaceApps',
+  'recap.summary': 'I commanded a crew of {crew} for {days} days at {site} ({dest}) in Solbound. {harvests} harvests, {big} predicted events faced, {science} science points. Result: {rating}. Rank: {rank}. #Solbound #SpaceApps',
   'recap.footer': 'Solbound · NASA Space Apps 2026 project · not affiliated with NASA',
 };
 

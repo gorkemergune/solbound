@@ -6,6 +6,7 @@ import { CHATS } from './chatter';
 import { EVENTS, type Cond } from './events';
 import { generateCandidates } from './characters';
 import { computeOutcome } from './outcome';
+import { RANKS, rankFor } from './rank';
 import { applyEffects, availableCrewFor, characterById, eventOf, optionState, returnStatus, successChance, suggestCrew } from './rules';
 import { deserialize, serialize } from './save';
 import { SCENARIOS, SURFACE_START_MINUTE, scenarioFor } from './scenarios';
@@ -824,3 +825,18 @@ describe('v0.8: random landing, departure window, V4 fixes', () => {
     expect(done.mission!.decisions.some((d) => d.eventId === 'R-REINF')).toBe(false);
   });
 });
+
+describe('v0.9: end-of-mission rank', () => {
+  it('ranks by science points, with the next rank and a cap when crew were lost', () => {
+    expect(rankFor(0, false).id).toBe('cadet');
+    expect(rankFor(99, false).id).toBe('cadet');
+    expect(rankFor(100, false).id).toBe('technician');
+    expect(rankFor(349, false)).toMatchObject({ id: 'researcher', next: { id: 'senior', min: 350 } });
+    expect(rankFor(700, false)).toMatchObject({ id: 'legend', next: null, capped: false });
+    expect(rankFor(800, true)).toMatchObject({ id: 'researcher', capped: true, next: null });
+    expect(rankFor(150, true)).toMatchObject({ id: 'technician', capped: false });
+    // thresholds rise strictly and the ladder has six steps
+    expect(RANKS.map((r) => r.min)).toEqual([0, 100, 200, 350, 500, 700]);
+  });
+});
+

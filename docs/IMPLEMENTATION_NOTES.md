@@ -357,3 +357,22 @@ V5 bağımsız testi: [V5_TEST.md](archive/V5_TEST.md) (mentör puanı 17/25, su
 - README’ye “In the classroom” (40 dakikalık ders akışı) ve maliyet notları (Vercel Hobby, `DEMO_KEY`) eklendi. Teslim PDF’i: `docs/Solbound_LoversGG.pdf` (kaynağı `docs/teslim/`).
 
 Doğrulama: typecheck temiz, vitest 66/66, build, `npm run e2e:short` 62/62 (macOS). Denge taraması tekrar koşulmadı; etiket değişikliği yalnız metin, oyun sayıları değişmedi.
+
+## v0.9 — müzik ve ses efektleri (15 Kasım 2026)
+
+- **Özgün müzik**, tarayıcıda Web Audio ile üretilir (`src/audio/sound.ts`); ses dosyası ve üçüncü taraf müzik yok, site boyutu değişmedi.
+  - 4 döngü: ana tema (D minör; başlık, hazırlık, uçuş), Ay yüzeyi (seyrek çanlar), Mars yüzeyi (nabız gibi bas), eve dönüş (majör tema). Görev kaybedilirse ana tema çalar.
+  - Paylaşılan referans videonun (Auralnauts, “How To Make A Blockbuster Movie Trailer”) melodisi **kopyalanmadı**; yalnız fragman tarzı (geri sayım, gürleme, alçak “braam” vuruşu) kalkış efektinde örnek alındı.
+- **Efektler:** kalkış (geri sayım bipleri + roket gürlemesi + braam), yüzeyden ayrılış, iniş, karar kartı (çan), acil durum ve ekip krizi (alarm), sonuç (başarılı/başarısız), yeni tahmin (radyo bipleri). Kalkış ve inişte müzik kısılır.
+- **Kontrol:** her ekranın üst çubuğunda dil düğmesinin yanında 🔊 düğmesi: sesi kapat/aç, müzik ve efekt sesi kaydırıcıları; seçim tarayıcıda saklanır. Varsayılan müzik %50, efekt %70.
+- Tarayıcı kuralı gereği ses ilk tıklama ya da tuşla başlar; sekme gizlenince ses motoru durur.
+- `AudioDirector` (`src/ui/AudioDirector.tsx`) ekrana göre parçayı seçer; oyun motoru sesten habersizdir.
+
+Doğrulama (Chromium, macOS): ilk tıklamadan sonra ses bağlamı çalışıyor ve çıkış sessiz değil; “Sesi kapat” çıkışı 0’a indiriyor; en yüksek tepe kalkışta 0,74 (bozulma yok); konsol hatası yok. Typecheck, vitest 66/66, build, `e2e:short` 62/62. **Müzik kulakla yalnız kullanıcı tarafından değerlendirilebilir;** Safari ve Firefox’ta denenmedi.
+- **Daha epik kalkış:** 3-2-1 bipleri, yükselen gerilim (riser), ateşleme (BRAAAM + alt bas “boom” + 8 sn roket gürlemesi), bir ton yukarıda ikinci BRAAAM ve ardından parlak bir bakır (D majör) yükselişi. Müzik kalkış boyunca kısılır. Ölçülen tepe 0,83 (bozulma yok).
+- **Müzik daha yüksek:** müzik kanalı yaklaşık +3,5 dB (aynı kaydırıcı ayarında tepe 0,17’den 0,23’e).
+- **İniş yeri kutucuğu:** yüzeyde geri sayım satırının en solunda 📍 yer adı ve zorluk; (i) düğmesi gerçek NASA bilgisini (“NASA ne biliyor”), oyun etkisini ayrı satırda (“Oyunda, bizim kuralımız”) ve kaynak bağlantılarını gösterir. 16 yerin her biri için metindeki her sayı bağlı NASA/JPL sayfasında 15 Kasım 2026’da kontrol edildi (`src/ui/components/siteFacts.ts`, i18n `site.fact.*`).
+- E2E’ye eklenen kontroller: yüzeyde yer kutucuğu, (i) penceresinde nasa.gov kaynağı, pencere açıkken taşma yok, üst çubukta ses düğmesi. `e2e:short` 70/70.
+- **Görev sonu rütbesi** (`src/engine/rank.ts`, oyun kuralı): bilim puanına göre 6 rütbe: Aday Astronot 0+, Saha Teknisyeni 100+, Araştırmacı 200+, Kıdemli Bilim İnsanı 350+, Baş Bilim İnsanı 500+, Efsanevi Kâşif 700+. Ekipten kayıp varsa rütbe “Araştırmacı” ile sınırlanır (bilim insandan önce gelmez). Eşikler 15 Kasım’da 720 simüle oyunluk taramadan: en düşük 0 (2. gün dönen), ortanca 284, %90’lık 580, en yüksek 1.025 (bütün ekip bilim rutininde, dönüş yok; bu oyunların %48’i kayıpla bitti). Özenli oyuncu ortancası 247 (hedefte dönen) ve 358 (tahmine kadar kalan). Değerlendirme ekranında rütbe kartı (sonraki rütbeye ilerleme çubuğu, tüm basamaklar); paylaşım metninde rütbe. Birim testi eklendi.
+- **Envanter:** yüzeyde yer kutucuğunun yanında 🎒 Envanter düğmesi. Küçük pencere: batarya, O₂, su, yiyecek (kişi-gün ve mevcut ekiple kaç gün), yetişen bitki ve hasat sayısı, getirilen her eşya için kalan / getirilen (kendiliğinden çalışan eşyalar ayrı yazılır). × düğmesi, Escape, dışarı tıklama ya da fare pencereden çıkınca kapanır.
+

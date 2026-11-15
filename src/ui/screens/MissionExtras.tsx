@@ -23,6 +23,8 @@ import {
 import { formatFixed } from '../../i18n';
 import { Portrait } from '../art/Portrait';
 import { RichText } from '../components/RichText';
+import { SiteChip } from '../components/LandingInfo';
+import { InventoryChip } from '../components/Inventory';
 import { useLocale, useStore } from '../store';
 import { journalText, lockText, swLink } from '../text';
 
@@ -66,6 +68,8 @@ export function CountdownChips({ run, onOpen }: { run: RunState; onOpen: () => v
   });
   return (
     <div className="countdowns" role="list" aria-label={t('big.countdownLabel')}>
+      {(run.phase === 'surface' || run.phase === 'returnPrep') && <SiteChip id={run.landing} />}
+      {(run.phase === 'surface' || run.phase === 'returnPrep') && <InventoryChip run={run} />}
       {live.map((b) => {
         const st = bigStatus(b, m.minute);
         const left = st === 'active' ? b.endAt - m.minute : b.startAt - m.minute;

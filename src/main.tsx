@@ -7,6 +7,10 @@ import { App } from './ui/App';
 import { StoreProvider } from './ui/store';
 import { SpaceWeatherProvider } from './live/useSpaceWeather';
 import { initialLocale, loadLocale } from './i18n';
+import { installSoundUnlock } from './audio/sound';
+
+// sound starts on the first click or key press (browser rule)
+installSoundUnlock();
 
 // load the starting language before the first paint (Turkish is a lazy chunk)
 await loadLocale(initialLocale()).catch(() => undefined);

@@ -1,6 +1,6 @@
 # Solbound — güncel durum (tek kaynak)
 
-Son güncelleme: 14 Kasım 2026 · içerik sürümü `0.8.0-landing` · kayıt şeması 7
+Son güncelleme: 14 Kasım 2026 · içerik sürümü `0.8.0-landing` (arayüz v0.9: ses) · kayıt şeması 7
 
 Bu belge oyunun **şu anki** kapsamını özetler. Diğer belgelerle çelişirse bu belge ve kod geçerlidir. Eski belgeler `docs/archive/` klasöründedir: `00_START_HERE.md` ve v0.2 belgeleri tasarım geçmişidir; `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md`, `CLAUDE_DISCOVERY_TASK.md` ise v0.1 önerisidir. Değişiklik günlüğü ve doğrulama sonuçları için [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), kullanıcının açık listesi için `bug/eksikler.md` (git’e girmez), son bağımsız test için [V4_TEST.md](archive/V4_TEST.md) okunmalıdır. [V4_PROMPT.md](archive/V4_PROMPT.md) bir önceki test görevidir; sıradaki test görevi (mentör formuna göre puanlama dahil) [V5_PROMPT.md](archive/V5_PROMPT.md).
 
@@ -40,6 +40,9 @@ NASA kayıtlarından beslenen, hikâye ağırlıklı bir **eğitim simülasyonu*
   Ekranda “kısmen güncel / alınamadı” ayrımı yapılır. Kartlarda gerçek kayıt, model tahmini ve oyun etkisi ayrı satırlarda yazılır.
 - **Sinyal gecikmesi:** JPL yaklaşık gezegen konumu formülüyle yerelde hesaplanır; canlı Horizons çağrısı değildir. Testlerde Horizons’a karşı hata en fazla %0,02.
 - **Özet filmi:** WebM video, PNG kart, Web Share ve kopyalanabilir metin.
+- **Ses:** özgün müzik (4 döngü) ve efektler tarayıcıda Web Audio ile üretilir; ses dosyası yok. Üst çubukta 🔊 düğmesi: kapat/aç, müzik ve efekt sesi.
+- **Yüzey üst satırı:** 📍 iniş yeri + zorluk + (i) gerçek NASA bilgisi ve kaynakları; 🎒 Envanter penceresi (stoklar, kalan eşyalar, hasat).
+- **Rütbe:** görev sonunda bilim puanına göre 6 rütbe (0/100/200/350/500/700); ekipten kayıp varsa en fazla Araştırmacı.
 
 ## Çalıştırma
 

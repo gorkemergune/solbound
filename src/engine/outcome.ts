@@ -1,4 +1,5 @@
 import { activeCrew, characterById } from './rules';
+import { rankFor, type RankResult } from './rank';
 import { scenarioFor } from './scenarios';
 import type { DecisionRecord, Echo, RunState } from './types';
 
@@ -10,6 +11,8 @@ export type Outcome = {
   evacuated: string[];
   lost: string[];
   science: number;
+  /** end-of-mission rank from science points (capped if crew were lost) */
+  rank: RankResult;
   keyDecisions: DecisionRecord[];
   echoes: Echo[];
   lessons: string[];
@@ -81,6 +84,7 @@ export function computeOutcome(run: RunState): Outcome {
     evacuated,
     lost,
     science: Math.round(m.resources.science),
+    rank: rankFor(Math.round(m.resources.science), lost.length > 0),
     keyDecisions,
     echoes: m.echoes,
     lessons: lessons.slice(0, 5),

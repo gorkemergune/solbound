@@ -210,6 +210,24 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
   await page.locator('.surface').waitFor();
   await shot(page, `${prefix}-08-surface-start`);
   await noHorizontalOverflow(page, `${prefix} surface`);
+  // v0.9: landing-site chip with an (i) box of real NASA facts and sources; the sound button sits in the top bar
+  check(`${prefix} landing-site chip on the surface`, (await page.locator('[data-testid="site-chip"]').count()) === 1);
+  await page.locator('[data-testid="site-chip"] .infotip-btn').click();
+  const siteLinks = await page.locator('.site-info .si-src').count();
+  const siteHref = (await page.locator('.site-info .si-src').first().getAttribute('href').catch(() => '')) ?? '';
+  check(`${prefix} site info cites NASA sources`, siteLinks > 0 && /nasa\.gov/.test(siteHref), `${siteLinks} links · ${siteHref}`);
+  await shot(page, `${prefix}-08c-site-info`);
+  await noHorizontalOverflow(page, `${prefix} site info open`);
+  await page.keyboard.press('Escape');
+  check(`${prefix} sound button in the top bar`, (await page.locator('[data-testid="sound-btn"]').count()) >= 1);
+  // v0.9: inventory chip next to the site chip: a small panel with stocks and cargo, closed with ×
+  await page.locator('[data-testid="inv-btn"]').click();
+  const invRows = await page.locator('[data-testid="inv-panel"] .inv-row').count();
+  check(`${prefix} inventory panel lists stocks and cargo`, invRows >= 4, `${invRows} rows`);
+  await shot(page, `${prefix}-08d-inventory`);
+  await noHorizontalOverflow(page, `${prefix} inventory open`);
+  await page.locator('[data-testid="inv-panel"] .inv-x').click();
+  check(`${prefix} inventory closes with ×`, (await page.locator('[data-testid="inv-panel"]').count()) === 0);
   const speedLabel = await page.locator('.speed-label').textContent().catch(() => '');
   const speedVisible = await page.locator('.speed-label').isVisible().catch(() => false);
   check(`${prefix} speed buttons are labelled`, (speedLabel ?? '').trim() === (lang === 'tr' ? 'Hız' : 'Speed'), `${speedLabel} visible=${speedVisible}`);
@@ -406,6 +424,8 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
     await page.screenshot({ path: `${OUT}${prefix}-13-debrief-full.png`, fullPage: true });
     await noHorizontalOverflow(page, `${prefix} debrief`);
     const rating = await page.locator('.debrief-hero-text h2').textContent();
+    const rankName = (await page.locator('[data-testid="rank-card"] h3').textContent().catch(() => '')) ?? '';
+    check(`${prefix} debrief shows a rank`, rankName.trim().length > 0, rankName);
     console.log(`   ${prefix} outcome: ${rating}`);
     // recap film: canvas drawn, image card and video downloads
     await page.locator('.recap-canvas').scrollIntoViewIfNeeded();

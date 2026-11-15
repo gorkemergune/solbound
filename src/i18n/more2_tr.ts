@@ -345,7 +345,7 @@ export const more2Tr: Record<keyof typeof more2En, string> = {
   'recap.n.big': 'önceden bilinen olay',
   'recap.n.home': 'eve dönen',
   'recap.n.preps': 'tamamlanan hazırlık',
-  'recap.summary': 'Solbound’da {crew} kişilik bir ekibi {days} gün boyunca {dest} ({site}) yönettim. {harvests} hasat, {big} önceden bilinen büyük olay, {science} bilim puanı. Sonuç: {rating}. #Solbound #SpaceApps',
+  'recap.summary': 'Solbound’da {crew} kişilik bir ekibi {days} gün boyunca {dest} ({site}) yönettim. {harvests} hasat, {big} önceden bilinen büyük olay, {science} bilim puanı. Sonuç: {rating}. Rütbe: {rank}. #Solbound #SpaceApps',
   'recap.footer': 'Solbound · NASA Space Apps 2026 projesi · NASA ile bağlantılı değildir',
 };
 

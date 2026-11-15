@@ -3,6 +3,7 @@ import { PREP_PHASES } from '../engine';
 import { Toast } from './components/common';
 import { useStore } from './store';
 import { TitleScreen } from './screens/Title';
+import { AudioDirector } from './AudioDirector';
 
 // Screens are split into separate chunks: the title page loads first, the rest on demand.
 const PrepShell = lazy(() => import('./screens/Prep').then((m) => ({ default: m.PrepShell })));
@@ -44,6 +45,7 @@ export function App() {
       {/* own boundary: loading the modal chunk must never blank the screen behind it */}
       <Suspense fallback={null}>{researchOpen && <ResearchModal />}</Suspense>
       <Toast />
+      <AudioDirector />
     </>
   );
 }

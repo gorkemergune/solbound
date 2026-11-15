@@ -1,6 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { Locale } from '../../engine';
 import { useStore } from '../store';
+import { SoundControl } from './SoundControl';
 
 export function StatBar({ label, value, max = 100, tone, suffix, invert }: { label: string; value: number; max?: number; tone?: 'tech' | 'sci' | 'team' | 'auto'; suffix?: string; invert?: boolean }) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
@@ -104,13 +105,17 @@ export function InfoTip({ label, children, className }: { label: ReactNode; chil
 export function LangSwitch({ compact = false }: { compact?: boolean }) {
   const { locale, setLocale, t } = useStore();
   const cur: Locale = locale ?? 'en';
+  // the sound control sits next to the language switch, so it is in the top bar of every screen
   return (
-    <div className={`lang-switch ${compact ? 'compact' : ''}`} role="group" aria-label={t('app.language')}>
-      {(['en', 'tr'] as const).map((l) => (
-        <button key={l} type="button" className={cur === l ? 'on' : ''} aria-pressed={cur === l} onClick={() => setLocale(l)}>
-          {l === 'en' ? 'EN' : 'TR'}
-        </button>
-      ))}
+    <div className={`top-tools ${compact ? 'compact' : ''}`}>
+      <SoundControl />
+      <div className={`lang-switch ${compact ? 'compact' : ''}`} role="group" aria-label={t('app.language')}>
+        {(['en', 'tr'] as const).map((l) => (
+          <button key={l} type="button" className={cur === l ? 'on' : ''} aria-pressed={cur === l} onClick={() => setLocale(l)}>
+            {l === 'en' ? 'EN' : 'TR'}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

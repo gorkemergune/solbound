@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { characterById, computeOutcome } from '../../engine';
+import { RANKS, characterById, computeOutcome } from '../../engine';
 import { Portrait } from '../art/Portrait';
 import { Landscape } from '../art/Scenes';
 import { LangSwitch } from '../components/common';
@@ -52,6 +52,37 @@ export function DebriefScreen() {
                 </ul>
               </div>
             )}
+          </div>
+        </section>
+
+        <section className={`card rank-card rank-${o.rank.id}`} data-testid="rank-card">
+          <div className="rank-badge" aria-hidden="true">
+            {o.rank.icon}
+          </div>
+          <div className="rank-body">
+            <p className="kind-tag">{t('rank.title')}</p>
+            <h3>{t(`rank.${o.rank.id}`)}</h3>
+            <p className="rank-points">{t('rank.points', { v: o.science })}</p>
+            {o.rank.capped ? (
+              <p className="fine warn-line">{t('rank.capped', { name: t(`rank.${o.rank.id}`) })}</p>
+            ) : o.rank.next ? (
+              <>
+                <div className="rank-bar" role="progressbar" aria-valuemin={o.rank.min} aria-valuemax={o.rank.next.min} aria-valuenow={o.science}>
+                  <span style={{ width: `${Math.min(100, ((o.science - o.rank.min) / (o.rank.next.min - o.rank.min)) * 100)}%` }} />
+                </div>
+                <p className="fine">{t('rank.next', { name: t(`rank.${o.rank.next.id}`), min: o.rank.next.min, left: o.rank.next.min - o.science })}</p>
+              </>
+            ) : (
+              <p className="fine">{t('rank.top')}</p>
+            )}
+            <ol className="rank-ladder" aria-label={t('rank.ladder')}>
+              {RANKS.map((x, i) => (
+                <li key={x.id} className={i === o.rank.index ? 'on' : i < o.rank.index ? 'done' : ''}>
+                  <span aria-hidden="true">{x.icon}</span> {t(`rank.${x.id}`)} <span className="fine">{x.min}+</span>
+                </li>
+              ))}
+            </ol>
+            <p className="fine">{t('rank.how')}</p>
           </div>
         </section>
 

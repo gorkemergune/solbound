@@ -463,6 +463,7 @@ function useRecapData(run: RunState): RecapData {
         { v: o.home.length, label: t('recap.n.home') },
       ],
       rating: t(`debrief.rating.${o.rating}`),
+    rank: t(`rank.${o.rank.id}`),
       ratingKey: o.rating,
       home: `${o.home.length}/${m.crew.length} ${t('recap.n.home')}`,
       labels: {

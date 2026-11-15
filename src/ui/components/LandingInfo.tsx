@@ -1,5 +1,7 @@
 import { LANDING_BY_ID, landingsFor, type DestinationId, type Difficulty, type LandingSite } from '../../engine';
 import { useStore } from '../store';
+import { InfoTip } from './common';
+import { SITE_SOURCES } from './siteFacts';
 
 export function DiffChip({ d }: { d: Difficulty }) {
   const { t } = useStore();
@@ -71,3 +73,43 @@ export function LandingCard({ id }: { id: string | null }) {
 export function landingName(t: (k: string, p?: Record<string, string | number>) => string, landing: string | null, site: string | null): string {
   return landing ? t(`site.landing.${landing}`) : site ? t(`site.${site}`) : '';
 }
+
+/** Surface top row: where the crew landed, its difficulty, and an (i) box with real NASA facts about the place. */
+export function SiteChip({ id }: { id: string | null }) {
+  const { t } = useStore();
+  const l = id ? LANDING_BY_ID[id] : null;
+  if (!l) return null;
+  const traits = landingTraits(l);
+  const sources = SITE_SOURCES[l.id] ?? [];
+  return (
+    <span role="listitem" className="cd-chip cd-site" data-testid="site-chip">
+      <span aria-hidden="true">📍</span>
+      <span className="cd-name">{t(`site.landing.${l.id}`)}</span>
+      <DiffChip d={l.difficulty} />
+      <InfoTip label={<span aria-label={t('site.info.open')}>i</span>} className="gloss site-info">
+        <span className="si-block">
+          <strong>{t(`site.landing.${l.id}`)}</strong> <DiffChip d={l.difficulty} />
+        </span>
+        <span className="si-kicker">{t('site.info.nasa')}</span>
+        <span className="si-block">{t(`site.fact.${l.id}`)}</span>
+        {traits.length > 0 && (
+          <>
+            <span className="si-kicker si-game">{t('site.info.game')}</span>
+            <span className="si-block si-traits">{traits.map((k) => t(k)).join(' · ')}</span>
+          </>
+        )}
+        {sources.length > 0 && (
+          <>
+            <span className="si-kicker">{t('site.info.sources')}</span>
+            {sources.map((s) => (
+              <a key={s.url} className="si-src" href={s.url} target="_blank" rel="noreferrer noopener">
+                {s.title} ↗
+              </a>
+            ))}
+          </>
+        )}
+      </InfoTip>
+    </span>
+  );
+}
+
