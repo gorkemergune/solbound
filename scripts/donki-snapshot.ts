@@ -6,7 +6,12 @@ import { fetchSnapshot } from '../src/live/donki.ts';
 // key from the environment (CI secret) or the local .env file; never printed
 const envFile = new URL('../.env', import.meta.url);
 const fromFile = existsSync(envFile) ? readFileSync(envFile, 'utf8').match(/^\s*NASA_API_KEY\s*=\s*(\S+)/m)?.[1] : undefined;
-const key = process.env.NASA_API_KEY || fromFile || 'DEMO_KEY';
+const key = process.env.NASA_API_KEY || fromFile;
+if (!key) {
+  // fail loudly (a red CI run) instead of silently falling back to DEMO_KEY, which GitHub's shared IPs exhaust
+  console.error('NASA_API_KEY is missing: set it in .env or as the repository secret NASA_API_KEY.');
+  process.exit(1);
+}
 const snap = await fetchSnapshot(key, Date.now());
 const out = { ...snap, source: 'bundled' };
 writeFileSync(new URL('../src/live/donki-fallback.json', import.meta.url), JSON.stringify(out, null, 1) + '\n');

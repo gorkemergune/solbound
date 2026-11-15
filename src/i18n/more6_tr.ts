@@ -63,6 +63,7 @@ export const more6Tr: Record<keyof typeof more6En, string> = {
   'ret.booked': 'Kalkış planlandı',
   'debrief.rating.excellent': 'Tahminin ötesinde',
   'debrief.rating.excellent.desc': 'Üssün dayanması beklenen süre kadar kaldın ve herkesi eve getirdin.',
+  'debrief.whyTop': 'En üst kademeye nasıl ulaşılır?',
   'reason.excellent': 'En üst kademe için tahmin edilen süre kadar kal.',
   'ev.CREW-CRISIS.title': '{name} sınırına geldi',
   'ev.CREW-CRISIS.body': 'Haftaların baskısı birikti. {name} uyuyamıyor, herkese çıkışıyor ve hata yapıyor. Böyle bırakılırsa bu onun için bir sağlık, herkes için bir moral sorununa dönüşür.',

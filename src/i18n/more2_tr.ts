@@ -11,7 +11,7 @@ export const more2Tr: Record<keyof typeof more2En, string> = {
   'dest.events': 'Karşılaşabileceğin olaylar: {list}',
   'brief.goal': 'Hedef: üssü {days} gün işlet, önceden bildirilen büyük olayları atlat, dönüşü hazırla ve ekibi eve getir.',
   'gh.compressed': 'Bitki büyümesi hızlandırılmıştır: gerçek bitkiler haftalar, aylar sürer.',
-  'debrief.rating.success.desc': 'Ekibin 30 günlük görevi tamamladı ve güvenle döndü.',
+  'debrief.rating.success.desc': 'Ekibin görev hedefine ulaştı ve güvenle döndü.',
   'cargo.unused': 'Bu hedefin olaylarında kullanılmıyor',
   'R-CROPS.inGame': 'Sera ışık için enerji ve biraz su ister. Büyüme hızlandırıldı; bir ayda birkaç hasat sığar.',
   'rule.dustLight': 'Bölgesel fırtına güneş ışığının %40–60’ını bir ila iki buçuk gün keser (oyun değerleri).',
@@ -57,8 +57,6 @@ export const more2Tr: Record<keyof typeof more2En, string> = {
   'time.sunUp': 'Gün batımına {d} g {h} sa',
   'time.sunDown': 'Gün doğumuna {d} g {h} sa',
   'time.polar': 'Güneş ufukta kayıyor',
-  'time.why': 'Neden iki saat?',
-  'time.whyText': 'Bir [[sol|sol]] 24 sa 39 dk 35 sn sürer; bu yüzden Mars saati her gün Dünya’nın yaklaşık 40 dakika gerisine düşer. Ay’da saatler biraz hızlı işler: Dünya saati günde 58,7 µs geri kalıyor gibi görünür ([[ltc|Ay zamanı]]). Mesajlar ışık hızıyla gider: Ay’dan 1,3 sn, Mars’tan 4–21 dk.',
 
   'tabs.prep': 'Plan',
   'big.storm': 'Toz fırtınası',

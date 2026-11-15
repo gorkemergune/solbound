@@ -61,6 +61,7 @@ export const more6En = {
   'ret.booked': 'Departure booked',
   'debrief.rating.excellent': 'Beyond the estimate',
   'debrief.rating.excellent.desc': 'You stayed at least as long as the base was expected to last, and brought everyone home.',
+  'debrief.whyTop': 'How to reach the top tier',
   'reason.excellent': 'Stay as long as the estimate to reach the top tier.',
   'ev.CREW-CRISIS.title': '{name} has reached the limit',
   'ev.CREW-CRISIS.body': 'Weeks of pressure have caught up. {name} cannot sleep, snaps at everyone and makes mistakes. Left alone, this turns into a health problem for them and a mood problem for all.',

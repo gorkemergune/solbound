@@ -44,7 +44,7 @@ export function DebriefScreen() {
             </p>
             {o.rating !== 'excellent' && o.reasons.length > 0 && (
               <div className="reasons">
-                <strong>{t('debrief.why')}</strong>
+                <strong>{t(o.rating === 'success' ? 'debrief.whyTop' : 'debrief.why')}</strong>
                 <ul>
                   {o.reasons.map((x) => (
                     <li key={x}>{t(x)}</li>

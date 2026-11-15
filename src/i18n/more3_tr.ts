@@ -6,7 +6,7 @@ export const more3Tr: Record<keyof typeof more3En, string> = {
   'sw.by': 'NASA DONKI',
   'sw.status.loading': 'NASA kontrol ediliyor…',
   'sw.status.ok': 'Güncel',
-  'sw.status.offline': 'NASA’ya ulaşılamadı, kayıtlı veri gösteriliyor',
+  'sw.status.offline': 'Sitenin NASA kopyası gösteriliyor',
   'sw.status.idle': '…',
   'sw.source.live': 'canlı',
   'sw.source.cache': 'kayıtlı kopya',

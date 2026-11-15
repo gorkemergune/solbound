@@ -50,6 +50,6 @@ NASA kayıtlarından beslenen, hikâye ağırlıklı bir **eğitim simülasyonu*
 1. “Başka bir karar verseydin?” karşılaştırması yok.
 2. Video yalnız Chromium’da test edildi; Safari’de MP4 ve dosya paylaşımı denenmedi; GIF çıktısı yok.
 3. Safari/Firefox, gerçek cihaz ve ekran okuyucu testleri yapılmadı.
-4. Uygulama Vercel’de yayında: https://solbound.vercel.app. GitHub Action, depoda `NASA_API_KEY` sırrı tanımlanmadan çalışmaz. 15 Kasım 2026’da uzak depoda henüz bot commit’i yoktu; canlı DONKI verisi 14 Kasım tarihli.
-5. Yapanlar penceresindeki isimler ve portföy linki boş (`src/credits.ts`).
-6. v0.8 için uzun 30 günlük e2e ve büyük denge taraması yapılmadı; iniş yerlerinin zorluk etiketleri yalnız kısa bir bot taramasına dayanıyor. E2E’nin Windows düzeltmesi Windows’ta denenmedi.
+4. Uygulama Vercel’de yayında: https://solbound.vercel.app. GitHub Action, depoda `NASA_API_KEY` sırrı tanımlanmadan çalışmaz; artık anahtar yoksa kırmızı biter. DONKI verisi 15 Kasım’da elle yenilendi. Tarayıcı, site kopyası 48 saatten yeniyse NASA’ya `DEMO_KEY` isteği atmaz.
+5. Yapanlar penceresinde isimler var; roller ve portföy linki boş (`src/credits.ts`).
+6. V5 testinin “sonra” listesinden açık kalanlar: ekip krizi neredeyse hiç açılmıyor (B10), EMG-MED görülen oyunlarda tam başarı %0,7 (B11), Windows’ta e2e `vite preview` sürecini öksüz bırakıyor (B9), özet WebM’inde süre bilgisi yok (B13). Ayrıntı [V5_TEST.md](archive/V5_TEST.md).

@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 const PORT = 4179;
-// E2E_SHORT=1: stop each run after the first surface checks (quick smoke test instead of two full playthroughs)
-const SHORT = process.env.E2E_SHORT === '1';
+// --short (or E2E_SHORT=1): stop each run after the first surface checks (quick smoke test instead of two full playthroughs)
+const SHORT = process.env.E2E_SHORT === '1' || process.argv.includes('--short');
 const BASE = `http://localhost:${PORT}/`;
 // fileURLToPath: correct on Windows too (no "C:\\C:\\…%20…" paths); V4 6.7
 const OUT = fileURLToPath(new URL('../e2e-screens/', import.meta.url));
@@ -106,7 +106,7 @@ async function play(browser, { lang, dest, viewport, prefix, cargo, offline }) {
   const swSource = await page.locator('.sw-source-label').textContent();
   const swCount = Number(await page.locator('.sw-counts strong').first().textContent());
   await shot(page, `${prefix}-01c-spaceweather`);
-  if (offline) check(`${prefix} DONKI offline falls back to bundled data`, /(unreachable|ulaşılamadı)/.test(swStatus ?? '') && /(bundled|oyunla gelen)/.test(swSource ?? '') && swCount > 0, `${swStatus} | ${swSource} | ${swCount}`);
+  if (offline) check(`${prefix} DONKI offline falls back to bundled data`, /(saved NASA copy|NASA kopyası)/.test(swStatus ?? '') && /(bundled|oyunla gelen)/.test(swSource ?? '') && swCount > 0, `${swStatus} | ${swSource} | ${swCount}`);
   else check(`${prefix} live NASA DONKI data loaded (partial if a list failed)`, /(Up to date|Partly up to date|Güncel|Kısmen güncel)/.test(swStatus ?? '') && /(live|canlı)/.test(swSource ?? '') && swCount > 0, `${swStatus} | ${swSource} | ${swCount} CMEs`);
   if (!offline && (await page.locator('.sw-counts li.missing').count())) {
     const unknown = await page.locator('.sw-counts li.missing strong').first().textContent();

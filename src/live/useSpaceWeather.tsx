@@ -1,7 +1,7 @@
 // Keeps a NASA DONKI snapshot fresh while the app is open. No secret ever ships to the browser:
 //   1. a cached copy younger than CACHE_MS (localStorage),
 //   2. the site's own static snapshot `donki-latest.json` (written by `npm run donki:snapshot` / CI with the
-//      real key) if it is younger than STATIC_MS,
+//      real key) if it is younger than STATIC_MS (48 h, so a day-old site copy never triggers DEMO_KEY calls),
 //   3. a live call with NASA's public DEMO_KEY (limits are per visitor IP, so nobody can drain a shared quota),
 //   4. otherwise the newest of what we have (static file, cache, bundled sample).
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
@@ -12,7 +12,7 @@ import fallback from './donki-fallback.json';
 const CACHE_KEY = 'solbound.donki.v1';
 /** refresh at most every 3 h (DEMO_KEY allows 10 requests per hour per IP; one refresh uses 5) */
 export const REFRESH_MS = 3 * 60 * 60 * 1000;
-const STATIC_MS = 6 * 60 * 60 * 1000;
+const STATIC_MS = 48 * 60 * 60 * 1000;
 const PUBLIC_KEY = 'DEMO_KEY';
 
 type Status = 'idle' | 'loading' | 'ok' | 'offline';

@@ -49,12 +49,27 @@ Running a base on the Moon or Mars means you can't do everything at once. Power,
 
 - **NASA DONKI:** space-weather events recorded by NASA in the last 30 days, such as coronal mass ejections (CMEs), happen in the game on the same days, with their real dates and speeds.
 - **Signal delay:** computed from the planets' real positions using JPL's approximate-position formulas.
-- **Research cards:** 12 cards that cite 25 NASA and JPL sources.
+- **Research cards:** 31 cards that cite 25 NASA and JPL sources.
 - **Game rules:** landing-site multipliers, success chances and consumption values are game-design assumptions. The cards keep sourced facts, derived values and game rules on separate lines. See [`docs/RESEARCH.md`](docs/RESEARCH.md).
+
+## In the classroom
+
+One 40-minute lesson, in pairs:
+
+1. **Intro (5 min):** each pair picks the Moon or Mars and reads the mission briefing.
+2. **Play (25 min):** at 16× speed. Before each decision the pair agrees on a choice and says why.
+3. **Discuss (10 min):**
+   - Why does a battery store energy but never make it?
+   - Should you go home at the goal, or stay as long as the estimate?
+   - Which preparation made the biggest difference?
 
 ## Cost and sustainability
 
-Solbound is a static web page with no server, no database and no paid service, so it costs nothing to run on Vercel's free plan. NASA's open APIs are free. A scheduled GitHub Action refreshes the NASA data with the team's own key, so the browser never needs a key. There are no accounts and no analytics: game progress is saved only in the player's browser. The code is MIT-licensed, so teachers or other teams can host or adapt it.
+Solbound is a static web page with no server, no database and no paid service. It runs at no cost on Vercel's free Hobby plan, which is for non-commercial use; a school can move it to any static host. NASA's open APIs are free.
+
+The NASA data is downloaded with the team's own key by a script, which a scheduled GitHub Action can run, and served as a static file, so the browser never needs a key. If that copy is more than two days old, the browser asks NASA directly with the public `DEMO_KEY`, which NASA rate-limits per visitor; when that fails, the game uses the saved copy.
+
+There are no accounts and no analytics: game progress is saved only in the player's browser. The code is MIT-licensed, so teachers or other teams can host or adapt it.
 
 ## Run locally
 

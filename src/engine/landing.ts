@@ -32,22 +32,22 @@ export type LandingSite = {
 
 export const LANDING_SITES: LandingSite[] = [
   // ---- Moon: south-pole ridges (Artemis candidate regions) ----
-  { id: 'shackleton', dest: 'moon', base: 'polar', difficulty: 'easy', solarMul: 1, thermalAdd: 0, ghMul: 1, waterDelta: 0, shelterAdd: 0, dustMul: 1, reference: true },
+  { id: 'shackleton', dest: 'moon', base: 'polar', difficulty: 'medium', solarMul: 1, thermalAdd: 0, ghMul: 1, waterDelta: 0, shelterAdd: 0, dustMul: 1, reference: true },
   { id: 'mons-mouton', dest: 'moon', base: 'polar', difficulty: 'easy', solarMul: 1.08, thermalAdd: 0, ghMul: 1.05, waterDelta: 10, shelterAdd: 0, dustMul: 1 },
-  { id: 'malapert', dest: 'moon', base: 'polar', difficulty: 'medium', solarMul: 0.92, thermalAdd: 0.15, ghMul: 1, waterDelta: -20, shelterAdd: 0, dustMul: 1, pool: { QUAKE: 1.6 } },
-  { id: 'nobile', dest: 'moon', base: 'polar', difficulty: 'medium', solarMul: 0.9, thermalAdd: 0.1, ghMul: 0.95, waterDelta: 20, shelterAdd: 0, dustMul: 1, pool: { ICE: 1.5 } },
-  { id: 'haworth', dest: 'moon', base: 'polar', difficulty: 'medium', solarMul: 0.9, thermalAdd: 0.15, ghMul: 0.9, waterDelta: 0, shelterAdd: 0, dustMul: 1, pool: { ICE: 2, SHADOW: 2 } },
+  { id: 'malapert', dest: 'moon', base: 'polar', difficulty: 'veryHard', solarMul: 0.92, thermalAdd: 0.15, ghMul: 1, waterDelta: -20, shelterAdd: 0, dustMul: 1, pool: { QUAKE: 1.6 } },
+  { id: 'nobile', dest: 'moon', base: 'polar', difficulty: 'hard', solarMul: 0.9, thermalAdd: 0.1, ghMul: 0.95, waterDelta: 20, shelterAdd: 0, dustMul: 1, pool: { ICE: 1.5 } },
+  { id: 'haworth', dest: 'moon', base: 'polar', difficulty: 'hard', solarMul: 0.9, thermalAdd: 0.15, ghMul: 0.9, waterDelta: 0, shelterAdd: 0, dustMul: 1, pool: { ICE: 2, SHADOW: 2 } },
   // ---- Moon: near-side equator (lunar night inside the month) ----
-  { id: 'tranquillitatis', dest: 'moon', base: 'equator', difficulty: 'hard', solarMul: 1, thermalAdd: 0, ghMul: 1, waterDelta: 0, shelterAdd: 0, dustMul: 1, reference: true },
-  { id: 'marius-hills', dest: 'moon', base: 'equator', difficulty: 'hard', solarMul: 0.95, thermalAdd: -0.2, ghMul: 1, waterDelta: -10, shelterAdd: 35, dustMul: 1 },
-  { id: 'procellarum', dest: 'moon', base: 'equator', difficulty: 'veryHard', solarMul: 0.94, thermalAdd: 0.12, ghMul: 0.9, waterDelta: -20, shelterAdd: 0, dustMul: 1, pool: { MICRO: 1.6, HEAT: 1.4 } },
+  { id: 'tranquillitatis', dest: 'moon', base: 'equator', difficulty: 'easy', solarMul: 1, thermalAdd: 0, ghMul: 1, waterDelta: 0, shelterAdd: 0, dustMul: 1, reference: true },
+  { id: 'marius-hills', dest: 'moon', base: 'equator', difficulty: 'easy', solarMul: 0.95, thermalAdd: -0.2, ghMul: 1, waterDelta: -10, shelterAdd: 35, dustMul: 1 },
+  { id: 'procellarum', dest: 'moon', base: 'equator', difficulty: 'easy', solarMul: 0.94, thermalAdd: 0.12, ghMul: 0.9, waterDelta: -20, shelterAdd: 0, dustMul: 1, pool: { MICRO: 1.6, HEAT: 1.4 } },
   // ---- Mars: northern spring arrivals ----
-  { id: 'jezero', dest: 'mars', base: 'spring', difficulty: 'medium', solarMul: 1, thermalAdd: 0, ghMul: 1, waterDelta: 0, shelterAdd: 0, dustMul: 1, reference: true },
+  { id: 'jezero', dest: 'mars', base: 'spring', difficulty: 'easy', solarMul: 1, thermalAdd: 0, ghMul: 1, waterDelta: 0, shelterAdd: 0, dustMul: 1, reference: true },
   { id: 'elysium', dest: 'mars', base: 'spring', difficulty: 'easy', solarMul: 1.12, thermalAdd: -0.1, ghMul: 1.05, waterDelta: 0, shelterAdd: 0, dustMul: 0.9 },
-  { id: 'arcadia', dest: 'mars', base: 'spring', difficulty: 'medium', solarMul: 0.9, thermalAdd: 0.3, ghMul: 0.95, waterDelta: 70, shelterAdd: 0, dustMul: 1, pool: { BRINE: 1.6 } },
-  { id: 'utopia', dest: 'mars', base: 'spring', difficulty: 'hard', solarMul: 0.92, thermalAdd: 0.15, ghMul: 0.9, waterDelta: 30, shelterAdd: 0, dustMul: 1.05 },
+  { id: 'arcadia', dest: 'mars', base: 'spring', difficulty: 'easy', solarMul: 0.9, thermalAdd: 0.3, ghMul: 0.95, waterDelta: 70, shelterAdd: 0, dustMul: 1, pool: { BRINE: 1.6 } },
+  { id: 'utopia', dest: 'mars', base: 'spring', difficulty: 'easy', solarMul: 0.92, thermalAdd: 0.15, ghMul: 0.9, waterDelta: 30, shelterAdd: 0, dustMul: 1.05 },
   // ---- Mars: southern summer arrivals (storm season) ----
-  { id: 'gale', dest: 'mars', base: 'summer', difficulty: 'hard', solarMul: 1, thermalAdd: 0, ghMul: 1, waterDelta: 0, shelterAdd: 0, dustMul: 1, reference: true },
+  { id: 'gale', dest: 'mars', base: 'summer', difficulty: 'medium', solarMul: 1, thermalAdd: 0, ghMul: 1, waterDelta: 0, shelterAdd: 0, dustMul: 1, reference: true },
   { id: 'meridiani', dest: 'mars', base: 'summer', difficulty: 'medium', solarMul: 1.08, thermalAdd: -0.1, ghMul: 1.05, waterDelta: 10, shelterAdd: 0, dustMul: 0.85 },
   { id: 'valles', dest: 'mars', base: 'summer', difficulty: 'hard', solarMul: 0.9, thermalAdd: 0.1, ghMul: 1, waterDelta: -20, shelterAdd: 25, dustMul: 1.15, pool: { WIND: 1.6 } },
   { id: 'hellas', dest: 'mars', base: 'summer', difficulty: 'veryHard', solarMul: 0.88, thermalAdd: 0.2, ghMul: 0.95, waterDelta: -30, shelterAdd: 0, dustMul: 1.3, pool: { WIND: 1.5 } },

@@ -41,7 +41,11 @@ Form, her ölçütü 1–5 puanla değerlendiriyor (toplam 25). 5 puanın tanım
 | **İlgililik** | Başvurulan problem başlığını tam ve doğrudan ele alma; NASA verilerini yüzeysel bir ek olarak değil, çözümün temel bileşeni olarak kullanma | Problem başlığını kapsamlı biçimde ele alır. NASA verileri projenin ayrılmaz bir parçasıdır ve yeniliği ileriye taşıyan içgörüler sağlar. |
 | **Sunum** | Problemin, çözümün ve öneminin açıkça aktarılması; hikâyeleştirme; sunumun açıklığı ve düzeni. Mentörler proje gösterimini ve projenin tamamını değerlendirir. | Problem, çözüm ve önem açıkça ifade edilmiş; ilgi çekici, iyi yapılandırılmış ve ikna edici bir sunum. |
 
-Problem başlığı için `docs/MAIN.md` dosyasının ilk paragrafını kullan. Başlık özetle şunu istiyor:
+Yarışma problemi (resmî metin):
+
+> Space-themed STEM content often oversimplifies the engineering trade-offs that define a real mission or presents them at a level too complex to hold a young learner's attention. Few tools make those trade-offs both tangible and fun. Your challenge is to design and build an interactive game or app that lets students run a lunar or Martian outpost, balancing competing demands like life support, radiation shielding, power, and food production, so they experience firsthand the decisions that determine whether a mission fails or succeeds.
+
+Ayrıntı için `docs/MAIN.md` dosyasının ilk paragrafına da bak. Problem özetle şunu istiyor:
 
 - Öğrenci, bir Ay ya da Mars üssünü yönetirken mühendislik kararlarının bedelini deneyimlemeli.
 - Yaşam desteği, enerji, gıda ve radyasyon koruması ele alınmalı.
@@ -64,7 +68,7 @@ Her ölçüt için şunları yaz:
   - Geri sayımlı olaylar.
   - Özet filmi.
 - **Geçerlilik:**
-  - Araştırma kartlarındaki 25 NASA/JPL kaynağından en az 8’ini aç; kaynaklar oyundaki iddiayı gerçekten destekliyor mu?
+  - 31 araştırma kartındaki 25 NASA/JPL kaynağından en az 8’ini aç; kaynaklar oyundaki iddiayı gerçekten destekliyor mu?
   - Oyun varsayımları açıkça ayrılmış mı?
   - README’deki “Cost and sustainability” bölümü doğru ve yeterli mi?
   - Erişilebilirlik: klavyeyle oynanabilirlik, kontrast, ekran okuyucu etiketleri, `prefers-reduced-motion`. Tarayıcı aracıyla ölçebildiğin kadarını ölç.

@@ -339,3 +339,21 @@ Kayıt şeması 7, içerik `0.8.0-landing`. Kaynak: `docs/archive/V4_TEST.md` bu
 | `npm run e2e:short` | 62/62. Masaüstü Mars/TR ve mobil Ay/EN; 390 px’te yüzeyde taşma 0; kalkış planlanınca saat işliyor |
 | Özet filmi portreleri | Vite geliştirme sunucusunda ekip sahnesi çizildi; portreler oyundakilerle aynı, tuval kirlenmedi |
 | Uzun 30 günlük e2e ve büyük denge taraması | **Yapılmadı**; ayrıntılı test oturumuna bırakıldı |
+
+## v0.8.1 — V5 test düzeltmeleri ve teslim (15 Kasım 2026)
+
+V5 bağımsız testi: [V5_TEST.md](archive/V5_TEST.md) (mentör puanı 17/25, sunumu engelleyen hata yok).
+
+- **B1 DONKI:** site kopyası 48 saate kadar geçerli (`STATIC_MS`), böylece açılışta `DEMO_KEY` isteği ve 429 hatası olmaz. Durum metni “Sitenin NASA kopyası gösteriliyor”. `scripts/donki-snapshot.ts` anahtar yoksa `DEMO_KEY`’e düşmek yerine hata verir. Veri 15 Kasım’da yenilendi.
+- **B2:** Yapanlar penceresinde Görkem Ergüne ve Gözde Kacar.
+- **B3:** EN paylaşım metni “on the The Moon” yerine “at {site} ({dest})”.
+- **B4:** README’de 31 araştırma kartı.
+- **B5:** R-MOLD kaynağı, iddiayı birebir destekleyen “Growing Plants in Space” sayfası oldu.
+- **B6:** iniş yeri zorluk etiketleri V5 ölçümüne göre (özenli oyuncunun tam başarısı: ≥%72 kolay, %60–72 orta, %48–60 zor, <%48 çok zor). Ay ekvatoru artık kolay; Malapert çok zor.
+- **B7:** “Herkes eve döndü” sonucunda başlık “En üst kademeye nasıl ulaşılır?”, açıklama gün sayısı söylemiyor.
+- **B8:** `npm run e2e:short` artık `--short` bayrağıyla; Windows’ta da çalışır (Windows’ta denenmedi).
+- **B12:** `--faint` rengi `#9aa4ba` (en açık panelde 4,5:1).
+- **B14:** ölü `time.why` anahtarları silindi.
+- README’ye “In the classroom” (40 dakikalık ders akışı) ve maliyet notları (Vercel Hobby, `DEMO_KEY`) eklendi. Teslim PDF’i: `docs/Solbound_LoversGG.pdf` (kaynağı `docs/teslim/`).
+
+Doğrulama: typecheck temiz, vitest 66/66, build, `npm run e2e:short` 62/62 (macOS). Denge taraması tekrar koşulmadı; etiket değişikliği yalnız metin, oyun sayıları değişmedi.

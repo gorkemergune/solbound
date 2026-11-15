@@ -12,7 +12,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "node scripts/e2e.mjs",
-    "e2e:short": "E2E_SHORT=1 node scripts/e2e.mjs",
+    "e2e:short": "node scripts/e2e.mjs --short",
     "donki:snapshot": "node scripts/donki-snapshot.ts"
   },
   "dependencies": {

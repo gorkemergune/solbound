@@ -10,7 +10,7 @@ export const more2En = {
   'dest.events': 'Events you may meet: {list}',
   'brief.goal': 'Goal: run the outpost for {days} days, get through the predicted big events, prepare the return and bring the crew home.',
   'gh.compressed': 'Plant growth is time-compressed: real crops take weeks to months.',
-  'debrief.rating.success.desc': 'Your crew completed the 30-day mission and returned safely.',
+  'debrief.rating.success.desc': 'Your crew reached the mission goal and returned safely.',
   'cargo.unused': 'Not used in this destination’s events',
   'R-CROPS.inGame': 'The greenhouse needs power for lights and some water. Growth is compressed so several harvests fit into one month.',
   'rule.dustLight': 'A regional storm blocks 40–60% of sunlight for one to two and a half days (gameplay values).',
@@ -58,8 +58,6 @@ export const more2En = {
   'time.sunUp': 'Sunset in {d} d {h} h',
   'time.sunDown': 'Sunrise in {d} d {h} h',
   'time.polar': 'Sun skims the horizon',
-  'time.why': 'Why two clocks?',
-  'time.whyText': 'A [[sol|sol]] is 24 h 39 min 35 s, so a Mars clock slips about 40 minutes behind Earth every day. On the Moon, clocks run slightly fast: an Earth clock seems to lose 58.7 µs per day ([[ltc|lunar time]]). Messages travel at light speed: 1.3 s from the Moon, 4–21 min from Mars.',
 
   // ---------- countdowns & preparation ----------
   'tabs.prep': 'Plan',
@@ -358,7 +356,7 @@ export const more2En = {
   'recap.n.big': 'predicted events faced',
   'recap.n.home': 'crew home',
   'recap.n.preps': 'preparation tasks done',
-  'recap.summary': 'I commanded a crew of {crew} on the {dest} ({site}) for {days} days in Solbound. {harvests} harvests, {big} predicted events faced, {science} science points. Result: {rating}. #Solbound #SpaceApps',
+  'recap.summary': 'I commanded a crew of {crew} for {days} days at {site} ({dest}) in Solbound. {harvests} harvests, {big} predicted events faced, {science} science points. Result: {rating}. #Solbound #SpaceApps',
   'recap.footer': 'Solbound · NASA Space Apps 2026 project · not affiliated with NASA',
 };
 

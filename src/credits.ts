@@ -4,6 +4,8 @@ export type CreditPerson = { name: string; role?: { en: string; tr: string }; li
 
 export const CREDITS: { team: CreditPerson[]; portfolio: string } = {
   team: [
+    { name: 'Görkem Ergüne' },
+    { name: 'Gözde Kacar' },
     // { name: 'Ad Soyad', role: { en: 'Design and code', tr: 'Tasarım ve kod' }, link: 'https://…' },
   ],
   portfolio: '', // e.g. 'https://example.com'

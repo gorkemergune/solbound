@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<title>Solbound — LoversGG</title>
+<link rel="stylesheet" href="../../node_modules/@fontsource-variable/inter/index.css" />
+<link rel="stylesheet" href="../../node_modules/@fontsource-variable/space-grotesk/index.css" />
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --bg: #0a0f1f;
+    --panel: #141b31;
+    --line: #26304f;
+    --text: #e9ecf5;
+    --muted: #9aa3bd;
+    --sun: #f6b445;
+    --mars: #e0703a;
+    --blue: #5aa9ff;
+    --green: #4fd18b;
+    --head: 'Space Grotesk Variable', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); }
+  body {
+    font-family: 'Inter Variable', sans-serif;
+    color: var(--text);
+    font-size: 10.5pt;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  a { color: inherit; text-decoration: none; }
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+    page-break-after: always;
+    padding: 16mm 15mm 14mm;
+    background: radial-gradient(120% 60% at 100% 0%, #1a2142 0%, var(--bg) 60%);
+  }
+  .page:last-child { page-break-after: auto; }
+  h1, h2, h3, .num { font-family: var(--head); letter-spacing: -0.01em; }
+  h2 { font-size: 25pt; line-height: 1.1; margin-bottom: 3mm; }
+  h2 em { font-style: normal; color: var(--sun); }
+  h3 { font-size: 12.5pt; margin-bottom: 1.5mm; }
+  .kicker { font-family: var(--head); font-size: 8.5pt; letter-spacing: 0.18em; text-transform: uppercase; color: var(--sun); margin-bottom: 2mm; font-weight: 600; }
+  .lead { font-size: 12pt; color: #cfd5e6; max-width: 165mm; }
+  .muted { color: var(--muted); }
+  .shot { display: block; width: 100%; border-radius: 3mm; border: 1px solid var(--line); box-shadow: 0 3mm 8mm rgba(0,0,0,0.45); }
+  .cap { font-size: 8.5pt; color: var(--muted); margin-top: 1.5mm; }
+  .foot { position: absolute; left: 15mm; right: 15mm; bottom: 7mm; display: flex; justify-content: space-between; font-size: 7.5pt; color: #5d6787; }
+
+  /* ---------- cover ---------- */
+  .cover { padding: 0; background: #05070f; }
+  .cover .hero { position: absolute; inset: 0 0 auto 0; height: 138mm; background: url('img/scene.jpg') center 70% / cover; }
+  .cover .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,7,15,0.15) 0%, rgba(5,7,15,0.25) 45%, #05070f 100%); }
+  .cover .top { position: absolute; top: 12mm; left: 15mm; right: 15mm; display: flex; justify-content: space-between; font-size: 8.5pt; letter-spacing: 0.16em; text-transform: uppercase; font-family: var(--head); font-weight: 600; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.6); }
+  .cover .body { position: absolute; top: 104mm; left: 15mm; right: 15mm; }
+  .brand { display: flex; align-items: center; gap: 5mm; }
+  .brand img { width: 24mm; height: 24mm; }
+  .brand h1 { font-size: 62pt; line-height: 1; color: #f8b54a; font-weight: 700; text-shadow: 0 0.6mm 2mm rgba(0,0,0,0.35); }
+  .hook { margin-top: 7mm; font-family: var(--head); font-size: 22pt; line-height: 1.2; font-weight: 600; }
+  .hook span { color: var(--sun); }
+  .pitch { margin-top: 4mm; font-size: 12.5pt; color: #c9d0e3; max-width: 170mm; }
+  .links { margin-top: 7mm; display: grid; grid-template-columns: 1fr 1fr 1.25fr; gap: 4mm; }
+  .btn { display: block; border-radius: 3.5mm; padding: 4mm 4.5mm; border: 1px solid var(--line); background: #10172b; }
+  .btn b { display: block; font-family: var(--head); font-size: 13pt; margin-bottom: 0.8mm; }
+  .btn small { display: block; font-size: 8pt; color: var(--muted); white-space: nowrap; letter-spacing: -0.01em; }
+  .btn.primary { background: linear-gradient(180deg, #ffc35c, #f0952f); border: none; color: #1a1205; }
+  .btn.primary small { color: #4a3210; }
+  .chips { margin-top: 5mm; display: flex; flex-wrap: wrap; gap: 2.5mm; }
+  .chip { font-size: 8.5pt; padding: 1.4mm 3mm; border-radius: 10mm; border: 1px solid #343f63; color: #c6cde0; }
+  .cover .foot { color: #6b7596; }
+  .strip { position: absolute; left: 15mm; right: 15mm; bottom: 11mm; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4mm; }
+  .strip div { height: 44mm; border-radius: 3mm; overflow: hidden; border: 1px solid var(--line); }
+  .strip img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+  .diff { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-top: 3mm; }
+  .diff div { background: var(--panel); border: 1px solid var(--line); border-top: 1mm solid var(--sun); border-radius: 3mm; padding: 3.5mm 4mm; font-size: 9pt; color: #cfd5e6; }
+  .diff b { display: block; font-family: var(--head); font-size: 11pt; color: #fff; margin-bottom: 1mm; }
+
+  /* ---------- blocks ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3.5mm; margin: 4.5mm 0 5mm; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 3mm; padding: 3.5mm 4mm; }
+  .stat .num { font-size: 22pt; color: var(--sun); line-height: 1; font-weight: 700; }
+  .stat div:last-child { font-size: 8.5pt; color: var(--muted); margin-top: 1.5mm; }
+  .quote { margin: 6mm 0 0; padding: 5mm 6mm; border-left: 1.2mm solid var(--sun); background: linear-gradient(90deg, rgba(246,180,69,0.12), rgba(246,180,69,0)); font-family: var(--head); font-size: 15pt; line-height: 1.3; }
+  .quote small { display: block; font-family: 'Inter Variable', sans-serif; font-size: 8.5pt; color: var(--muted); margin-top: 1.5mm; }
+  .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 5mm; }
+  .step .n { display: inline-grid; place-items: center; width: 6.5mm; height: 6.5mm; border-radius: 50%; background: var(--sun); color: #1a1205; font-family: var(--head); font-weight: 700; font-size: 9pt; margin-right: 2mm; }
+  .step h3 { display: flex; align-items: center; margin-bottom: 1mm; }
+  .step p { font-size: 9pt; color: var(--muted); margin-bottom: 2mm; min-height: 9mm; }
+  .step .frame { height: 38mm; overflow: hidden; border-radius: 3mm; border: 1px solid var(--line); }
+  .step .frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
+
+  table.map { width: 100%; border-collapse: separate; border-spacing: 0 1.6mm; margin-top: 2mm; }
+  table.map td { background: var(--panel); padding: 2.2mm 4mm; vertical-align: top; font-size: 9.5pt; }
+  table.map td:first-child { width: 47mm; border-radius: 2.5mm 0 0 2.5mm; font-weight: 600; font-family: var(--head); font-size: 10.5pt; }
+  table.map td:last-child { border-radius: 0 2.5mm 2.5mm 0; color: #cfd5e6; }
+  .dot { display: inline-block; width: 2.4mm; height: 2.4mm; border-radius: 50%; margin-right: 2mm; vertical-align: 0.2mm; }
+
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 5mm 0 5mm; }
+  .flow div { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 3mm; padding: 3mm 3.5mm; font-size: 8.8pt; color: #cfd5e6; }
+  .flow div b { display: block; font-family: var(--head); color: #fff; font-size: 10pt; margin-bottom: 0.8mm; }
+  .flow div:not(:last-child)::after { content: '→'; position: absolute; right: -3mm; top: 50%; transform: translate(50%, -50%); color: var(--sun); font-weight: 700; font-size: 12pt; }
+  .flow div.nasa { border-color: #2f5fb3; background: #12224a; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .tag { display: inline-block; font-size: 7pt; font-weight: 700; letter-spacing: 0.08em; padding: 0.6mm 2mm; border-radius: 1mm; margin-right: 1.5mm; vertical-align: 0.3mm; }
+  .t-src { background: #1d3f8a; color: #dbe7ff; }
+  .t-der { background: #0f5a4a; color: #d4fff0; }
+  .t-game { background: #6b4a10; color: #ffe7b8; }
+  ul.clean { list-style: none; }
+  ul.clean li { padding-left: 4.5mm; position: relative; margin-bottom: 1.6mm; font-size: 9.5pt; color: #cfd5e6; }
+  ul.clean li::before { content: ''; position: absolute; left: 0; top: 2mm; width: 1.6mm; height: 1.6mm; border-radius: 50%; background: var(--sun); }
+
+  .refs { columns: 1; font-size: 8.6pt; }
+  .refs h3 { font-size: 10.5pt; margin: 4mm 0 1.5mm; color: var(--sun); }
+  .refs ol { padding-left: 5mm; }
+  .refs li { margin-bottom: 1.3mm; color: #cfd5e6; }
+  .refs li a { color: #8fb8ff; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<!-- 1. COVER -->
+<section class="page cover">
+  <div class="hero"></div>
+  <div class="top"><span>NASA Space Apps Challenge 2026 · METU</span><span>LoversGG · Görkem Ergüne · Gözde Kacar</span></div>
+  <div class="body">
+    <div class="brand"><img src="img/logo.svg" alt="" /><h1>Solbound</h1></div>
+    <p class="hook">Gerçek Güneş fırtınaları. Dört astronot. 30 gün.<br /><span>Hepsini eve getirebilir misin?</span></p>
+    <p class="pitch">Ay ya da Mars üssünde oksijen, su, enerji, gıda ve radyasyon korumasını aynı anda yönettiğin bir eğitim oyunu. NASA’nın son 30 günde kaydettiği gerçek uzay havası olayları, görevinde aynı günlerde yaşanır.</p>
+    <div class="links">
+      <a class="btn primary" href="https://solbound.vercel.app"><b>▶ Hemen oyna</b><small>solbound.vercel.app</small></a>
+      <a class="btn" href="https://www.youtube.com/watch?v=k4y-1OFfU08"><b>30 sn tanıtım</b><small>youtu.be/k4y-1OFfU08</small></a>
+      <a class="btn" href="https://github.com/gorkemergune/solbound"><b>Kaynak kod</b><small>github.com/gorkemergune/solbound</small></a>
+    </div>
+    <div class="chips">
+      <span class="chip">Tarayıcıda, ücretsiz, kurulumsuz</span>
+      <span class="chip">Bilgisayar ve telefon</span>
+      <span class="chip">Türkçe / English</span>
+      <span class="chip">Canlı NASA DONKI verisi</span>
+    </div>
+  </div>
+  <div class="strip"><div><img src="img/event.jpg" alt="" /></div><div><img src="img/research.jpg" alt="" /></div><div><img src="img/landing.jpg" alt="" /></div></div>
+</section>
+
+<!-- 2. PROBLEM + SOLUTION -->
+<section class="page">
+  <div class="kicker">Yarışma problemi</div>
+  <h2>Bir uzay üssü her şeye <em>aynı anda</em> yetemez.</h2>
+  <p class="lead">Uzay temalı STEM içerikleri mühendislik ödünleşimlerini ya fazla basitleştiriyor ya da genç öğrenciyi kaçıracak kadar karmaşık anlatıyor. İstenen: öğrencinin bir Ay ya da Mars üssünü yönetip yaşam desteği, radyasyon koruması, enerji ve gıda üretimini dengelediği ve görevin kaderini belirleyen kararları bizzat yaşadığı bir oyun.</p>
+  <div class="quote">“Ekibimi yaşatmak için her şeye aynı anda yetemiyorum. Neye öncelik vereceğim?”<small>Oyuncunun hissetmesini istediğimiz soru</small></div>
+
+  <div class="kicker" style="margin-top: 6mm">Çözüm</div>
+  <h2 style="font-size: 20pt">Ödünleşimi <em>somut ve eğlenceli</em> kılan bir görev.</h2>
+  <div class="stats">
+    <div class="stat"><div class="num">16</div><div>aday arasından 3 ekip arkadaşı</div></div>
+    <div class="stat"><div class="num">520 kg</div><div>fırlatma bütçesi, vücut kütlesi dahil</div></div>
+    <div class="stat"><div class="num">16</div><div>rastgele iniş yeri, kolaydan çok zora</div></div>
+    <div class="stat"><div class="num">30 gün</div><div>yüzey görevi ve eve dönüş</div></div>
+  </div>
+  <div class="steps">
+    <div class="step"><h3><span class="n">1</span>Ekibini kur</h3><p>Her adayın uzmanlığı, kilosu ve ekip uyumu farklı. Bir alandaki güç başka bir alandan götürür.</p><div class="frame"><img src="img/crew.jpg" alt="" /></div></div>
+    <div class="step"><h3><span class="n">2</span>Yükünü hazırla</h3><p>Her kilo bir seçim: gıda paketi mi, kalkan mı, yedek parça mı?</p><div class="frame"><img src="img/cargo.jpg" alt="" /></div></div>
+    <div class="step"><h3><span class="n">3</span>Bilinmeyen yere in</h3><p>Güneş açısı, su, soğuk ve toz iniş yerine göre değişir; hedefin inişte belirlenir.</p><div class="frame"><img src="img/landing.jpg" alt="" style="object-position: center 20%" /></div></div>
+    <div class="step"><h3><span class="n">4</span>Ekibi eve getir</h3><p>Saat akar; fırtınalara geri sayımla hazırlan, dönüş penceresini kendin seç.</p><div class="frame"><img src="img/surface.jpg" alt="" /></div></div>
+  </div>
+  <div class="foot"><span>Solbound · LoversGG</span><span>2</span></div>
+</section>
+
+<!-- 3. DECISIONS + CHALLENGE FIT -->
+<section class="page">
+  <div class="kicker">Oynanış</div>
+  <h2>Her karar <em>görünür bir iz</em> bırakır.</h2>
+  <p class="lead">Kararlar saati durdurur. Her seçeneğin başarı şansı ve bedeli yazar; sonuç üste, kaynaklara ve ekibin sağlığına hemen yansır. Büyük olaylar önceden duyurulur, geri sayım boyunca hazırlık yapılır.</p>
+  <img class="shot" src="img/event.jpg" alt="Olay kartı ve üs sahnesi" style="margin-top: 4mm; height: 104mm; object-fit: cover; object-position: top" />
+  <p class="cap">Toz fırtınasına 4 gün var: sera planı kararı verilirken üs, kaynaklar ve hazırlık bandı aynı ekranda.</p>
+
+  <div class="kicker" style="margin-top: 5mm">Yarışma problemine uyum</div>
+  <table class="map">
+    <tr><td><span class="dot" style="background: var(--blue)"></span>Yaşam desteği</td><td>Oksijen ve su stokları; elektroliz, MOXIE, su geri kazanımı; sızıntılar ve tek seferlik acil durum yedeği.</td></tr>
+    <tr><td><span class="dot" style="background: var(--sun)"></span>Enerji</td><td>İniş yerine, gece ve gündüze, toza bağlı güneş üretimi; batarya; sera modu ve ekip rutinleriyle tüketim kararı.</td></tr>
+    <tr><td><span class="dot" style="background: var(--green)"></span>Gıda</td><td>Yanında getirdiğin paketler ile seradaki hasat arasında denge; sera enerji ister, hasat zaman.</td></tr>
+    <tr><td><span class="dot" style="background: var(--mars)"></span>Radyasyon</td><td>Sığınak koruma sağlar ama iş gücü ve zaman yer. Gerçek NASA DONKI olayları radyasyon uyarısına dönüşür.</td></tr>
+    <tr><td><span class="dot" style="background: #b48cff"></span>Öğrenme</td><td>Araştırma kartları kararın arkasındaki bilimi açıklar; görev sonu değerlendirmesi oyuncunun kendi oyunundan dersleri çıkarır.</td></tr>
+    <tr><td><span class="dot" style="background: #ff6b6b"></span>Sonuç</td><td>Hedef kalkıştan önce belirlenir. Sonuç beş kademelidir: tahminin ötesinde, herkes eve döndü, bedeli oldu, erken bitti, kaybedildi. Değerlendirme, sonucu belirleyen kararları gösterir.</td></tr>
+  </table>
+  <div class="foot"><span>Solbound · LoversGG</span><span>3</span></div>
+</section>
+
+<!-- 4. NASA DATA -->
+<section class="page">
+  <div class="kicker">NASA verisi</div>
+  <h2>Bu görev <em>gerçek Güneş’le</em> oynanır.</h2>
+  <p class="lead">NASA’nın DONKI uzay havası veritabanı oyunun süsü değil, takvimidir: görevin 1. günü, kaydın ilk günüdür. Gerçek bir koronal kütle atımı Mars’a ya da Ay’a yöneldiyse oyuncu aynı gün uyarıyı ve geri sayımı alır.</p>
+  <div class="flow">
+    <div class="nasa"><b>NASA DONKI</b>Son 30 günün CME, jeomanyetik fırtına ve parçacık kayıtları</div>
+    <div><b>Anlık görüntü</b>API anahtarı gizli kalır; oyun tarayıcıda anahtarsız çalışır</div>
+    <div><b>Takvim eşleme</b>Görev günü = gerçek gün; gerçek tarih ve hız kartta yazar</div>
+    <div><b>Oyuncu kararı</b>Geri sayım, sığınak, kalkan ve iş planı</div>
+  </div>
+  <img class="shot" src="img/donki.jpg" alt="Brifingteki DONKI açıklaması" />
+  <img class="shot" src="img/swpanel.jpg" alt="Canlı uzay havası paneli" style="margin-top: 4mm" />
+  <p class="cap">Oyuna başlamadan önce brifing ve canlı uzay havası paneli: gerçek kayıt sayıları, son CME’nin tarihi ve hızı, Dünya–Mars sinyal gecikmesi.</p>
+
+  <div class="two" style="margin-top: 6mm">
+    <div>
+      <h3>Gerçek olan, oyun olan</h3>
+      <ul class="clean">
+        <li><b>31 araştırma kartı</b>, 25 NASA ve JPL kaynağına dayanır.</li>
+        <li>Her kartta bilgi üç ayrı etiketle yazılır:<br /><span class="tag t-src">KAYNAKLI</span><span class="tag t-der">TÜRETİLMİŞ</span><span class="tag t-game">OYUN VARSAYIMI</span></li>
+        <li><b>Sinyal gecikmesi</b> gezegenlerin gerçek konumundan, JPL’in yaklaşık konum formülüyle hesaplanır.</li>
+        <li>İniş yerlerinin adları gerçektir; zorluk çarpanları oyun varsayımıdır.</li>
+      </ul>
+    </div>
+    <div><img class="shot" src="img/research.jpg" alt="Araştırma kartı" style="height: 72mm; object-fit: cover; object-position: top" /><p class="cap">Araştırma kartı: su–oksijen döngüsü.</p></div>
+  </div>
+  <div class="foot"><span>Solbound · LoversGG</span><span>4</span></div>
+</section>
+
+<!-- 5. LEARNING, VALIDITY, SUSTAINABILITY -->
+<section class="page">
+  <div class="kicker">Öğrenme</div>
+  <h2>Oyun biter, <em>ders kalır.</em></h2>
+  <p class="lead">Görev sonunda oyuncu kendi kararlarının sonuçlarını görür: kim eve döndü, hangi hazırlık neyi mümkün kıldı, hangi sistem neden zorlandı. Sonuç paylaşılabilir kısa bir özet filmine dönüşür.</p>
+  <img class="shot" src="img/lessons.jpg" alt="Görev sonu dersleri" style="margin-top: 5mm" />
+  <p class="cap">Görev değerlendirmesi: dersler oyuncunun o görevde yaşadıklarından seçilir.</p>
+
+  <div class="kicker" style="margin-top: 7mm">Bizi farklı kılan</div>
+  <div class="diff">
+    <div><b>Gerçek takvim</b>Her görev, Güneş’in son 30 gerçek gününü yeniden oynatır; uzay havası oynadığın güne göre değişir.</div>
+    <div><b>Geri sayımlı kriz</b>Büyük olaylar önceden bilinir; hazırlık, sonradan onarmaktan ucuzdur.</div>
+    <div><b>İnsan hikâyesi</b>16 farklı aday, stres ve ekip uyumu: kaynak yönetimi bir ekibin hikâyesine dönüşür.</div>
+  </div>
+
+  <div class="kicker" style="margin-top: 7mm">Geçerlilik</div>
+  <div class="stats">
+    <div class="stat"><div class="num">70.000</div><div>simüle oyunla iki bağımsız denge taraması</div></div>
+    <div class="stat"><div class="num">66</div><div>oyun motoru testi</div></div>
+    <div class="stat"><div class="num">95</div><div>masaüstü ve mobil tarayıcı kontrolü, hepsi geçti</div></div>
+    <div class="stat"><div class="num">0 TL</div><div>aylık işletme maliyeti</div></div>
+  </div>
+  <div class="two">
+    <div>
+      <h3>Sürdürülebilir</h3>
+      <ul class="clean">
+        <li>Sunucu, veritabanı ve ücretli servis yok: statik site, ücretsiz barındırma.</li>
+        <li>NASA’nın açık API’leri ücretsiz. Hesap ve takip yok; ilerleme yalnız oyuncunun tarayıcısında saklanır.</li>
+        <li>Kod MIT lisanslı: öğretmenler ve başka takımlar kendi sunucularında yayınlayabilir, uyarlayabilir.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Derste 40 dakika</h3>
+      <ul class="clean">
+        <li><b>Giriş (5 dk):</b> ikişerli gruplar Ay ya da Mars seçer, brifingi okur.</li>
+        <li><b>Oyun (25 dk):</b> 16× hız; grup her karardan önce seçimini ve nedenini söyler.</li>
+        <li><b>Tartışma (10 dk):</b> Batarya neden enerji üretmez? Hedefte mi dönmeli, tahmine kadar mı kalmalı? Hangi hazırlık neyi mümkün kıldı?</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Solbound · LoversGG</span><span>5</span></div>
+</section>
+
+<!-- 6. REFERENCES -->
+<section class="page">
+  <div class="kicker">Kaynakça</div>
+  <h2 style="font-size: 20pt">Kaynaklar</h2>
+  <p class="muted" style="font-size: 9pt">Kaynaklara 14 Kasım 2026’da erişildi. Oyundaki 31 araştırma kartının kaynak listesinin tamamı depoda: <code>src/engine/research.ts</code> ve <code>docs/RESEARCH.md</code>.</p>
+  <div class="refs">
+    <h3>Kullanılan NASA verisi</h3>
+    <ol>
+      <li>NASA CCMC — DONKI: Space Weather Database Of Notifications, Knowledge, Information. <a href="https://ccmc.gsfc.nasa.gov/tools/DONKI/">ccmc.gsfc.nasa.gov/tools/DONKI</a></li>
+      <li>NASA Open APIs — DONKI uç noktaları. <a href="https://api.nasa.gov/">api.nasa.gov</a></li>
+      <li>NASA/JPL SSD — Approximate Positions of the Planets. <a href="https://ssd.jpl.nasa.gov/planets/approx_pos.html">ssd.jpl.nasa.gov/planets/approx_pos.html</a></li>
+      <li>NASA/JPL — Horizons System (formülü doğrulamak için). <a href="https://ssd.jpl.nasa.gov/horizons/">ssd.jpl.nasa.gov/horizons</a></li>
+    </ol>
+    <h3>Yaşam desteği, gıda ve enerji</h3>
+    <ol start="5">
+      <li>NASA — Environmental Control and Life Support Systems (ECLSS). <a href="https://www.nasa.gov/reference/environmental-control-and-life-support-systems-eclss/">nasa.gov/reference/environmental-control-and-life-support-systems-eclss</a></li>
+      <li>NASA — NASA Achieves Water Recovery Milestone on International Space Station. <a href="https://www.nasa.gov/missions/station/iss-research/nasa-achieves-water-recovery-milestone-on-international-space-station/">nasa.gov/missions/station/iss-research/…water-recovery-milestone…</a></li>
+      <li>NASA Science — Mars 2020 Perseverance: Science Instruments (MOXIE). <a href="https://science.nasa.gov/mission/mars-2020-perseverance/science-instruments/">science.nasa.gov/mission/mars-2020-perseverance/science-instruments</a></li>
+      <li>NASA NTRS — Moon to Mars ISRU Status Update (Sanders, 2024). <a href="https://ntrs.nasa.gov/api/citations/20240013906/downloads/M2M%20ISRU%20Status_SandersV2.pdf">ntrs.nasa.gov/citations/20240013906</a></li>
+      <li>NASA — NASA Plant Researchers Explore Question of Deep-Space Food Crops. <a href="https://www.nasa.gov/science-research/nasa-plant-researchers-explore-question-of-deep-space-food-crops/">nasa.gov/science-research/…deep-space-food-crops</a></li>
+      <li>NASA — Growing Plants in Space. <a href="https://www.nasa.gov/exploration-research-and-technology/growing-plants-in-space/">nasa.gov/exploration-research-and-technology/growing-plants-in-space</a></li>
+      <li>NASA Glenn — NASA’s Fission Surface Power Project Energizes Lunar Exploration. <a href="https://www.nasa.gov/centers-and-facilities/glenn/nasas-fission-surface-power-project-energizes-lunar-exploration/">nasa.gov/centers-and-facilities/glenn/…fission-surface-power…</a></li>
+    </ol>
+    <h3>Radyasyon, ortam ve zaman</h3>
+    <ol start="12">
+      <li>NASA OCHMO — Radiation Protection Technical Brief (NASA-STD-3001). <a href="https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-020-radiation-protection.pdf">nasa.gov/…/ochmo-tb-020-radiation-protection.pdf</a></li>
+      <li>NASA Human Research Program — Hazard: Distance From Earth. <a href="https://www.nasa.gov/hrp/hazard-distance-from-earth/">nasa.gov/hrp/hazard-distance-from-earth</a></li>
+      <li>NASA — The Fact and Fiction of Martian Dust Storms. <a href="https://www.nasa.gov/solar-system/the-fact-and-fiction-of-martian-dust-storms/">nasa.gov/solar-system/the-fact-and-fiction-of-martian-dust-storms</a></li>
+      <li>NASA Science — Mars Facts; Moon Facts; Moon Dust. <a href="https://science.nasa.gov/mars/facts/">science.nasa.gov/mars/facts</a> · <a href="https://science.nasa.gov/moon/facts/">science.nasa.gov/moon/facts</a> · <a href="https://science.nasa.gov/moon/moon-dust/">science.nasa.gov/moon/moon-dust</a></li>
+      <li>NASA Science — Shackleton Crater’s Illuminated Rim &amp; Shadowed Interior. <a href="https://science.nasa.gov/resource/shackleton-craters-illuminated-rim-shadowed-interior/">science.nasa.gov/resource/shackleton-craters-illuminated-rim-shadowed-interior</a></li>
+      <li>NASA — Shrinking Moon Causing Moonquakes and Faults Near Lunar South Pole. <a href="https://www.nasa.gov/solar-system/moon/shrinking-moon-causing-moonquakes-and-faults-near-lunar-south-pole/">nasa.gov/solar-system/moon/shrinking-moon-causing-moonquakes…</a></li>
+      <li>NASA Meteoroid Environment Office — About Lunar Impact Monitoring. <a href="https://www.nasa.gov/meteoroid-environment-office/about-lunar-impact-monitoring/">nasa.gov/meteoroid-environment-office/about-lunar-impact-monitoring</a></li>
+      <li>NASA GISS — Mars24 Sunclock: Technical Notes on Mars Solar Time. <a href="https://www.giss.nasa.gov/tools/mars24/help/notes.html">giss.nasa.gov/tools/mars24/help/notes.html</a></li>
+      <li>NASA — Lunar Time. <a href="https://www.nasa.gov/communicating-with-missions/lunar-time/">nasa.gov/communicating-with-missions/lunar-time</a></li>
+    </ol>
+    <h3>Araçlar</h3>
+    <ol start="21">
+      <li>React, TypeScript ve Vite ile geliştirildi; Vercel’de yayında. Ekran görüntüleri ve tanıtım videosu oyunun kendisinden alındı; videonun müziği bu video için özgün olarak yapıldı.</li>
+    </ol>
+  </div>
+  <div class="foot"><span>Solbound · LoversGG · Bağımsız öğrenci projesi, resmî bir NASA ürünü değildir.</span><span>6</span></div>
+</section>
+
+</body>
+</html>

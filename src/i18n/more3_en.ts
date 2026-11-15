@@ -4,7 +4,7 @@ export const more3En = {
   'sw.by': 'NASA DONKI',
   'sw.status.loading': 'Checking NASA…',
   'sw.status.ok': 'Up to date',
-  'sw.status.offline': 'NASA unreachable, showing saved data',
+  'sw.status.offline': 'Showing the site’s saved NASA copy',
   'sw.status.idle': '…',
   'sw.source.live': 'live',
   'sw.source.cache': 'saved copy',
