@@ -1,6 +1,6 @@
 # Solbound — v0.2 tasarım sözleşmesi ve okuma sırası
 
-> **Güncel durum için önce [CURRENT_STATE.md](CURRENT_STATE.md) dosyasını okuyun.** Bu belge uygulama öncesi v0.2 tasarımıdır ve tarihsel kayıt olarak korunur. O zamandan beri değişenler: 12 → 16 aday, 100V → 520 kg kütle bütçesi, 3 günlük demo → tam 30 günlük görev, canlı NASA DONKI verisi, geri sayımlı büyük olaylar, özet filmi. Aşağıdaki tablolarda bu eski değerler geçer.
+> **Güncel durum için önce [CURRENT_STATE.md](../CURRENT_STATE.md) dosyasını okuyun.** Bu belge uygulama öncesi v0.2 tasarımıdır ve tarihsel kayıt olarak korunur. O zamandan beri değişenler: 12 → 16 aday, 100V → 520 kg kütle bütçesi, 3 günlük demo → tam 30 günlük görev, canlı NASA DONKI verisi, geri sayımlı büyük olaylar, özet filmi. Aşağıdaki tablolarda bu eski değerler geçer.
 
 Sürüm: v0.2 · 14 Kasım 2026 · Durum: tarihsel tasarım sözleşmesi (uygulama bunun ötesine geçti).
 
@@ -44,10 +44,10 @@ Bunlar kullanıcının kesin kararı olarak sunulmaz; ilk prototip için değiş
 
 ## Okuma sırası
 
-1. [Kullanıcı ve ekran akışı](USER_FLOW.md)
-2. [Oyun sistemleri ve güncel mimari](GAME_SYSTEMS_V2.md)
-3. [Hikâye ve olay modeli](STORY_EVENTS.md)
-4. [Görsel ve etkileşim yönü](VISUAL_DIRECTION.md)
+1. [Kullanıcı ve ekran akışı](../USER_FLOW.md)
+2. [Oyun sistemleri ve güncel mimari](../GAME_SYSTEMS_V2.md)
+3. [Hikâye ve olay modeli](../STORY_EVENTS.md)
+4. [Görsel ve etkileşim yönü](../VISUAL_DIRECTION.md)
 5. [Uygulama planı ve kabul ölçütleri](IMPLEMENTATION_PLAN_V2.md)
 6. [Claude Code geliştirme promptu](CLAUDE_CODE_PROMPT.md)
 7. [Model seçimi ve çalışma şekli](MODEL_WORKFLOW.md)

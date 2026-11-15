@@ -1,35 +1,51 @@
 <div align="center">
-  <img src="public/favicon.svg" width="64" alt="Solbound" />
+  <img src="public/favicon.svg" width="72" alt="Solbound logo" />
   <h1>Solbound</h1>
-  <p><strong>Choose your crew. Build your outpost. Bring everyone home.</strong></p>
-  <p><a href="https://solbound.verlce.app"><strong>Play now ↗</strong></a> · <a href="docs/media/solbound-trailer.mp4">Watch the trailer</a> · English / Türkçe</p>
+  <p><strong>Choose your crew. Pack every kilo. Bring everyone home.</strong></p>
+  <p>
+    <a href="https://solbound.vercel.app"><strong>▶ Play now</strong></a> ·
+    <a href="docs/media/solbound-trailer.mp4">Watch the trailer</a> ·
+    English / Türkçe
+  </p>
+  <a href="docs/media/solbound-trailer.mp4">
+    <img src="docs/media/trailer-poster.jpg" width="820" alt="Solbound trailer — click to watch (30 s)" />
+  </a>
 </div>
 
-![A Solbound Mars outpost with life support, solar panels, a greenhouse and crew](docs/media/outpost.png)
+## About
 
-A story-driven STEM survival game set on the **Moon or Mars**. Recruit three companions, pack for launch, and balance **oxygen, water, power, food and radiation protection** through a 30-day mission. Real **NASA DONKI space-weather records** shape the challenges your crew faces.
+Solbound is a story-driven survival game set on the **Moon or Mars**. You lead a four-person crew through a 30-day surface mission, keeping **oxygen, water, power, food and radiation shielding** in balance. Every decision has a cost.
 
-|                                  Build your crew                                  |                            Pack for survival                            |
-| :-------------------------------------------------------------------------------: | :---------------------------------------------------------------------: |
-| ![Choose companions with different skills and personalities](docs/media/crew.png) | ![Choose equipment within the launch mass budget](docs/media/cargo.png) |
+The solar storms are real: solar eruptions recorded in **NASA DONKI** become radiation events in your mission, with the real dates and speeds shown in the game.
 
-## Trailer
+## How it plays
 
-[![Watch the 30-second Solbound trailer](docs/media/trailer-poster.jpg)](docs/media/solbound-trailer.mp4)
+| | |
+| --- | --- |
+| **1. Choose your crew** | Pick three companions from sixteen. Each has different skills and a different personality. |
+| **2. Pack for launch** | You have 520 kg, and that includes the crew's own body mass. |
+| **3. Survive 30 days** | Deal with dust storms, meteor showers, quakes, failing systems and arguments in the crew. Big events come with a countdown, so you can prepare. |
+| **4. Bring them home** | Book the return window, get everyone off the surface and share a recap film of your mission. |
+
+|                        Build your crew                        |                     Pack for survival                     |
+| :-----------------------------------------------------------: | :-------------------------------------------------------: |
+| ![Choosing companions with different skills](docs/media/crew.png) | ![Packing within the 520 kg launch budget](docs/media/cargo.png) |
 
 ## Run locally
 
-Node.js 20.19+.
+Requires Node.js 20.19+.
 
 ```sh
 npm install
-npm run dev
+npm run dev     # start the game
+npm test        # engine tests
 ```
 
-React · TypeScript · Vite
+Built with React, TypeScript and Vite. Design notes and science sources are in [`docs/`](docs/README.md).
 
 ---
 
-Built by **LoversGG** at **METU NASA Space Apps Challenge 2026**. Independent student project.
-
-[MIT License](LICENSE) · [Media credits](docs/media/CREDITS.md)
+<div align="center">
+  Built by <strong>LoversGG</strong> for the <strong>METU NASA Space Apps Challenge 2026</strong>. An independent student project, not an official NASA product.<br />
+  <a href="LICENSE">MIT License</a> · <a href="docs/media/CREDITS.md">Media credits</a>
+</div>

@@ -6,12 +6,12 @@ Aşağıdaki bloğu Solbound deposunda çalışan Claude Code'a ver. Bu belge g�
 Solbound'u bu repoda çalışır, görsel olarak özenli ve oynanabilir bir 2D STEM web oyununa dönüştür. METU NASA Space Apps Challenge 2026 için çalışıyoruz. Sen deneyimli bir oyun tasarımcısı ve frontend mühendisi gibi ürün bütünlüğünden sorumlusun.
 
 Önce varsa AGENTS.md ve CLAUDE.md'yi, kullanıcı bağlamı PROMPT.txt ile docs/MAIN.txt'yi oku. Ardından şu sırayı izle:
-1. docs/00_START_HERE.md
+1. docs/archive/00_START_HERE.md
 2. docs/USER_FLOW.md
 3. docs/GAME_SYSTEMS_V2.md
 4. docs/STORY_EVENTS.md
 5. docs/VISUAL_DIRECTION.md
-6. docs/IMPLEMENTATION_PLAN_V2.md
+6. docs/archive/IMPLEMENTATION_PLAN_V2.md
 7. Bilimsel kaynak başlangıcı için docs/RESEARCH.md
 
 Sonraki doğrudan kullanıcı talimatını öncelikli tut. v0.2 belgeleri önceki PRODUCT.md, ARCHITECTURE.md, BACKLOG.md ve araştırma-only CLAUDE_DISCOVERY_TASK.md'nin eski kapsamını günceller. Eski 12-sol, yalnız Mars ve sadece tur onayı planını uygulama. Mevcut kullanıcı dosyalarını ve MIT lisansını koru.

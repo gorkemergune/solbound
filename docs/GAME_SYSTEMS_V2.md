@@ -1,6 +1,6 @@
 # Oyun sistemleri ve güncel mimari
 
-v0.2. [Ürün kapsamı](00_START_HERE.md) ve [ekran akışı](USER_FLOW.md) ile birlikte okunur. Aşağıdaki sayılar dengelenecek oyun parametreleridir.
+v0.2. [Ürün kapsamı](archive/00_START_HERE.md) ve [ekran akışı](USER_FLOW.md) ile birlikte okunur. Aşağıdaki sayılar dengelenecek oyun parametreleridir.
 
 ## Teknoloji ve sınırlar
 

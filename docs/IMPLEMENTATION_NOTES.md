@@ -1,6 +1,6 @@
 # Uygulama notları — ilk oynanabilir dilim (V2-01)
 
-Tarih: 14 Kasım 2026. Bu dosya [IMPLEMENTATION_PLAN_V2.md](IMPLEMENTATION_PLAN_V2.md) kapsamındaki ilk teslimatın kısa planı, alınan mühendislik kararları ve oyun varsayımlarıdır. Durum ve test sonuçları en alttaki "Durum" bölümünde tutulur.
+Tarih: 14 Kasım 2026. Bu dosya [IMPLEMENTATION_PLAN_V2.md](archive/IMPLEMENTATION_PLAN_V2.md) kapsamındaki ilk teslimatın kısa planı, alınan mühendislik kararları ve oyun varsayımlarıdır. Durum ve test sonuçları en alttaki "Durum" bölümünde tutulur.
 
 ## Repo incelemesi
 
@@ -298,7 +298,7 @@ Ayrıntılı madde listesi `eksikler.md` dosyasında; güncel özet `docs/CURREN
 
 ## v0.8 — rastgele iniş, V4 test düzeltmeleri, `bug/eksikler.md` turu (14 Kasım 2026)
 
-Kayıt şeması 7, içerik `0.8.0-landing`. Kaynak: `docs/V4_TEST.md` bulguları ve `bug/eksikler.md`.
+Kayıt şeması 7, içerik `0.8.0-landing`. Kaynak: `docs/archive/V4_TEST.md` bulguları ve `bug/eksikler.md`.
 
 - **Rastgele iniş (`src/engine/landing.ts`):**
   - Hedef ekranındaki iki iniş yeri seçeneği kaldırıldı. Kalkışta seed’e bağlı olarak 8 yerden biri seçiliyor (`pickLanding`); her yer bir temel tip (Ay kutup/ekvator, Mars bahar/yaz) ve oyun çarpanları taşıyor: güneş, ısıtma, sera, başlangıç suyu, doğal sığınak, toz, olay ağırlıkları.

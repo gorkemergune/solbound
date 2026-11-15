@@ -4,11 +4,11 @@ Aşağıdaki metni olduğu gibi yeni bir Claude Code oturumuna verin. Oturum dep
 
 ---
 
-Solbound deposunda (`CLAUDE.md` ve `docs/CURRENT_STATE.md` dosyalarını önce oku) **v0.7 (`0.7.0-goal`)** sürümünü ayrıntılı test et. Önceki bağımsız test `docs/V3_TEST.md` ve `docs/summary_v3.json` dosyalarında; aynı yöntemi kullan ve sonuçları **V3 ile yan yana** karşılaştır.
+Solbound deposunda (`CLAUDE.md` ve `docs/CURRENT_STATE.md` dosyalarını önce oku) **v0.7 (`0.7.0-goal`)** sürümünü ayrıntılı test et. Önceki bağımsız test `docs/archive/V3_TEST.md` ve `docs/archive/summary_v3.json` dosyalarında; aynı yöntemi kullan ve sonuçları **V3 ile yan yana** karşılaştır.
 
 ## Kurallar
 
-- Kaynak koda, testlere ve belgelere dokunma. Yalnız iki çıktı dosyası yaz: `docs/V4_TEST.md` (Türkçe rapor) ve `docs/summary_v4.json` (tablolar).
+- Kaynak koda, testlere ve belgelere dokunma. Yalnız iki çıktı dosyası yaz: `docs/archive/V4_TEST.md` (Türkçe rapor) ve `docs/archive/summary_v4.json` (tablolar).
 - Simülasyonu gerçek motor üzerinden çalıştır: `applyCommand` komut kapısı, gerçek kütle bütçesi (`setCargo` ile), normal `launch` komutu, seed’den üretilen profiller. Kısa yol olarak `src/engine/testkit.ts` içindeki `realistic()` ve `playLaunched()` kullanılabilir; `prepared()` ve `launchAnyway()` kütle kontrolünü atladığı için ana taramada kullanma.
 - Bellek: V3 taraması 40.468 oyunda bellek yüzünden durdu. Bu kez işi **5.000 oyunluk parçalara** böl. Her parçanın özetini diske yaz, ham oyun durumlarını bellekte tutma ve parçaları sonda birleştir. Hedef en az 40.000 oyun; zaman ya da bellek yetmezse kaç oyunla durduğunu açıkça yaz.
 - Botların ne yapamadığını (araştırma okuma, rutin değiştirme, güç önceliği vb.) rapordaki “Sınırlar” bölümünde belirt. Eşya ve uzmanlık etkileri korelasyondur; bunu da belirt.
@@ -70,7 +70,7 @@ Tarayıcı aracı varsa `npm run build && npm run e2e` çalıştır ve sonucu ya
 - Sahnenin yanlarında siyah boşluk var mı? 1280–1440 px genişlikte sekmeler sığıyor mu?
 - Mobilde (390 px) yatay taşma var mı?
 
-## Rapor biçimi (`docs/V4_TEST.md`)
+## Rapor biçimi (`docs/archive/V4_TEST.md`)
 
 1. Kısa özet: en önemli 3 sonuç.
 2. Yöntem ve sınırlar.

@@ -1,6 +1,6 @@
 # Kullanıcı ve ekran akışı
 
-Güncel kapsam: [Başlangıç belgesi](00_START_HERE.md). Metinler örnektir; EN/TR karşılıkları içerik dosyalarına taşınır.
+Güncel kapsam: [Başlangıç belgesi](archive/00_START_HERE.md). Metinler örnektir; EN/TR karşılıkları içerik dosyalarına taşınır.
 
 ```mermaid
 flowchart TD

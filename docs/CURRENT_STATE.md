@@ -2,7 +2,7 @@
 
 Son güncelleme: 14 Kasım 2026 · içerik sürümü `0.8.0-landing` · kayıt şeması 7
 
-Bu belge oyunun **şu anki** kapsamını özetler. Diğer belgelerle çelişirse bu belge ve kod geçerlidir. `00_START_HERE.md` ve v0.2 belgeleri tasarım geçmişidir; `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md`, `CLAUDE_DISCOVERY_TASK.md` ise v0.1 önerisidir. Değişiklik günlüğü ve doğrulama sonuçları için [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), kullanıcının açık listesi için `bug/eksikler.md` (git’e girmez), son bağımsız test için [V4_TEST.md](V4_TEST.md) okunmalıdır. [V4_PROMPT.md](V4_PROMPT.md) bir önceki test görevidir.
+Bu belge oyunun **şu anki** kapsamını özetler. Diğer belgelerle çelişirse bu belge ve kod geçerlidir. Eski belgeler `docs/archive/` klasöründedir: `00_START_HERE.md` ve v0.2 belgeleri tasarım geçmişidir; `PRODUCT.md`, `ARCHITECTURE.md`, `BACKLOG.md`, `CLAUDE_DISCOVERY_TASK.md` ise v0.1 önerisidir. Değişiklik günlüğü ve doğrulama sonuçları için [IMPLEMENTATION_NOTES.md](IMPLEMENTATION_NOTES.md), kullanıcının açık listesi için `bug/eksikler.md` (git’e girmez), son bağımsız test için [V4_TEST.md](archive/V4_TEST.md) okunmalıdır. [V4_PROMPT.md](archive/V4_PROMPT.md) bir önceki test görevidir.
 
 ## Ürün
 

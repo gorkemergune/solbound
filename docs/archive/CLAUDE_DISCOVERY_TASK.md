@@ -12,7 +12,7 @@ The challenge supplied by the team is:
 
 > Design and build an interactive game or app that lets students run a lunar or Martian outpost, balancing life support, radiation shielding, power, and food production so they experience decisions that determine mission success or failure.
 
-Read `README.md`, `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, `docs/BACKLOG.md`, `docs/RESEARCH.md`, and `docs/TOOLING.md`. Treat them as proposals to challenge, not settled truths. Initial scope: a browser-based, 12-sol Mars mission for ages 12–16 with a 5–8 minute play target. Audience and duration are hypotheses.
+Read `README.md`, `docs/archive/PRODUCT.md`, `docs/archive/ARCHITECTURE.md`, `docs/archive/BACKLOG.md`, `docs/RESEARCH.md`, and `docs/archive/TOOLING.md`. Treat them as proposals to challenge, not settled truths. Initial scope: a browser-based, 12-sol Mars mission for ages 12–16 with a 5–8 minute play target. Audience and duration are hypotheses.
 
 ## Research questions
 
@@ -83,4 +83,4 @@ Research and planning only. Do not modify production code, install packages, cha
 
 ## Suggested handoff
 
-After signing into Claude Code, start it from this repository and ask: “Read `docs/CLAUDE_DISCOVERY_TASK.md` and execute the research assignment. Return the report; do not change project files.” The same document can be attached or pasted into Claude with the referenced planning files.
+After signing into Claude Code, start it from this repository and ask: “Read `docs/archive/CLAUDE_DISCOVERY_TASK.md` and execute the research assignment. Return the report; do not change project files.” The same document can be attached or pasted into Claude with the referenced planning files.

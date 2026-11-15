@@ -30,7 +30,7 @@ Erişim yoksa `/model` menüsünden hesabın erişebildiği seçeneği kontrol e
 ## Fable için isteğe bağlı kısa inceleme promptu
 
 ```text
-docs/00_START_HERE.md ve bağlantılı v0.2 tasarım belgelerini oku. Solbound için ilk dikey kesiti oyun döngüsü, nedensellik, zamanlama, içerik maliyeti ve görsel açıklık açısından eleştir. En önemli beş riski ve her biri için en küçük çözümü docs/DESIGN_REVIEW.md'ye yaz. Kod yazma, kapsamı büyütme. Kullanıcı gereksinimini kendi tercihinle çıkarma; önerileri ayrı etiketle. Opus'un uygulamaya doğrudan geçebileceği kısa bir değerlendirme üret.
+docs/archive/00_START_HERE.md ve bağlantılı v0.2 tasarım belgelerini oku. Solbound için ilk dikey kesiti oyun döngüsü, nedensellik, zamanlama, içerik maliyeti ve görsel açıklık açısından eleştir. En önemli beş riski ve her biri için en küçük çözümü docs/DESIGN_REVIEW.md'ye yaz. Kod yazma, kapsamı büyütme. Kullanıcı gereksinimini kendi tercihinle çıkarma; önerileri ayrı etiketle. Opus'un uygulamaya doğrudan geçebileceği kısa bir değerlendirme üret.
 ```
 
 Ana geliştirme görevi [CLAUDE_CODE_PROMPT.md](CLAUDE_CODE_PROMPT.md) içindedir. Bu belgeler oluşturulurken Claude çalıştırılmadı, model ayarı değiştirilmedi ve bir göreve mesaj gönderilmedi.
