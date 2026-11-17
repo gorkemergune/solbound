@@ -1,6 +1,6 @@
 {
  "source": "bundled",
- "fetchedAt": "2026-11-17T07:58:48.223Z",
+ "fetchedAt": "2026-11-17T20:58:30.272Z",
  "rangeStart": "2026-10-18",
  "rangeEnd": "2026-11-17",
  "records": [
@@ -594,6 +594,13 @@
    "cls": "S"
   },
   {
+   "id": "2026-11-12T09:00:00-IPS-001",
+   "kind": "ips",
+   "time": "2026-11-12T09:00Z",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/IPS/49611/-1",
+   "location": "STEREO A"
+  },
+  {
    "id": "2026-11-12T21:12:00-CME-001",
    "kind": "cme",
    "time": "2026-11-12T21:12Z",
@@ -760,6 +767,34 @@
    "cls": "S",
    "arrivalMars": "2026-11-22T16:00Z",
    "glancingMars": true
+  },
+  {
+   "id": "2026-11-17T05:12:00-CME-001",
+   "kind": "cme",
+   "time": "2026-11-17T05:12Z",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49600/-1",
+   "speed": 559,
+   "cls": "C",
+   "arrivalMars": "2026-11-22T12:00Z",
+   "glancingMars": false
+  },
+  {
+   "id": "2026-11-17T07:00:00-CME-001",
+   "kind": "cme",
+   "time": "2026-11-17T07:00Z",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49603/-1",
+   "speed": 390,
+   "cls": "S"
+  },
+  {
+   "id": "2026-11-17T16:00:00-CME-001",
+   "kind": "cme",
+   "time": "2026-11-17T16:00Z",
+   "link": "https://ccmc.gsfc.nasa.gov/DONKI/view/CME/49613/-1",
+   "speed": 816,
+   "cls": "C",
+   "arrivalMars": "2026-11-22T12:38Z",
+   "glancingMars": false
   }
  ],
  "failed": [
